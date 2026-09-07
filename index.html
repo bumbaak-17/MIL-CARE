@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIL-CARE — Сэтгэл зүйн дэмжлэгийн платформ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --bg:#F4F7FB; --panel:#FFFFFF; --panel-2:#EEF3FA; --panel-3:#E3ECFA;
+    --gold:#2F6FED; --gold-deep:#1E54C0; --gold-soft:rgba(47,111,237,.12);
+    --cream:#1B2430; --sub:#6B7686; --line:#E1E7EF;
+    --red:#C23B34; --red-soft:rgba(194,59,52,.10);
+    --blue:#2F6FED; --blue-soft:rgba(47,111,237,.12);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--cream);
+    font-family:'Inter',-apple-system,sans-serif;}
+  h1,h2,h3,.brand,.headline{font-family:'Rajdhani',sans-serif;}
+  button{font-family:inherit;}
+
+  .app{display:grid;grid-template-columns:240px 1fr;min-height:100vh;}
+
+  /* ---------- SIDEBAR ---------- */
+  .sidebar{background:var(--panel);border-right:1px solid var(--line);
+    display:flex;flex-direction:column;padding:1.3rem 1.1rem;position:sticky;top:0;height:100vh;overflow-y:auto;}
+  .brand{display:flex;align-items:center;gap:.65rem;margin-bottom:1.6rem;padding:0 .2rem;}
+  .brand-badge{width:40px;height:40px;flex-shrink:0;}
+  .brand-text b{display:block;font-weight:700;font-size:1.1rem;letter-spacing:.02em;color:var(--gold);}
+  .brand-text span{display:block;font-size:.6rem;color:var(--sub);font-weight:600;letter-spacing:.04em;}
+
+  .navlist{list-style:none;padding:0;margin:0 0 .8rem;}
+  .navgroup-label{font-size:.62rem;font-weight:800;color:var(--sub);letter-spacing:.08em;
+    margin:.9rem .8rem .3rem;}
+  .navitem{display:flex;align-items:center;gap:.65rem;padding:.56rem .8rem;border-radius:8px;
+    font-size:.83rem;font-weight:700;color:var(--sub);cursor:pointer;margin-bottom:.1rem;user-select:none;}
+  .navitem svg{width:16px;height:16px;flex-shrink:0;}
+  .navitem:hover{background:var(--panel-2);}
+  .navitem.active{background:var(--gold-soft);color:var(--gold);}
+
+  .sos-btn{margin-top:auto;display:flex;align-items:center;gap:.7rem;background:var(--red-soft);
+    border:1px solid rgba(192,69,58,.4);border-radius:10px;padding:.7rem .85rem;cursor:pointer;}
+  .sos-btn svg{width:19px;height:19px;color:var(--gold);flex-shrink:0;}
+  .sos-btn .t1{font-size:.65rem;font-weight:800;color:var(--gold);letter-spacing:.03em;}
+  .sos-btn .t2{font-size:1.1rem;font-weight:800;color:var(--gold);}
+
+  /* ---------- MAIN ---------- */
+  .main{padding:0 0 3rem;}
+  .topbar{display:flex;align-items:center;gap:1rem;padding:1rem 1.6rem;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:10;}
+  .hamburger{display:none;background:none;border:none;color:var(--cream);cursor:pointer;}
+  .tagline{display:flex;align-items:center;gap:.5rem;color:var(--sub);font-size:.85rem;font-weight:600;}
+  .tagline svg{width:16px;height:16px;color:var(--gold);}
+  .topbar-right{margin-left:auto;display:flex;align-items:center;gap:1.1rem;}
+  .bell{position:relative;color:var(--sub);cursor:pointer;}
+  .bell svg{width:20px;height:20px;}
+  .bell .dot{position:absolute;top:-4px;right:-5px;background:var(--red);color:#fff;font-size:.6rem;
+    font-weight:800;border-radius:100px;padding:.05rem .35rem;}
+  .user-chip{display:flex;align-items:center;gap:.6rem;cursor:pointer;}
+  .user-avatar{width:34px;height:34px;border-radius:50%;background:var(--panel-3);
+    display:flex;align-items:center;justify-content:center;font-size:1rem;}
+  .user-name{font-size:.82rem;font-weight:700;line-height:1.2;}
+  .user-role{font-size:.68rem;color:var(--sub);}
+
+  .content{padding:1.6rem;}
+  .view{display:none;}
+  .view.active{display:block;animation:fadeIn .3s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  .page-head{margin-bottom:1.3rem;}
+  .page-head h2{margin:0 0 .3rem;font-size:1.5rem;font-weight:700;}
+  .page-head p{margin:0;color:var(--sub);font-size:.88rem;}
+
+  /* ---------- HERO ---------- */
+  .hero{position:relative;border-radius:16px;overflow:hidden;padding:2.2rem 2rem;margin-bottom:1.4rem;
+    background:radial-gradient(ellipse at 78% 30%, rgba(47,111,237,.14), transparent 55%),
+      repeating-linear-gradient(115deg, rgba(20,40,80,.02) 0 18px, transparent 18px 36px),
+      linear-gradient(120deg, #EAF1FC 0%, #E1ECFB 55%, #D8E7FA 100%);
+    border:1px solid var(--line);}
+  .hero-tag{font-size:.7rem;font-weight:800;color:var(--gold);letter-spacing:.08em;margin-bottom:.6rem;}
+  .headline{font-size:2rem;font-weight:700;line-height:1.15;margin:0 0 .5rem;max-width:520px;}
+  .hero-sub{color:var(--sub);font-size:.92rem;margin:0 0 1.4rem;max-width:440px;}
+  .mood-row{display:flex;gap:.7rem;flex-wrap:wrap;}
+  .mood-btn{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:1rem 1.3rem;text-align:center;cursor:pointer;min-width:96px;}
+  .mood-btn .emo{font-size:1.6rem;display:block;margin-bottom:.4rem;}
+  .mood-btn .lbl{font-size:.68rem;font-weight:800;color:var(--sub);letter-spacing:.02em;}
+  .mood-btn.selected{border-color:var(--gold);background:var(--gold-soft);}
+  .mood-btn.selected .lbl{color:var(--gold);}
+
+  /* ---------- QUICK ACTIONS ---------- */
+  .quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.9rem;margin-bottom:1.4rem;}
+  .quick-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:1.1rem 1.2rem;cursor:pointer;display:flex;flex-direction:column;gap:.55rem;}
+  .quick-card:hover{border-color:var(--gold-deep);}
+  .quick-icon{width:36px;height:36px;border-radius:9px;background:var(--panel-3);
+    display:flex;align-items:center;justify-content:center;color:var(--gold);}
+  .quick-icon svg{width:19px;height:19px;}
+  .quick-title{font-weight:800;font-size:.9rem;line-height:1.25;}
+  .quick-sub{font-size:.75rem;color:var(--sub);}
+
+  /* ---------- SECTION HEAD / CARD ---------- */
+  .section-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:1.3rem 1.4rem;margin-bottom:1.4rem;}
+  .section-head{display:flex;align-items:center;margin-bottom:1.1rem;}
+  .section-head h3{margin:0;font-size:1.02rem;font-weight:700;letter-spacing:.02em;}
+  .section-head .more{margin-left:auto;font-size:.78rem;color:var(--gold);font-weight:700;cursor:pointer;}
+
+  .test-row{display:flex;gap:.9rem;overflow-x:auto;padding-bottom:.3rem;}
+  .test-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;}
+  .test-card{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;
+    padding:1.1rem 1rem;min-width:140px;flex-shrink:0;cursor:pointer;text-align:left;}
+  .test-card:hover{border-color:var(--gold-deep);}
+  .test-emo{font-size:1.5rem;margin-bottom:.6rem;display:block;}
+  .test-title{font-weight:800;font-size:.85rem;line-height:1.25;margin-bottom:.35rem;}
+  .test-blurb{font-size:.74rem;color:var(--sub);margin-bottom:.4rem;line-height:1.4;}
+  .test-dur{font-size:.72rem;color:var(--sub);}
+
+  .post{border-bottom:1px solid var(--line);padding:1.1rem 0;}
+  .post:last-child{border-bottom:none;padding-bottom:0;}
+  .post:first-child{padding-top:0;}
+  .post-head{display:flex;align-items:center;gap:.6rem;margin-bottom:.55rem;}
+  .post-avatar{width:32px;height:32px;border-radius:50%;background:var(--panel-3);
+    display:flex;align-items:center;justify-content:center;font-size:.85rem;}
+  .post-name{font-weight:700;font-size:.85rem;}
+  .post-time{font-size:.72rem;color:var(--sub);}
+  .post-text{font-size:.9rem;line-height:1.55;color:var(--cream);margin:0 0 .7rem;}
+  .post-actions{display:flex;gap:1.1rem;align-items:center;}
+  .post-action{display:flex;align-items:center;gap:.35rem;font-size:.8rem;color:var(--sub);cursor:pointer;font-weight:600;}
+  .post-action svg{width:15px;height:15px;}
+  .post-action.liked{color:var(--red);}
+  .support-btn{margin-left:auto;background:var(--gold-soft);color:var(--gold);border:none;
+    border-radius:100px;padding:.35rem .9rem;font-size:.72rem;font-weight:800;letter-spacing:.03em;cursor:pointer;}
+  .composer{display:flex;gap:.6rem;margin-top:1rem;}
+  .composer input{flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:100px;
+    padding:.6rem 1rem;color:var(--cream);font-family:inherit;font-size:.85rem;}
+  .composer input:focus{outline:none;border-color:var(--gold-deep);}
+  .composer button{background:var(--gold);border:none;color:#FFFFFF;border-radius:100px;
+    padding:.55rem 1.2rem;font-weight:800;font-size:.82rem;cursor:pointer;}
+
+  .body-grid{display:grid;grid-template-columns:1fr 300px;gap:1.4rem;align-items:start;}
+  .right-col{display:flex;flex-direction:column;gap:1.4rem;}
+  .rc-head{display:flex;align-items:center;margin-bottom:.9rem;}
+  .rc-title{font-size:.85rem;font-weight:800;letter-spacing:.02em;}
+  .rc-sub{font-size:.68rem;color:var(--sub);}
+  .rc-more{margin-left:auto;font-size:.72rem;color:var(--gold);font-weight:700;cursor:pointer;}
+  .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:.35rem;text-align:center;}
+  .week-day{font-size:.68rem;color:var(--sub);font-weight:700;margin-bottom:.35rem;}
+  .week-emo{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:.95rem;margin:0 auto .3rem;background:var(--panel-2);}
+  .week-emo.today{outline:2px solid var(--gold);}
+  .week-num{font-size:.68rem;color:var(--sub);}
+  .encourage{background:linear-gradient(120deg, var(--panel-3), var(--panel-2));border:1px solid var(--line);
+    border-radius:14px;padding:1.1rem 1.2rem;display:flex;gap:.8rem;align-items:flex-start;}
+  .encourage svg{width:26px;height:26px;color:var(--gold);flex-shrink:0;}
+  .encourage b{display:block;font-size:.85rem;color:var(--gold);margin-bottom:.25rem;letter-spacing:.02em;}
+  .encourage p{margin:0;font-size:.8rem;color:var(--sub);line-height:1.45;}
+  .appt{display:flex;gap:.7rem;align-items:flex-start;padding:.7rem 0;border-bottom:1px solid var(--line);}
+  .appt:last-of-type{border-bottom:none;}
+  .appt-icon{width:30px;height:30px;border-radius:8px;background:var(--panel-3);flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;color:var(--gold);}
+  .appt-icon svg{width:15px;height:15px;}
+  .appt-title{font-size:.82rem;font-weight:700;}
+  .appt-sub{font-size:.72rem;color:var(--sub);margin-top:.1rem;}
+  .appt-badge{margin-left:auto;background:var(--gold-soft);color:var(--gold);font-size:.65rem;
+    font-weight:800;padding:.15rem .5rem;border-radius:100px;align-self:center;white-space:nowrap;}
+  .connect-note{font-size:.78rem;color:var(--sub);line-height:1.5;margin:.9rem 0 .8rem;}
+  .connect-btn{width:100%;background:var(--gold);border:none;color:#FFFFFF;border-radius:10px;
+    padding:.65rem;font-weight:800;font-size:.82rem;cursor:pointer;}
+  .banner{border-radius:14px;padding:1.6rem 1.3rem;text-align:center;
+    background:linear-gradient(160deg, #E7F0FD, #D6E5FB);border:1px solid var(--line);}
+  .banner svg{width:30px;height:30px;color:var(--gold);margin-bottom:.7rem;}
+  .banner p{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1rem;line-height:1.3;margin:0;color:var(--cream);}
+
+  footer{text-align:center;padding:1.4rem;color:var(--sub);font-size:.75rem;}
+  footer a{color:var(--sub);text-decoration:none;margin:0 .5rem;}
+
+  /* ---------- Modal ---------- */
+  .modal-overlay{position:fixed;inset:0;background:rgba(20,30,48,.45);display:none;
+    align-items:center;justify-content:center;z-index:50;padding:1rem;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:1.6rem;
+    max-width:460px;width:100%;max-height:88vh;overflow-y:auto;}
+  .modal h3{margin:0 0 .3rem;font-size:1.15rem;}
+  .modal .msub{font-size:.8rem;color:var(--sub);margin-bottom:1.1rem;}
+  .q-block{margin-bottom:1rem;}
+  .q-text{font-size:.86rem;margin-bottom:.5rem;}
+  .q-opts{display:flex;gap:.4rem;flex-wrap:wrap;}
+  .q-opts label{border:1px solid var(--line);border-radius:100px;padding:.3rem .7rem;font-size:.75rem;
+    color:var(--sub);cursor:pointer;display:flex;align-items:center;gap:.3rem;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:.6rem;margin-top:1.2rem;}
+  .modal-close{background:none;border:1px solid var(--line);color:var(--sub);border-radius:100px;
+    padding:.5rem 1.1rem;font-size:.82rem;cursor:pointer;font-family:inherit;}
+
+  /* result screen inside modal */
+  .result-level{font-size:1.1rem;font-weight:800;color:var(--gold);margin-bottom:.3rem;}
+  .bar-row{margin:1rem 0;}
+  .bar-track{background:var(--panel-2);border-radius:100px;height:10px;overflow:hidden;}
+  .bar-fill{height:100%;border-radius:100px;background:linear-gradient(90deg, var(--gold-deep), var(--gold));}
+  .bar-pct{font-size:.72rem;color:var(--sub);margin-top:.3rem;}
+  .result-block{background:var(--panel-2);border-radius:10px;padding:.9rem 1rem;margin-top:.8rem;font-size:.84rem;line-height:1.55;}
+  .result-block b{color:var(--gold);}
+  .result-list{margin:.4rem 0 0;padding-left:1.1rem;font-size:.83rem;line-height:1.6;}
+  .disclaimer-note{font-size:.72rem;color:var(--sub);margin-top:.9rem;line-height:1.5;}
+
+  /* ---------- Mood diary ---------- */
+  .emo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;margin-bottom:1.3rem;}
+  .emo-btn{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:1.1rem .6rem;
+    text-align:center;cursor:pointer;}
+  .emo-btn .e{font-size:1.7rem;display:block;margin-bottom:.4rem;}
+  .emo-btn .l{font-size:.76rem;font-weight:700;color:var(--sub);}
+  .emo-btn.selected{border-color:var(--gold);background:var(--gold-soft);}
+  .emo-btn.selected .l{color:var(--gold);}
+  .diary-entry{border-bottom:1px solid var(--line);padding:.9rem 0;}
+  .diary-entry:last-child{border-bottom:none;}
+  .diary-top{display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem;}
+  .diary-emo{font-size:1.1rem;}
+  .diary-date{font-size:.72rem;color:var(--sub);margin-left:auto;}
+  .diary-text{font-size:.87rem;color:var(--cream);line-height:1.5;}
+
+  /* ---------- Pros search ---------- */
+  .filter-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:.7rem;margin-bottom:1.3rem;}
+  .filter-bar select{background:var(--panel-2);border:1px solid var(--line);color:var(--cream);
+    border-radius:10px;padding:.55rem .7rem;font-family:inherit;font-size:.83rem;}
+  .pro-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:1.3rem 1.4rem;margin-bottom:1.1rem;}
+  .pro-top{display:flex;gap:1rem;align-items:flex-start;}
+  .pro-avatar{width:54px;height:54px;border-radius:50%;background:var(--panel-3);flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:1.4rem;}
+  .pro-name{font-weight:800;font-size:1.02rem;}
+  .pro-spec{font-size:.83rem;color:var(--sub);margin-top:.15rem;}
+  .pro-meta{display:flex;gap:.9rem;margin-top:.5rem;font-size:.78rem;color:var(--sub);flex-wrap:wrap;}
+  .pro-meta .star{color:var(--gold);}
+  .pro-price{margin-left:auto;font-weight:800;color:var(--gold);font-size:.9rem;white-space:nowrap;}
+  .pro-actions{display:flex;gap:.6rem;margin-top:1rem;}
+  .pro-actions button{flex:1;border-radius:10px;padding:.6rem;font-size:.82rem;font-weight:800;cursor:pointer;border:none;font-family:inherit;}
+  .pro-actions .txt{background:var(--panel-3);color:var(--cream);}
+  .pro-actions .vid{background:var(--gold);color:#FFFFFF;}
+
+  /* ---------- Analytics ---------- */
+  .metric-row{margin-bottom:1.3rem;}
+  .metric-top{display:flex;justify-content:space-between;font-size:.86rem;font-weight:700;margin-bottom:.4rem;}
+  .metric-track{background:var(--panel-2);border-radius:100px;height:14px;overflow:hidden;}
+  .metric-fill{height:100%;border-radius:100px;}
+  .metric-fill.stress{background:linear-gradient(90deg,#8B4A3F,var(--red));}
+  .metric-fill.burnout{background:linear-gradient(90deg,var(--gold-deep),var(--gold));}
+  .metric-fill.sat{background:linear-gradient(90deg,#3F6B4A,#6E9A61);}
+  .trend-note{display:flex;align-items:center;gap:.5rem;background:var(--gold-soft);color:var(--gold);
+    border-radius:10px;padding:.8rem 1rem;font-size:.85rem;font-weight:700;margin-top:1rem;}
+
+  /* ---------- Org dashboard ---------- */
+  .org-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.4rem;}
+  .org-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:1.3rem 1.2rem;}
+  .org-num{font-family:'Rajdhani',sans-serif;font-size:2.1rem;font-weight:700;color:var(--gold);}
+  .org-lbl{font-size:.8rem;color:var(--sub);font-weight:700;margin-top:.2rem;}
+  .unit-row{display:flex;align-items:center;gap:.8rem;padding:.7rem 0;border-bottom:1px solid var(--line);}
+  .unit-row:last-child{border-bottom:none;}
+  .unit-name{width:110px;font-size:.83rem;font-weight:700;flex-shrink:0;}
+  .unit-track{flex:1;background:var(--panel-2);border-radius:100px;height:10px;overflow:hidden;}
+  .unit-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--gold-deep),var(--gold));}
+  .unit-pct{width:40px;text-align:right;font-size:.8rem;color:var(--sub);}
+  .privacy-note{font-size:.78rem;color:var(--sub);background:var(--panel-2);border-radius:10px;
+    padding:.8rem 1rem;line-height:1.5;margin-top:1rem;}
+
+  /* ---------- Admin ---------- */
+  .admin-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:.9rem;margin-bottom:1.4rem;}
+  .admin-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:1.2rem 1rem;
+    text-align:center;cursor:pointer;}
+  .admin-card:hover{border-color:var(--gold-deep);}
+  .admin-icon{font-size:1.5rem;margin-bottom:.5rem;}
+  .admin-lbl{font-size:.8rem;font-weight:700;}
+  .risk-row{display:flex;align-items:center;gap:.8rem;padding:.7rem 0;border-bottom:1px solid var(--line);font-size:.85rem;}
+  .risk-row:last-child{border-bottom:none;}
+  .risk-id{font-weight:700;width:130px;}
+  .risk-score{margin-left:auto;font-weight:800;padding:.2rem .6rem;border-radius:100px;font-size:.75rem;}
+  .risk-high{background:var(--red-soft);color:var(--red);}
+  .risk-med{background:var(--gold-soft);color:var(--gold);}
+
+  @media(max-width:980px){
+    .app{grid-template-columns:1fr;}
+    .sidebar{position:fixed;left:-260px;top:0;width:240px;z-index:60;transition:left .2s;box-shadow:0 0 30px rgba(0,0,0,.4);}
+    .sidebar.open{left:0;}
+    .hamburger{display:block;}
+    .quick-grid, .test-grid, .filter-bar, .org-grid, .admin-grid{grid-template-columns:repeat(2,1fr);}
+    .body-grid{grid-template-columns:1fr;}
+    .emo-grid{grid-template-columns:repeat(2,1fr);}
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <svg class="brand-badge" viewBox="0 0 48 48" fill="none">
+        <path d="M24 3 L43 10 V22 C43 34 35 42 24 46 C13 42 5 34 5 22 V10 Z" fill="#EAF1FC" stroke="#2F6FED" stroke-width="1.6"/>
+        <path d="M24 12 L24 30 M15 21 L33 21" stroke="#2F6FED" stroke-width="1.6"/>
+        <circle cx="24" cy="21" r="5.5" fill="none" stroke="#2F6FED" stroke-width="1.6"/>
+      </svg>
+      <div class="brand-text"><b>MIL-CARE</b><span>СЭТГЭЛ ЗҮЙН ДЭМЖЛЭГ</span></div>
+    </div>
+
+    <ul class="navlist">
+      <li class="navitem active" data-view="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Нүүр хуудас</li>
+      <li class="navitem" data-view="diary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>Өнөөдөр би...</li>
+      <li class="navitem" data-view="tests"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/></svg>Сэтгэл зүйн тестүүд</li>
+      <li class="navitem" data-view="feed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 5h4v4"/></svg>Нийтлэл, хуваалцах</li>
+      <li class="navitem" data-view="pros"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>Сэтгэл зүйч</li>
+      <li class="navitem" data-view="analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>Миний сэтгэл зүй</li>
+
+      <div class="navgroup-label">БАЙГУУЛЛАГА</div>
+      <li class="navitem" data-view="org"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg>Байгууллагын самбар</li>
+      <li class="navitem" data-view="admin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82 2 2 0 1 1-2.83 2.83 1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33 2 2 0 1 1-2.83-2.83A1.65 1.65 0 0 0 4.6 15 1.65 1.65 0 0 0 3 14H2.91a2 2 0 0 1 0-4H3a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82 2 2 0 1 1 2.83-2.83A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33 2 2 0 1 1 2.83 2.83A1.65 1.65 0 0 0 19.4 9c.36.14.63.44.77.83H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Админ систем</li>
+
+      <div class="navgroup-label">ХЭРЭГЛЭГЧ</div>
+      <li class="navitem" data-view="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>Миний профайл</li>
+    </ul>
+
+    <div class="sos-btn" onclick="alert('Яаралтай тусламжийн 103 дугаарт залгаж байна (demo)')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13 1 .36 1.94.68 2.85a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.23-1.25a2 2 0 0 1 2.11-.45c.91.32 1.85.55 2.85.68A2 2 0 0 1 22 16.92z"/></svg>
+      <div><div class="t1">ЯАРАЛТАЙ ТУСЛАМЖ</div><div class="t2">103</div></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <button class="hamburger" id="hamburger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+      <div class="tagline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 6v6c0 5 3.5 8.5 9 10 5.5-1.5 9-5 9-10V6z"/></svg>Нэрээ нууцлан, сэтгэлээ хамгаал.</div>
+      <div class="topbar-right">
+        <div class="bell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="dot">3</span></div>
+        <div class="user-chip"><div class="user-avatar">🎖️</div><div><div class="user-name">Anonymous #4821</div><div class="user-role">Алба хаагч</div></div></div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ================= HOME ================= -->
+      <div id="view-home" class="view active">
+        <div class="hero">
+          <div class="hero-tag">ӨНӨӨДӨР</div>
+          <h1 class="headline">ӨНӨӨДӨР ТАНЫ<br>СЭТГЭЛ ЯМАР БАЙНА ВЭ?</h1>
+          <p class="hero-sub">Өөрийгөө ойлгох жижиг алхмыг өнөөдөр эхлүүлээрэй.</p>
+          <div class="mood-row" id="mood-row"></div>
+        </div>
+
+        <div class="quick-grid">
+          <div class="quick-card" data-goto="tests"><div class="quick-icon">🧠</div><div class="quick-title">Сэтгэл зүйгээ үнэлэх</div><div class="quick-sub">Тест бөглөх</div></div>
+          <div class="quick-card" data-goto="diary"><div class="quick-icon">💬</div><div class="quick-title">Мэдрэмжээ хуваалцах</div><div class="quick-sub">Нэрээ нуулцан бичих</div></div>
+          <div class="quick-card" data-goto="pros"><div class="quick-icon">👩‍⚕️</div><div class="quick-title">Мэргэжилтэнтэй ярилцах</div><div class="quick-sub">Зөвлөгөө авах</div></div>
+          <div class="quick-card" data-goto="analytics"><div class="quick-icon">📊</div><div class="quick-title">Миний сэтгэл зүй</div><div class="quick-sub">Үзүүлэлтээ харах</div></div>
+        </div>
+
+        <div class="body-grid">
+          <div>
+            <div class="section-card">
+              <div class="section-head"><h3>Санал болгож буй тестүүд</h3><span class="more" data-goto="tests">Бүгдийг харах</span></div>
+              <div class="test-row" id="test-row-preview"></div>
+            </div>
+            <div class="section-card">
+              <div class="section-head"><h3>Нийтлэл, хуваалцах</h3><span class="more" data-goto="feed">Бүгдийг харах</span></div>
+              <div id="feed-preview"></div>
+            </div>
+          </div>
+          <div class="right-col">
+            <div class="section-card">
+              <div class="rc-head"><div><div class="rc-title">МИНИЙ СЭТГЭЛ</div><div class="rc-sub">(сүүлийн 7 хоног)</div></div><span class="rc-more" data-goto="analytics">Дэлгэрэнгүй</span></div>
+              <div class="week-grid" id="week-grid"></div>
+            </div>
+            <div class="encourage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 6v6c0 5 3.5 8.5 9 10 5.5-1.5 9-5 9-10V6z"/></svg><div><b>ЧИ ЧАДНА!</b><p>Өнөөдөр өчигдрөөсөө 1% илүү байхад л хангалттай.</p></div></div>
+            <div class="section-card">
+              <div class="rc-head"><div class="rc-title">ИРЭЭДҮЙН ЗӨВЛӨГӨӨ</div><span class="rc-more" data-goto="pros">Бүгдийг харах</span></div>
+              <div class="appt"><div class="appt-icon">🎥</div><div><div class="appt-title">Видео зөвлөгөө</div><div class="appt-sub">Сэтгэл зүйч Б.Ануударь<br>2026-09-06 · 15:00</div></div><span class="appt-badge">ИРЭХ</span></div>
+              <div class="appt"><div class="appt-icon">💬</div><div><div class="appt-title">Текст зөвлөгөө</div><div class="appt-sub">Сэтгэл зүйч Г.Мөнх-Эрдэнэ<br>2026-09-08 · 10:00</div></div><span class="appt-badge">ИРЭХ</span></div>
+              <p class="connect-note">Хэрэв танд хүнд санагдаж байвал мэргэжилтэнтэй холбогдоорой.</p>
+              <button class="connect-btn" data-goto="pros">ХОЛБОГДОХ</button>
+            </div>
+            <div class="banner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 6v6c0 5 3.5 8.5 9 10 5.5-1.5 9-5 9-10V6z"/></svg><p>БИД ЗӨВХӨН БИЕЭ БИШ,<br>СЭТГЭЛЭЭ Ч ХАМГААЛНА.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= DIARY (Өнөөдөр би...) ================= -->
+      <div id="view-diary" class="view">
+        <div class="page-head"><h2>Өнөөдөр би...</h2><p>Мэдрэмжээ сонгоод, юу болсныг нэрээ нуулцан бичээрэй. Зөвхөн та л харах хувийн тэмдэглэл.</p></div>
+        <div class="section-card">
+          <div class="emo-grid" id="emo-grid"></div>
+          <label style="font-size:.83rem;color:var(--sub);font-weight:700;display:block;margin-bottom:.5rem;">Юу болсон бэ?</label>
+          <textarea id="diary-text" placeholder="Нэрээ нуулцан бичнэ үү..." style="width:100%;min-height:90px;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:.8rem 1rem;color:var(--cream);font-family:inherit;font-size:.9rem;resize:vertical;"></textarea>
+          <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;margin-top:.9rem;" onclick="addDiary()">Хадгалах</button>
+        </div>
+        <div class="section-card">
+          <div class="section-head"><h3>Миний тэмдэглэл</h3></div>
+          <div id="diary-list"></div>
+        </div>
+      </div>
+
+      <!-- ================= TESTS ================= -->
+      <div id="view-tests" class="view">
+        <div class="page-head"><h2>Сэтгэл зүйн тестүүд</h2><p>Олон улсын стандартад нийцсэн богино скрининг тестүүд. Эмнэлзүйн онош биш.</p></div>
+        <div class="test-grid" id="test-grid-full"></div>
+      </div>
+
+      <!-- ================= FEED (community) ================= -->
+      <div id="view-feed" class="view">
+        <div class="page-head"><h2>Нийтлэл, хуваалцах</h2><p>Нэрээ нуусан орон зайд мэдрэмжээ хуваалцаж, дэмжлэг үзүүлээрэй.</p></div>
+        <div class="section-card">
+          <div id="feed-list-full"></div>
+          <div class="composer"><input type="text" id="post-input" placeholder="Мэдрэмжээ нэрээ нуулцан бичих..."><button onclick="addPost()">Илгээх</button></div>
+        </div>
+      </div>
+
+      <!-- ================= PROS ================= -->
+      <div id="view-pros" class="view">
+        <div class="page-head"><h2>Сэтгэл зүйч</h2><p>Мэргэжилтэн хайж, текст эсвэл видео зөвлөгөө товлоорой.</p></div>
+        <div class="filter-bar">
+          <select id="f-issue"><option value="">Асуудлаар</option><option>Стресс</option><option>Гэр бүл</option><option>Цэргийн сэтгэл зүй</option><option>Burnout</option></select>
+          <select id="f-loc"><option value="">Байршлаар</option><option>Улаанбаатар</option><option>Орон нутаг</option><option>Онлайн</option></select>
+          <select id="f-rating"><option value="">Үнэлгээгээр</option><option value="desc">Өндөрөөс бага руу</option></select>
+          <select id="f-price"><option value="">Үнээр</option><option value="asc">Хямдаас өндөр рүү</option><option value="desc">Өндрөөс хямд руу</option></select>
+        </div>
+        <div id="pro-list-full"></div>
+      </div>
+
+      <!-- ================= ANALYTICS ================= -->
+      <div id="view-analytics" class="view">
+        <div class="page-head"><h2>Миний сэтгэл зүй</h2><p>Сүүлийн 30 хоногийн үзүүлэлт. Зөвхөн та харна.</p></div>
+        <div class="section-card">
+          <div class="metric-row"><div class="metric-top"><span>Стресс</span><span>72%</span></div><div class="metric-track"><div class="metric-fill stress" style="width:72%;"></div></div></div>
+          <div class="metric-row"><div class="metric-top"><span>Burnout</span><span>58%</span></div><div class="metric-track"><div class="metric-fill burnout" style="width:58%;"></div></div></div>
+          <div class="metric-row"><div class="metric-top"><span>Сэтгэл ханамж</span><span>42%</span></div><div class="metric-track"><div class="metric-fill sat" style="width:42%;"></div></div></div>
+          <div class="trend-note">📈 Таны стресс сүүлийн 14 хоногт буурсан байна.</div>
+        </div>
+        <div class="section-card">
+          <div class="rc-head"><div class="rc-title">7 ХОНОГИЙН MOOD</div></div>
+          <div class="week-grid" id="week-grid-2"></div>
+        </div>
+      </div>
+
+      <!-- ================= ORG ================= -->
+      <div id="view-org" class="view">
+        <div class="page-head"><h2>Байгууллагын самбар</h2><p>Нэгтгэсэн, нэрээ нуусан статистик. Хувь хүнийг тодорхойлохгүй.</p></div>
+        <div class="org-grid">
+          <div class="org-card"><div class="org-num">1,250</div><div class="org-lbl">Нийт ажилтан</div></div>
+          <div class="org-card"><div class="org-num">876</div><div class="org-lbl">Судалгаанд хамрагдсан</div></div>
+          <div class="org-card"><div class="org-num">61%</div><div class="org-lbl">Дундаж стресс</div></div>
+          <div class="org-card"><div class="org-num">17%</div><div class="org-lbl">Burnout-ийн өндөр эрсдэл</div></div>
+          <div class="org-card"><div class="org-num">68%</div><div class="org-lbl">Ажлын сэтгэл ханамж</div></div>
+          <div class="org-card"><div class="org-num">876/1250</div><div class="org-lbl">Хамрагдалтын түвшин</div></div>
+        </div>
+        <div class="section-card">
+          <div class="section-head"><h3>Аль нэгжид стресс өндөр байна</h3></div>
+          <div id="unit-list"></div>
+          <div class="privacy-note">Энэ самбарт зөвхөн нэгтгэсэн тоо харагдана. Ямар ч хувь хүний тест, тэмдэглэл, нэр удирдлагад харагдахгүй.</div>
+        </div>
+      </div>
+
+      <!-- ================= ADMIN ================= -->
+      <div id="view-admin" class="view">
+        <div class="page-head"><h2>Админ систем</h2><p>Платформын удирдлагын самбар.</p></div>
+
+        <div class="section-card" id="admin-login-card">
+          <div class="section-head"><h3>Админ нэвтрэх</h3></div>
+          <div class="field"><label style="display:block;margin-bottom:.4rem;">Имэйл</label><input type="text" id="admin-email" placeholder="admin@mil-care.mn" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);"></div>
+          <div class="field"><label style="display:block;margin-bottom:.4rem;">Нууц үг</label><input type="password" id="admin-password" placeholder="••••••••" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);"></div>
+          <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" onclick="adminLogin()">Нэвтрэх</button>
+          <div id="admin-login-msg" style="font-size:.82rem;margin-top:.7rem;"></div>
+        </div>
+
+        <div id="admin-panel" style="display:none;">
+          <div class="admin-grid" id="admin-grid"></div>
+          <div class="section-card">
+            <div class="section-head"><h3>🚨 Эрсдэлийн дохио (жишээ)</h3></div>
+            <div id="risk-list"></div>
+            <div class="privacy-note">Эрсдэлийн дохио зөвхөн автомат үнэлгээгээр эрт анхаарал татахад зориулагдсан бөгөөд эцсийн шийдвэрийг зөвхөн мэргэжилтэн гаргана.</div>
+          </div>
+          <div class="section-card">
+            <div class="section-head"><h3>Бодит нэрсийн жагсаалт (зөвхөн админ)</h3></div>
+            <div id="identity-list"></div>
+            <div class="privacy-note">Энэ жагсаалт зөвхөн баталгаажсан админд харагдана. Ердийн алба хаагч, мэргэжилтэн бусдын бодит нэрийг хэзээ ч харахгүй.</div>
+          </div>
+          <button class="btn-secondary-link" style="background:none;border:1px solid var(--line);color:var(--sub);border-radius:10px;padding:.5rem 1.1rem;font-size:.82rem;cursor:pointer;" onclick="adminLogout()">Админ горимоос гарах</button>
+        </div>
+      </div>
+
+      <!-- ================= PROFILE ================= -->
+      <div id="view-profile" class="view">
+        <div class="page-head"><h2>Миний профайл</h2><p>Та энд өөрийн бодит нэрээ (сонголтоор) оруулж болно. Энэ мэдээллийг зөвхөн та өөрөө болон баталгаажсан админ харах боломжтой — бусад хэрэглэгч, мэргэжилтэнд хэзээ ч харагдахгүй.</p></div>
+        <div class="section-card">
+          <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.3rem;">
+            <div class="user-avatar" style="width:56px;height:56px;font-size:1.5rem;">🎖️</div>
+            <div><div id="profile-handle" style="font-weight:800;font-size:1.05rem;">...</div><div style="font-size:.82rem;color:var(--sub);">Алба хаагч</div></div>
+          </div>
+          <div class="field"><label style="display:block;margin-bottom:.4rem;">Жинхэнэ нэр (сонголтоор, зөвхөн танд болон админд харагдана)</label><input type="text" id="profile-realname" placeholder="Овог нэр" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);"></div>
+          <div class="field"><label style="display:block;margin-bottom:.4rem;">Цол (сонголтоор)</label><input type="text" id="profile-rank" placeholder="Жишээ: Ахмад" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);"></div>
+          <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" onclick="saveIdentity()">Хадгалах</button>
+          <div id="profile-save-msg" style="font-size:.82rem;margin-top:.7rem;"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <footer>© 2026 MIL-CARE СЭТГЭЛ ЗҮЙН ДЭМЖЛЭГИЙН ПЛАТФОРМ &nbsp;<a href="#">НУУЦЛАЛЫН БОДЛОГО</a> | <a href="#">ҮЙЛЧИЛГЭЭНИЙ НӨХЦӨЛ</a> | <a href="#">БИДНИЙ ТУХАЙ</a></footer>
+  </div>
+</div>
+
+<!-- TEST MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal-box"></div>
+</div>
+
+<script>
+/* ================= SUPABASE ================= */
+const SUPABASE_URL = 'https://zsceezpxjigxdcwfrlkm.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_t5jPFZ1ZQS3_LsXSUq3ftg_OPpH0nxb';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* ================= ANONYMOUS USER (localStorage-д тогтвортой хадгалагдана) ================= */
+let currentUser = null;
+async function ensureUser() {
+  let { data: sessionData } = await sb.auth.getSession();
+  let session = sessionData?.session;
+  if (!session) {
+    const { data, error } = await sb.auth.signInAnonymously();
+    if (error) { console.error('Anonymous auth error:', error); return; }
+    session = data.session;
+  }
+  const uid = session.user.id;
+
+  const { data: existing, error: selErr } = await sb.from('users').select('*').eq('id', uid).maybeSingle();
+  if (selErr) { console.error('users select error:', selErr); }
+
+  if (existing) {
+    currentUser = { id: uid, handle: existing.anon_handle };
+    return;
+  }
+
+  const handle = randomHandle();
+  const { data: inserted, error: insErr } = await sb.from('users').insert({ id: uid, anon_handle: handle }).select().single();
+  if (insErr) { console.error('users insert error:', insErr); currentUser = { id: uid, handle }; return; }
+  currentUser = { id: uid, handle: inserted.anon_handle };
+}
+function applyUserToTopbar() {
+  const nameEl = document.querySelector('.user-chip .user-name');
+  if (nameEl && currentUser) nameEl.textContent = currentUser.handle;
+  const profileEl = document.getElementById('profile-handle');
+  if (profileEl && currentUser) profileEl.textContent = currentUser.handle;
+}
+
+/* ================= PROFILE: бодит нэр (сонголтоор) ================= */
+async function saveIdentity() {
+  const realName = document.getElementById('profile-realname').value.trim();
+  const rank = document.getElementById('profile-rank').value.trim();
+  const msgEl = document.getElementById('profile-save-msg');
+  if (!currentUser?.id) { msgEl.textContent = 'Холболт бэлэн болоогүй, түр хүлээнэ үү.'; return; }
+  const { error } = await sb.from('user_identities').upsert({ user_id: currentUser.id, real_name: realName, rank: rank, updated_at: new Date().toISOString() });
+  if (error) { msgEl.style.color = 'var(--red)'; msgEl.textContent = 'Хадгалахад алдаа гарлаа: ' + error.message; return; }
+  msgEl.style.color = 'var(--gold)';
+  msgEl.textContent = 'Амжилттай хадгалагдлаа.';
+}
+
+/* ================= ADMIN: имэйл+нууц үгээр нэвтрэх ================= */
+let isAdmin = false;
+async function adminLogin() {
+  const email = document.getElementById('admin-email').value.trim();
+  const password = document.getElementById('admin-password').value;
+  const msgEl = document.getElementById('admin-login-msg');
+  if (!email || !password) { msgEl.style.color='var(--red)'; msgEl.textContent='Имэйл, нууц үгээ бичнэ үү.'; return; }
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) { msgEl.style.color='var(--red)'; msgEl.textContent='Нэвтрэхэд алдаа гарлаа: ' + error.message; return; }
+  await checkAdminStatus();
+  if (isAdmin) {
+    document.getElementById('admin-login-card').style.display = 'none';
+    document.getElementById('admin-panel').style.display = 'block';
+    loadIdentityList();
+  } else {
+    msgEl.style.color='var(--red)';
+    msgEl.textContent='Энэ бүртгэл админ эрхгүй байна.';
+    await sb.auth.signOut();
+    await ensureUser();
+  }
+}
+async function checkAdminStatus() {
+  const { data: sessionData } = await sb.auth.getSession();
+  const uid = sessionData?.session?.user?.id;
+  if (!uid) { isAdmin = false; return; }
+  const { data, error } = await sb.from('admins').select('user_id').eq('user_id', uid).maybeSingle();
+  isAdmin = !!data && !error;
+}
+async function adminLogout() {
+  await sb.auth.signOut();
+  isAdmin = false;
+  document.getElementById('admin-panel').style.display = 'none';
+  document.getElementById('admin-login-card').style.display = 'block';
+  document.getElementById('admin-email').value = '';
+  document.getElementById('admin-password').value = '';
+  document.getElementById('admin-login-msg').textContent = '';
+  await ensureUser();
+  applyUserToTopbar();
+}
+async function loadIdentityList() {
+  const el = document.getElementById('identity-list');
+  const { data, error } = await sb.from('user_identities').select('*, users(anon_handle)').order('updated_at', { ascending:false });
+  if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Жагсаалт татахад алдаа гарлаа.</div>'; return; }
+  if (!data || data.length===0) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор бодит нэр бүртгүүлсэн хэрэглэгч алга.</div>'; return; }
+  el.innerHTML = data.map(d => `
+    <div class="risk-row"><span class="risk-id">${d.users?.anon_handle || '—'}</span><span>${d.real_name || '(нэр өгөгдөөгүй)'} ${d.rank ? '· '+d.rank : ''}</span></div>
+  `).join('');
+}
+
+/* ================= NAV ROUTING ================= */
+document.getElementById('hamburger').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
+
+function goto(view) {
+  document.querySelectorAll('.navitem').forEach(n => n.classList.remove('active'));
+  document.querySelector(`.navitem[data-view="${view}"]`)?.classList.add('active');
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  document.getElementById('sidebar').classList.remove('open');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+document.querySelectorAll('.navitem').forEach(el => el.addEventListener('click', () => goto(el.dataset.view)));
+document.querySelectorAll('[data-goto]').forEach(el => el.addEventListener('click', () => goto(el.dataset.goto)));
+
+/* ================= Helpers ================= */
+function randomHandle() { return 'Anonymous #' + Math.floor(1000 + Math.random()*9000); }
+
+/* ================= HOME mood + week tracker ================= */
+const MOODS = [
+  { key: 'great', emo: '😊', label: 'МАШ САЙН' },
+  { key: 'good', emo: '🙂', label: 'САЙН' },
+  { key: 'ok', emo: '😐', label: 'ДУНД' },
+  { key: 'bad', emo: '🙁', label: 'МУУ' },
+  { key: 'worst', emo: '😔', label: 'МАШ МУУ' },
+];
+function renderMoodRow() {
+  const el = document.getElementById('mood-row');
+  el.innerHTML = MOODS.map(m => `<div class="mood-btn" data-mood="${m.key}"><span class="emo">${m.emo}</span><span class="lbl">${m.label}</span></div>`).join('');
+  el.querySelectorAll('.mood-btn').forEach(b => b.addEventListener('click', () => {
+    el.querySelectorAll('.mood-btn').forEach(x => x.classList.remove('selected'));
+    b.classList.add('selected');
+    weekMoods[6] = b.dataset.mood; renderWeek();
+  }));
+}
+const DAYS = ['Да','Мя','Лх','Пү','Ба','Ня','Бя'];
+const today = new Date();
+const weekNums = []; for (let i=6;i>=0;i--){ const d=new Date(today); d.setDate(today.getDate()-i); weekNums.push(d.getDate()); }
+const weekMoods = ['good','good','ok','bad','good','ok','bad'];
+const MOOD_EMO = { great:'😊', good:'🙂', ok:'😐', bad:'🙁', worst:'😔' };
+function renderWeek() {
+  const html = DAYS.map((d,i)=>`<div><div class="week-day">${d}</div><div class="week-emo ${i===6?'today':''}">${MOOD_EMO[weekMoods[i]]||''}</div><div class="week-num">${weekNums[i]}</div></div>`).join('');
+  document.getElementById('week-grid').innerHTML = html;
+  document.getElementById('week-grid-2').innerHTML = html;
+}
+renderMoodRow(); renderWeek();
+
+/* ================= DIARY (Өнөөдөр би...) ================= */
+const DIARY_EMOS = [
+  {key:'sad', e:'😢', l:'Гунигтай'}, {key:'angry', e:'😡', l:'Ууртай'},
+  {key:'anxious', e:'😰', l:'Түгшүүртэй'}, {key:'tired', e:'😴', l:'Ядарсан'},
+  {key:'happy', e:'🥰', l:'Баяртай'}, {key:'lonely', e:'😔', l:'Ганцаардсан'},
+  {key:'calm', e:'😌', l:'Тайван'}, {key:'grateful', e:'❤️', l:'Талархаж байна'},
+];
+let selectedDiaryEmo = null;
+function renderEmoGrid() {
+  const el = document.getElementById('emo-grid');
+  el.innerHTML = DIARY_EMOS.map(m => `<div class="emo-btn" data-e="${m.key}"><span class="e">${m.e}</span><span class="l">${m.l}</span></div>`).join('');
+  el.querySelectorAll('.emo-btn').forEach(b => b.addEventListener('click', () => {
+    el.querySelectorAll('.emo-btn').forEach(x=>x.classList.remove('selected'));
+    b.classList.add('selected'); selectedDiaryEmo = b.dataset.e;
+  }));
+}
+renderEmoGrid();
+let diaryEntries = [];
+async function addDiary() {
+  const textEl = document.getElementById('diary-text');
+  const text = textEl.value.trim();
+  if (!selectedDiaryEmo || !text) { alert('Мэдрэмжээ сонгоод, юу болсныг бичнэ үү.'); return; }
+  if (!currentUser?.id) { alert('Холболт хараахан бэлэн болоогүй байна, түр хүлээгээд дахин оролдоно уу.'); return; }
+  const emoObj = DIARY_EMOS.find(m=>m.key===selectedDiaryEmo);
+  textEl.value = '';
+  document.querySelectorAll('.emo-btn').forEach(x=>x.classList.remove('selected'));
+  selectedDiaryEmo = null;
+  const { error } = await sb.from('mood_entries').insert({ user_id: currentUser.id, mood: emoObj.key, note: text });
+  if (error) { alert('Хадгалахад алдаа гарлаа: ' + error.message); return; }
+  loadDiary();
+}
+function renderDiaryList() {
+  const el = document.getElementById('diary-list');
+  if (diaryEntries.length===0){ el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;text-align:center;padding:1.5rem 0;">Одоогоор тэмдэглэл байхгүй байна.</div>'; return; }
+  el.innerHTML = diaryEntries.map(d => `
+    <div class="diary-entry"><div class="diary-top"><span class="diary-emo">${d.emo}</span><span style="font-weight:700;font-size:.85rem;">${d.label}</span><span class="diary-date">${d.date}</span></div><div class="diary-text">${d.text}</div></div>
+  `).join('');
+}
+async function loadDiary() {
+  if (!currentUser?.id) { renderDiaryList(); return; }
+  const { data, error } = await sb.from('mood_entries').select('*').eq('user_id', currentUser.id).order('created_at', { ascending:false }).limit(30);
+  if (error) { console.error('loadDiary error:', error); return; }
+  diaryEntries = data.map(d => {
+    const emoObj = DIARY_EMOS.find(m=>m.key===d.mood) || { e:'💬', l:d.mood };
+    return { emo: emoObj.e, label: emoObj.l, text: d.note, date: new Date(d.created_at).toLocaleDateString('mn-MN') };
+  });
+  renderDiaryList();
+}
+
+/* ================= TESTS ================= */
+const TESTS = {
+  stress: { title:'Стрессийн түвшин', emo:'🪖', dur:'10 минут', blurb:'Сүүлийн үеийн ачаалал, хяналтын мэдрэмжийг үнэлнэ.', qs:['Гэнэтийн зүйлээс болж бухимдсан','Ачааллаа хянаж чадахгүй мэт мэдэрсэн','Бэрхшээл дийлэхгүй мэт санагдсан'] },
+  anxiety: { title:'Түгшүүрийн түвшин', emo:'😰', dur:'10 минут', blurb:'Санаа зовнил, түгшүүрийн давтамжийг үнэлнэ.', qs:['Санаа зовнилоо зогсоож чадахгүй байсан','Тайвшрахад хэцүү байсан','Аймшигтай зүйл тохиолдох мэт айдас'] },
+  depression: { title:'Сэтгэл гутралын шинж', emo:'😔', dur:'12 минут', blurb:'Сонирхол, сэтгэлийн байдлын өөрчлөлтийг үнэлнэ.', qs:['Юунд ч сонирхолгүй болсон','Гутарсан, найдваргүй мэдрэмж','Ядарсан, эрч хүчгүй мэдрэмж'] },
+  burnout: { title:'Мэргэжлийн туйлдалт', emo:'⚠️', dur:'15 минут', blurb:'Ажлын шавхагдал, хайхрамжгүй байдлыг үнэлнэ.', qs:['Ажлаасаа бүрэн ядарсан мэт мэдэрсэн','Ажилдаа өмнөх шигээ идэвхтэй бус','Ур чадвартаа итгэх итгэл буурсан'] },
+  work_stress: { title:'Ажлын стресс', emo:'💼', dur:'10 минут', blurb:'Ажлын байрандаа мэдэрч буй дарамтыг үнэлнэ.', qs:['Ажлын ачаалал хэт их санагдсан','Ажил дээрээ хурцадмал уур амьсгал мэдэрсэн','Ажлаасаа гарахад л амардаг гэж бодсон'] },
+  satisfaction: { title:'Сэтгэл ханамж', emo:'❤️', dur:'12 минут', blurb:'Амьдралын ерөнхий сэтгэл ханамжийг үнэлнэ.', qs:['Амьдралдаа ерөнхийдөө сэтгэл хангалуун','Ажил-амьдралын тэнцвэртээ сэтгэл хангалуун','Ойр дотны хүмүүстэйгээ дэмжлэгтэй харилцаатай'] },
+  sleep: { title:'Нойрны чанар', emo:'🌙', dur:'8 минут', blurb:'Унтах чанар, амрах байдлыг үнэлнэ.', qs:['Унтахад хэцүү байсан','Шөнө сэрдэг, буцаж унтахад хэцүү','Өглөө ядарсан сэрдэг'] },
+  self_esteem: { title:'Өөрийгөө үнэлэх үнэлэмж', emo:'🪞', dur:'8 минут', blurb:'Өөрийн үнэ цэнийн мэдрэмжийг үнэлнэ.', qs:['Өөртөө сэтгэл хангалуун бус байсан','Бусадтай харьцуулж дутуу мэт санагдсан','Өөрийн шийдвэрт эргэлзсэн'] },
+  relationship: { title:'Харилцааны сэтгэл ханамж', emo:'🤝', dur:'10 минут', blurb:'Ойр дотны харилцааны чанарыг үнэлнэ.', qs:['Ойр дотны хүнтэйгээ зөрчилдсөн','Хэн нэгэнд ойлгогдохгүй мэт санагдсан','Харилцаандаа цаг гаргаж чадаагүй'] },
+};
+const OPTS = ['Огт үгүй','Ховор','Заримдаа','Байнга'];
+
+function renderTestCard(key, t) {
+  return `<div class="test-card" onclick="openModal('${key}')"><span class="test-emo">${t.emo}</span><div class="test-title">${t.title}</div><div class="test-blurb">${t.blurb}</div><div class="test-dur">${t.dur}</div></div>`;
+}
+document.getElementById('test-row-preview').innerHTML = Object.entries(TESTS).slice(0,5).map(([k,t])=>renderTestCard(k,t)).join('');
+document.getElementById('test-grid-full').innerHTML = Object.entries(TESTS).map(([k,t])=>renderTestCard(k,t)).join('');
+
+function openModal(key) {
+  const t = TESTS[key];
+  const box = document.getElementById('modal-box');
+  box.innerHTML = `
+    <h3>${t.emo} ${t.title}</h3>
+    <p class="msub">${t.dur} — сүүлийн 2 долоо хоногт хэр олон удаа тохиолдсоныг үнэлнэ үү.</p>
+    <div id="mq-wrap">${t.qs.map((q,i)=>`
+      <div class="q-block"><div class="q-text">${i+1}. ${q}</div>
+        <div class="q-opts">${OPTS.map((o,v)=>`<label><input type="radio" name="mq${i}" value="${v}"> ${o}</label>`).join('')}</div>
+      </div>`).join('')}</div>
+    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="scoreModal('${key}')">Дүн харах</button></div>
+  `;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(){ document.getElementById('modal-overlay').classList.remove('open'); }
+
+async function scoreModal(key) {
+  const t = TESTS[key];
+  let total=0, answered=0;
+  for (let i=0;i<t.qs.length;i++){ const sel=document.querySelector(`input[name="mq${i}"]:checked`); if(sel){answered++; total+=parseInt(sel.value,10);} }
+  if (answered < t.qs.length) { alert('Бүх асуултад хариулна уу.'); return; }
+  const max = t.qs.length*3;
+  const pct = Math.round((total/max)*100);
+  const level = pct < 34 ? 'Тайван' : pct < 62 ? 'Дунд зэрэг' : 'Өндөр анхаарал шаардлагатай';
+  const levelKey = pct < 34 ? 'low' : pct < 62 ? 'medium' : 'high';
+  const rec = pct < 34
+    ? ['Одоогийн дадлаа үргэлжлүүлээрэй.', 'Тогтмол амралт, дасгал хөдөлгөөнөө хэвээр байлгаарай.']
+    : pct < 62
+    ? ['Амралт, унтах цагаа тогтмолжуулаарай.', 'Хамт олон, найз нөхөдтэйгээ ярилцах цаг гаргаарай.', 'Шинж тэмдэг үргэлжилвэл мэргэжилтэнтэй холбогдоорой.']
+    : ['Аль болох эрт мэргэжлийн сэтгэл зүйчид хандахыг зөвлөж байна.', 'Итгэмжит хүн, ахлагчдаа мэдэгдээрэй.', 'Шаардлагатай бол "Сэтгэл зүйч" хэсгээр шууд холбогдоорой.'];
+
+  if (currentUser?.id) {
+    const { error } = await sb.from('test_results').insert({ user_id: currentUser.id, test_key: key, score: total, max_score: max, level: levelKey });
+    if (error) console.error('test_results save error:', error);
+  }
+
+  document.getElementById('modal-box').innerHTML = `
+    <h3>${t.title} — Үр дүн</h3>
+    <div class="result-level">${level}</div>
+    <div class="bar-row"><div class="bar-track"><div class="bar-fill" style="width:${pct}%;"></div></div><div class="bar-pct">${total}/${max} оноо (${pct}%)</div></div>
+    <div class="result-block"><b>Тайлбар:</b> Таны хариултаас харахад ${level.toLowerCase()} түвшний үзүүлэлт байна.</div>
+    <div class="result-block"><b>Зөвлөмж:</b><ul class="result-list">${rec.map(r=>`<li>${r}</li>`).join('')}</ul></div>
+    <div class="disclaimer-note">⚠️ Энэ тест нь эмнэлгийн онош биш, зөвхөн эрт анхаарал татах зорилготой скрининг хэрэгсэл.</div>
+    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="closeModal(); goto('pros');">Мэргэжилтэнтэй холбогдох</button></div>
+  `;
+}
+
+/* ================= FEED (Supabase-тэй холбогдсон) ================= */
+let feedState = [];
+
+function timeAgo(ts) {
+  const s = Math.floor((Date.now() - new Date(ts).getTime())/1000);
+  if (s < 60) return 'дөнгөж сая';
+  const m = Math.floor(s/60); if (m < 60) return m+' минутын өмнө';
+  const h = Math.floor(m/60); if (h < 24) return h+' цагийн өмнө';
+  return Math.floor(h/24)+' өдрийн өмнө';
+}
+function postHTML(p,i){ return `
+  <div class="post">
+    <div class="post-head"><div class="post-avatar">🪖</div><div><div class="post-name">${p.anon_handle}</div><div class="post-time">${timeAgo(p.created_at)}</div></div></div>
+    <p class="post-text">${p.text}</p>
+    <div class="post-actions">
+      <div class="post-action" onclick="toggleLike('${p.id}', ${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>${p.likes}</div>
+      <div class="post-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5A8.5 8.5 0 1 1 21 11.5z"/></svg>0</div>
+      <button class="support-btn" onclick="toggleLike('${p.id}', ${i})">ДЭМЖИХ</button>
+    </div>
+  </div>`; }
+function renderFeed(){
+  const html = feedState.map(postHTML).join('') || '<div style="color:var(--sub);text-align:center;padding:2rem 0;">Одоогоор бичлэг байхгүй байна. Эхнийхийг та бичээрэй!</div>';
+  document.getElementById('feed-list-full').innerHTML = html;
+  document.getElementById('feed-preview').innerHTML = feedState.slice(0,2).map(postHTML).join('');
+}
+async function loadPosts() {
+  const { data, error } = await sb.from('posts').select('*').order('created_at', { ascending:false }).limit(50);
+  if (error) { console.error(error); return; }
+  feedState = data;
+  renderFeed();
+}
+async function toggleLike(id, i) {
+  const newLikes = feedState[i].likes + 1;
+  feedState[i].likes = newLikes;
+  renderFeed();
+  await sb.from('posts').update({ likes: newLikes }).eq('id', id);
+}
+async function addPost(){
+  const input=document.getElementById('post-input');
+  const text=input.value.trim();
+  if(!text) return;
+  input.value='';
+  const { error } = await sb.from('posts').insert({ anon_handle: randomHandle(), text, likes: 0 });
+  if (error) { alert('Илгээхэд алдаа гарлаа: ' + error.message); return; }
+  loadPosts();
+}
+
+/* ================= PROS (Supabase-тэй холбогдсон) ================= */
+let PROS = [];
+
+function renderPros() {
+  const issue = document.getElementById('f-issue')?.value;
+  const loc = document.getElementById('f-loc')?.value;
+  const ratingSort = document.getElementById('f-rating')?.value;
+  const priceSort = document.getElementById('f-price')?.value;
+  let list = PROS.filter(p => (!issue || p.issue_tag===issue) && (!loc || p.location===loc));
+  if (ratingSort==='desc') list = [...list].sort((a,b)=>b.rating-a.rating);
+  if (priceSort==='asc') list = [...list].sort((a,b)=>a.price-b.price);
+  if (priceSort==='desc') list = [...list].sort((a,b)=>b.price-a.price);
+  const el = document.getElementById('pro-list-full');
+  if (list.length===0){ el.innerHTML='<div style="color:var(--sub);text-align:center;padding:2rem 0;">Тохирох мэргэжилтэн олдсонгүй.</div>'; return; }
+  el.innerHTML = list.map(p => `
+    <div class="pro-card">
+      <div class="pro-top">
+        <div class="pro-avatar">👩‍⚕️</div>
+        <div style="flex:1;"><div class="pro-name">${p.name}</div><div class="pro-spec">${p.spec}</div>
+          <div class="pro-meta"><span class="star">★ ${p.rating}</span><span>${p.years} жилийн туршлага</span><span>📍 ${p.location}</span></div>
+        </div>
+        <div class="pro-price">${p.price.toLocaleString()}₮</div>
+      </div>
+      <div class="pro-actions">
+        <button class="txt" onclick="bookPro('${p.id}','${p.name}','Текст зөвлөгөө')">Текст зөвлөгөө</button>
+        <button class="vid" onclick="bookPro('${p.id}','${p.name}','Видео зөвлөгөө')">Видео зөвлөгөө</button>
+      </div>
+    </div>`).join('');
+}
+async function loadPros() {
+  const { data, error } = await sb.from('professionals').select('*').order('rating', { ascending:false });
+  if (error) { console.error(error); return; }
+  PROS = data;
+  renderPros();
+}
+['f-issue','f-loc','f-rating','f-price'].forEach(id => document.getElementById(id).addEventListener('change', renderPros));
+
+async function bookPro(proId, name, type) {
+  const code = 'MC-' + Math.floor(1000+Math.random()*9000);
+  const { error } = await sb.from('appointments').insert({
+    code, professional_id: proId, category: type, message: '', status: 'new'
+  });
+  if (error) { alert('Захиалахад алдаа гарлаа: ' + error.message); return; }
+  alert(`${type} товлогдлоо: ${name}\nБаталгаажуулах код: ${code}\n(нэрээ нуусан хэвээр, мэргэжилтэн зөвхөн кодоор таныг мэднэ)`);
+}
+
+/* ================= ORG ================= */
+const UNITS = [ {name:'1-р анги', pct:74}, {name:'2-р анги', pct:52}, {name:'Штабын салбар', pct:63}, {name:'3-р анги', pct:41} ];
+document.getElementById('unit-list').innerHTML = UNITS.sort((a,b)=>b.pct-a.pct).map(u => `
+  <div class="unit-row"><div class="unit-name">${u.name}</div><div class="unit-track"><div class="unit-fill" style="width:${u.pct}%;"></div></div><div class="unit-pct">${u.pct}%</div></div>
+`).join('');
+
+/* ================= ADMIN ================= */
+const ADMIN_ITEMS = [
+  {icon:'👥',label:'Хэрэглэгч'}, {icon:'🧠',label:'Тест'}, {icon:'💬',label:'Пост'}, {icon:'👩‍⚕️',label:'Мэргэжилтэн'}, {icon:'📅',label:'Зөвлөгөө'},
+  {icon:'💳',label:'Төлбөр'}, {icon:'📊',label:'Статистик'}, {icon:'🚨',label:'Эрсдэлийн дохио'}, {icon:'📰',label:'Нийтлэл'}, {icon:'🎓',label:'Сургалт'},
+];
+document.getElementById('admin-grid').innerHTML = ADMIN_ITEMS.map(a => `
+  <div class="admin-card" onclick="alert('${a.label} — demo хувилбарт зөвхөн харагдацтай, production дээр бүрэн удирдах боломжтой.')"><div class="admin-icon">${a.icon}</div><div class="admin-lbl">${a.label}</div></div>
+`).join('');
+const RISKS = [ {id:'Anonymous #4821', score:82, level:'high'}, {id:'Anonymous #1902', score:61, level:'med'}, {id:'Anonymous #7745', score:58, level:'med'} ];
+document.getElementById('risk-list').innerHTML = RISKS.map(r => `
+  <div class="risk-row"><span class="risk-id">${r.id}</span><span>Автомат үнэлгээ: ${r.score}/100</span><span class="risk-score ${r.level==='high'?'risk-high':'risk-med'}">${r.level==='high'?'Өндөр':'Дунд'}</span></div>
+`).join('');
+
+/* ================= INIT: эхлээд хэрэглэгч бэлдээд, дараа нь бүх мэдээллийг ачаална ================= */
+async function init() {
+  await ensureUser();
+  applyUserToTopbar();
+  await checkAdminStatus();
+  if (isAdmin) {
+    document.getElementById('admin-login-card').style.display = 'none';
+    document.getElementById('admin-panel').style.display = 'block';
+    loadIdentityList();
+  }
+  await Promise.all([ loadPosts(), loadPros(), loadDiary() ]);
+}
+init();
+</script>
+</body>
+</html>

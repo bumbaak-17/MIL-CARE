@@ -248,6 +248,23 @@
   .trend-note{display:flex;align-items:center;gap:.5rem;background:var(--gold-soft);color:var(--gold);
     border-radius:10px;padding:.8rem 1rem;font-size:.85rem;font-weight:700;margin-top:1rem;}
 
+  /* ---------- Year chart (12 сарын сэтгэл зүйн байдал) ---------- */
+  .year-chart{display:flex;align-items:flex-end;gap:.5rem;height:170px;}
+  .year-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:0;}
+  .year-bar-val{font-size:.66rem;color:var(--sub);margin-bottom:.3rem;font-weight:700;white-space:nowrap;}
+  .year-bar{width:65%;border-radius:5px 5px 2px 2px;transition:height .3s ease;}
+  .year-bar.good{background:linear-gradient(180deg,#8FBB7E,#3F6B4A);}
+  .year-bar.mid{background:linear-gradient(180deg,#E0AA3E,#C08A26);}
+  .year-bar.low{background:linear-gradient(180deg,#D98B80,var(--red));}
+  .year-bar.empty{background:var(--panel-2);border:1px dashed var(--line);}
+  .year-bar-lbl{font-size:.68rem;color:var(--sub);margin-top:.45rem;white-space:nowrap;}
+  .low-month-card{display:flex;align-items:center;gap:.8rem;background:var(--red-soft);border-radius:10px;
+    padding:.8rem 1rem;margin-bottom:.6rem;flex-wrap:wrap;}
+  .low-month-card .lm-text{flex:1;font-size:.85rem;color:var(--cream);min-width:200px;}
+  .low-month-card .lm-text b{color:var(--red);}
+  .low-month-card button{background:var(--red);color:#fff;border:none;border-radius:100px;
+    padding:.5rem 1.1rem;font-size:.8rem;font-weight:800;cursor:pointer;white-space:nowrap;font-family:inherit;}
+
   /* ---------- Org dashboard ---------- */
   .org-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.4rem;}
   .org-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:1.3rem 1.2rem;}
@@ -284,10 +301,47 @@
     .quick-grid, .test-grid, .filter-bar, .org-grid, .admin-grid{grid-template-columns:repeat(2,1fr);}
     .body-grid{grid-template-columns:1fr;}
     .emo-grid{grid-template-columns:repeat(2,1fr);}
+    .ob-grid{grid-template-columns:repeat(2,1fr) !important;}
   }
+
+  /* ---------- Onboarding (эхний нэвтрэлтийн сонголт) ---------- */
+  .ob-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem;margin-top:1.2rem;}
+  .ob-card{background:var(--panel);border:1.5px solid var(--line);border-radius:14px;padding:1.3rem 1rem;text-align:center;cursor:pointer;transition:.15s;}
+  .ob-card:hover{border-color:var(--gold-deep);}
+  .ob-icon{font-size:1.9rem;margin-bottom:.55rem;}
+  .ob-label{font-size:.85rem;font-weight:700;color:var(--cream);}
+  .ob-step-title{font-weight:800;font-size:1.1rem;margin:0 0 .2rem;color:var(--cream);}
+  .ob-step-sub{font-size:.85rem;color:var(--sub);margin:0 0 .3rem;}
 </style>
 </head>
 <body>
+
+<div id="onboarding-overlay" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:100;overflow-y:auto;">
+  <div style="max-width:720px;margin:0 auto;padding:3rem 1.5rem 4rem;">
+    <div style="text-align:center;margin-bottom:2.2rem;">
+      <svg width="52" height="52" viewBox="0 0 48 48" fill="none" style="margin-bottom:.8rem;">
+        <path d="M24 3 L43 10 V22 C43 34 35 42 24 46 C13 42 5 34 5 22 V10 Z" fill="#EAF1FC" stroke="#2F6FED" stroke-width="1.6"/>
+        <path d="M24 12 L24 30 M15 21 L33 21" stroke="#2F6FED" stroke-width="1.6"/>
+        <circle cx="24" cy="21" r="5.5" fill="none" stroke="#2F6FED" stroke-width="1.6"/>
+      </svg>
+      <h2 style="margin:0 0 .4rem;font-size:1.6rem;color:var(--gold-deep);">MIL-CARE-д тавтай морил</h2>
+      <p style="color:var(--sub);font-size:.9rem;max-width:480px;margin:0 auto;">Үргэлжлүүлэхийн өмнө дараах товч мэдээллийг сонгоно уу. Таны нэрийг хэн ч харахгүй — зөвхөн нэгтгэсэн, нэрээ нуусан статистикт ашиглагдана.</p>
+    </div>
+
+    <div id="ob-step-branch">
+      <p class="ob-step-title">1. Цэргийн төрлөө сонгоно уу</p>
+      <p class="ob-step-sub">Та харьяалагдах цэргийн төрлийг сонгоно уу.</p>
+      <div class="ob-grid" id="ob-branch-grid"></div>
+    </div>
+
+    <div id="ob-step-role" style="display:none;">
+      <p class="ob-step-title">2. Албан хаагчийн төрлөө сонгоно уу</p>
+      <p class="ob-step-sub">Сүүлийн алхам.</p>
+      <div class="ob-grid" id="ob-role-grid"></div>
+      <button class="modal-close" style="margin-top:1.2rem;" onclick="obBack()">← Буцах</button>
+    </div>
+  </div>
+</div>
 
 <div class="app">
   <!-- SIDEBAR -->
@@ -329,6 +383,7 @@
       <button class="hamburger" id="hamburger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
       <div class="tagline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 6v6c0 5 3.5 8.5 9 10 5.5-1.5 9-5 9-10V6z"/></svg>Нэрээ нууцлан, сэтгэлээ хамгаал.</div>
       <div class="topbar-right">
+        <div id="ub-clock" style="font-size:.78rem;color:var(--sub);font-weight:700;white-space:nowrap;"></div>
         <div class="bell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="dot">3</span></div>
         <div class="user-chip"><div class="user-avatar">🎖️</div><div><div class="user-name">Anonymous #4821</div><div class="user-role">Алба хаагч</div></div></div>
       </div>
@@ -436,6 +491,12 @@
           <div class="rc-head"><div class="rc-title">7 ХОНОГИЙН MOOD</div></div>
           <div class="week-grid" id="week-grid-2"></div>
         </div>
+        <div class="section-card">
+          <div class="rc-head"><div class="rc-title">СҮҮЛИЙН 12 САРЫН СЭТГЭЛ ЗҮЙН БАЙДАЛ</div></div>
+          <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Тус бүр сард өгсөн скрининг тестийн дундаж дүнгээс тооцоолсон сэтгэл зүйн тогтвортой байдлын хувь. Тест өгөөгүй сар "—" гэж харагдана.</p>
+          <div class="year-chart" id="year-chart"></div>
+          <div id="low-months-alert" style="margin-top:1.1rem;"></div>
+        </div>
       </div>
 
       <!-- ================= ORG ================= -->
@@ -470,6 +531,12 @@
 
         <div id="admin-panel" style="display:none;">
           <div class="admin-grid" id="admin-grid"></div>
+          <div class="section-card">
+            <div class="section-head"><h3>🎖️ Алба хаагчдын бүрэлдэхүүн</h3></div>
+            <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Цэргийн төрөл, албан хаагчийн төрлөөр нэгтгэсэн тоо. Хувь хүнийг тодорхойлохгүй.</p>
+            <div id="branch-stats"></div>
+            <div id="role-stats" style="margin-top:1.1rem;"></div>
+          </div>
           <div class="section-card">
             <div class="section-head"><h3>🚨 Эрсдэлийн дохио (жишээ)</h3></div>
             <div id="risk-list"></div>
@@ -517,8 +584,47 @@ const SUPABASE_KEY = 'sb_publishable_t5jPFZ1ZQS3_LsXSUq3ftg_OPpH0nxb';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 /* ================= ANONYMOUS USER (localStorage-д тогтвортой хадгалагдана) ================= */
+/* ---- Монголын цагийн бүс (Asia/Ulaanbaatar) — Intl.DateTimeFormat ашиглан найдвартай тооцоолно ----
+   Тайлбар: mn-MN locale-ийн нэр (сар, гарагийн нэр) зарим хөтчид дутуу байдаг тул,
+   зөвхөн тоон утгыг (жил/сар/өдөр/цаг/минут) en-US + timeZone-оор гаргаж аваад,
+   монгол нэрийг өөрсдөө буулгаж бичдэг — цагийн бүсийн тооцоо millisecond-аар гар аргаар хийхээс
+   хамаагүй найдвартай (timezone-ийн offset давхар нэмэгдэх алдаанаас сэргийлнэ). */
+const MN_MONTHS = ['1-р сар','2-р сар','3-р сар','4-р сар','5-р сар','6-р сар','7-р сар','8-р сар','9-р сар','10-р сар','11-р сар','12-р сар'];
+const EN_WD_TO_MN_FULL = { Mon:'Даваа', Tue:'Мягмар', Wed:'Лхагва', Thu:'Пүрэв', Fri:'Баасан', Sat:'Бямба', Sun:'Ням' };
+const EN_WD_TO_MN_SHORT = { Mon:'Да', Tue:'Мя', Wed:'Лх', Thu:'Пү', Fri:'Ба', Sat:'Бя', Sun:'Ня' };
+const UB_TZ = 'Asia/Ulaanbaatar';
+
+function getUbParts(input) {
+  const d = input === undefined ? new Date() : new Date(input);
+  const fmt = new Intl.DateTimeFormat('en-US', {
+    timeZone: UB_TZ, year:'numeric', month:'numeric', day:'numeric',
+    hour:'numeric', minute:'numeric', hour12:false, weekday:'short'
+  });
+  const obj = {};
+  fmt.formatToParts(d).forEach(p => { obj[p.type] = p.value; });
+  return {
+    year: parseInt(obj.year,10), month: parseInt(obj.month,10), day: parseInt(obj.day,10),
+    hour: (obj.hour === '24') ? 0 : parseInt(obj.hour,10), minute: parseInt(obj.minute,10),
+    weekdayEn: obj.weekday,
+  };
+}
+function formatUbShort(input) { const p = getUbParts(input); return `${MN_MONTHS[p.month-1]}ын ${p.day}`; }
+function formatUbWeekday(input) { const p = getUbParts(input); return `${MN_MONTHS[p.month-1]}ын ${p.day}, ${EN_WD_TO_MN_FULL[p.weekdayEn]} гараг`; }
+function formatUbFull(input) { const p = getUbParts(input); return `${p.year}.${String(p.month).padStart(2,'0')}.${String(p.day).padStart(2,'0')}`; }
+function formatUbTime(input) { const p = getUbParts(input); return `${String(p.hour).padStart(2,'0')}:${String(p.minute).padStart(2,'0')}`; }
+
+/* ---- Дээд самбарт Улаанбаатарын бодит цагийг харуулах, минут тутам шинэчилнэ ---- */
+function renderUbClock() {
+  const el = document.getElementById('ub-clock');
+  if (!el) return;
+  el.textContent = `🇲🇳 ${formatUbWeekday()} · ${formatUbTime()}`;
+}
+renderUbClock();
+setInterval(renderUbClock, 30000);
+
 let currentUser = null;
 async function ensureUser() {
+  // 1. Supabase Anonymous Auth-аар бодит, аюулгүй session үүсгэх/сэргээх
   let { data: sessionData } = await sb.auth.getSession();
   let session = sessionData?.session;
   if (!session) {
@@ -528,24 +634,79 @@ async function ensureUser() {
   }
   const uid = session.user.id;
 
+  // 2. Тухайн auth хэрэглэгчид харгалзах users мөр байгаа эсэхийг шалгах
   const { data: existing, error: selErr } = await sb.from('users').select('*').eq('id', uid).maybeSingle();
   if (selErr) { console.error('users select error:', selErr); }
 
   if (existing) {
-    currentUser = { id: uid, handle: existing.anon_handle };
+    currentUser = { id: uid, handle: existing.anon_handle, branch: existing.branch, personnel_type: existing.personnel_type };
     return;
   }
 
+  // 3. Байхгүй бол шинэ, нэрээ нуусан профайл үүсгэх (id нь auth.uid()-тэй яг адилхан)
   const handle = randomHandle();
   const { data: inserted, error: insErr } = await sb.from('users').insert({ id: uid, anon_handle: handle }).select().single();
   if (insErr) { console.error('users insert error:', insErr); currentUser = { id: uid, handle }; return; }
-  currentUser = { id: uid, handle: inserted.anon_handle };
+  currentUser = { id: uid, handle: inserted.anon_handle, branch: inserted.branch, personnel_type: inserted.personnel_type };
 }
 function applyUserToTopbar() {
   const nameEl = document.querySelector('.user-chip .user-name');
   if (nameEl && currentUser) nameEl.textContent = currentUser.handle;
   const profileEl = document.getElementById('profile-handle');
   if (profileEl && currentUser) profileEl.textContent = currentUser.handle;
+}
+
+/* ================= ONBOARDING: цэргийн төрөл, албан хаагчийн төрөл сонгох ================= */
+const BRANCHES = [
+  { key:'air', icon:'✈️', label:'Агаарын цэрэг' },
+  { key:'ground', icon:'🪖', label:'Хуурай замын цэрэг' },
+  { key:'cyber', icon:'💻', label:'Кибер цэргийн командлал' },
+  { key:'engineer', icon:'🏗️', label:'Инженерийн цэрэг' },
+  { key:'artillery', icon:'💥', label:'Артиллерийн анги' },
+  { key:'staff', icon:'📋', label:'Штабын алба' },
+  { key:'other', icon:'❓', label:'Бусад' },
+];
+const PERSONNEL_TYPES = [
+  { key:'military', icon:'🎖️', label:'Цэргийн алба хаагч' },
+  { key:'civilian', icon:'👔', label:'Энгийн ажилтан алба хаагч' },
+  { key:'contract', icon:'📄', label:'Гэрээт алба хаагч' },
+];
+const BRANCH_LABELS = Object.fromEntries(BRANCHES.map(b => [b.key, b.label]));
+const ROLE_LABELS = Object.fromEntries(PERSONNEL_TYPES.map(r => [r.key, r.label]));
+
+let obSelectedBranch = null, obSelectedRole = null;
+
+function renderObBranch() {
+  const el = document.getElementById('ob-branch-grid');
+  el.innerHTML = BRANCHES.map(b => `<div class="ob-card" data-key="${b.key}"><div class="ob-icon">${b.icon}</div><div class="ob-label">${b.label}</div></div>`).join('');
+  el.querySelectorAll('.ob-card').forEach(c => c.addEventListener('click', () => {
+    obSelectedBranch = c.dataset.key;
+    document.getElementById('ob-step-branch').style.display = 'none';
+    document.getElementById('ob-step-role').style.display = 'block';
+    renderObRole();
+  }));
+}
+function renderObRole() {
+  const el = document.getElementById('ob-role-grid');
+  el.innerHTML = PERSONNEL_TYPES.map(r => `<div class="ob-card" data-key="${r.key}"><div class="ob-icon">${r.icon}</div><div class="ob-label">${r.label}</div></div>`).join('');
+  el.querySelectorAll('.ob-card').forEach(c => c.addEventListener('click', () => {
+    obSelectedRole = c.dataset.key;
+    obSubmit();
+  }));
+}
+function obBack() {
+  document.getElementById('ob-step-role').style.display = 'none';
+  document.getElementById('ob-step-branch').style.display = 'block';
+}
+async function obSubmit() {
+  if (!currentUser?.id) return;
+  const { error } = await sb.from('users').update({ branch: obSelectedBranch, personnel_type: obSelectedRole }).eq('id', currentUser.id);
+  if (error) { alert('Хадгалахад алдаа гарлаа: ' + error.message); return; }
+  currentUser.branch = obSelectedBranch;
+  currentUser.personnel_type = obSelectedRole;
+  document.getElementById('onboarding-overlay').style.display = 'none';
+  document.querySelector('.app').style.display = 'grid';
+  await Promise.all([ loadPosts(), loadPros(), loadDiary(), loadWeekMood(), loadMonthlyAnalysis() ]);
 }
 
 /* ================= PROFILE: бодит нэр (сонголтоор) ================= */
@@ -574,11 +735,12 @@ async function adminLogin() {
     document.getElementById('admin-login-card').style.display = 'none';
     document.getElementById('admin-panel').style.display = 'block';
     loadIdentityList();
+    loadCompositionStats();
   } else {
     msgEl.style.color='var(--red)';
     msgEl.textContent='Энэ бүртгэл админ эрхгүй байна.';
     await sb.auth.signOut();
-    await ensureUser();
+    await ensureUser(); // буцаад энгийн anonymous session рүү шилжинэ
   }
 }
 async function checkAdminStatus() {
@@ -626,7 +788,7 @@ document.querySelectorAll('[data-goto]').forEach(el => el.addEventListener('clic
 /* ================= Helpers ================= */
 function randomHandle() { return 'Anonymous #' + Math.floor(1000 + Math.random()*9000); }
 
-/* ================= HOME mood + week tracker ================= */
+/* ================= HOME mood + week tracker (бодит mood_entries-тэй холбогдсон) ================= */
 const MOODS = [
   { key: 'great', emo: '😊', label: 'МАШ САЙН' },
   { key: 'good', emo: '🙂', label: 'САЙН' },
@@ -634,26 +796,120 @@ const MOODS = [
   { key: 'bad', emo: '🙁', label: 'МУУ' },
   { key: 'worst', emo: '😔', label: 'МАШ МУУ' },
 ];
+// Нүүр хуудасны 5-шатлалт mood-ыг "Өнөөдөр би..." дневникийн 8 мэдрэмжийн аль тохирохтой нь холбоно
+const MOOD5_TO_DIARY = { great:'grateful', good:'happy', ok:'calm', bad:'tired', worst:'sad' };
+
 function renderMoodRow() {
   const el = document.getElementById('mood-row');
   el.innerHTML = MOODS.map(m => `<div class="mood-btn" data-mood="${m.key}"><span class="emo">${m.emo}</span><span class="lbl">${m.label}</span></div>`).join('');
-  el.querySelectorAll('.mood-btn').forEach(b => b.addEventListener('click', () => {
+  el.querySelectorAll('.mood-btn').forEach(b => b.addEventListener('click', async () => {
     el.querySelectorAll('.mood-btn').forEach(x => x.classList.remove('selected'));
     b.classList.add('selected');
-    weekMoods[6] = b.dataset.mood; renderWeek();
+    const diaryKey = MOOD5_TO_DIARY[b.dataset.mood];
+    if (currentUser?.id) {
+      const { error } = await sb.from('mood_entries').insert({ user_id: currentUser.id, mood: diaryKey, note: 'Нүүр хуудасны хурдан бүртгэл' });
+      if (error) { console.error('quick mood insert error:', error); }
+      await loadWeekMood();
+      loadDiary();
+    } else {
+      weekMoods[6] = diaryKey; renderWeek();
+    }
   }));
 }
-const DAYS = ['Да','Мя','Лх','Пү','Ба','Ня','Бя'];
-const today = new Date();
-const weekNums = []; for (let i=6;i>=0;i--){ const d=new Date(today); d.setDate(today.getDate()-i); weekNums.push(d.getDate()); }
-const weekMoods = ['good','good','ok','bad','good','ok','bad'];
-const MOOD_EMO = { great:'😊', good:'🙂', ok:'😐', bad:'🙁', worst:'😔' };
+const today = new Date(); // absolute UTC instant — Ub-parts тооцоолол getUbParts()-д даатгана
+const DAYS = []; const weekNums = [];
+for (let i=6;i>=0;i--){ const p = getUbParts(today.getTime() - i*86400000); DAYS.push(EN_WD_TO_MN_SHORT[p.weekdayEn]); weekNums.push(p.day); }
+let weekMoods = new Array(7).fill('none');
+const EMO_LOOKUP = { sad:'😢', angry:'😡', anxious:'😰', tired:'😴', happy:'🥰', lonely:'😔', calm:'😌', grateful:'❤️', none:'' };
 function renderWeek() {
-  const html = DAYS.map((d,i)=>`<div><div class="week-day">${d}</div><div class="week-emo ${i===6?'today':''}">${MOOD_EMO[weekMoods[i]]||''}</div><div class="week-num">${weekNums[i]}</div></div>`).join('');
+  const html = DAYS.map((d,i)=>`<div><div class="week-day">${d}</div><div class="week-emo ${i===6?'today':''}">${EMO_LOOKUP[weekMoods[i]]||''}</div><div class="week-num">${weekNums[i]}</div></div>`).join('');
   document.getElementById('week-grid').innerHTML = html;
   document.getElementById('week-grid-2').innerHTML = html;
 }
+async function loadWeekMood() {
+  if (!currentUser?.id) { renderWeek(); return; }
+  const { data, error } = await sb.from('mood_entries').select('mood, created_at').eq('user_id', currentUser.id).order('created_at', { ascending:true }).limit(300);
+  if (error) { console.error('loadWeekMood error:', error); renderWeek(); return; }
+  const byDate = {};
+  data.forEach(e => { byDate[formatUbFull(e.created_at)] = e.mood; }); // ascending тул сүүлийн бичлэг эцэст нь давхарлагдана
+  const nowMs = Date.now();
+  const result = [];
+  for (let i=6;i>=0;i--) { result.push(byDate[formatUbFull(nowMs - i*86400000)] || 'none'); }
+  weekMoods = result;
+  renderWeek();
+}
 renderMoodRow(); renderWeek();
+
+/* ================= 12 САРЫН СЭТГЭЛ ЗҮЙН БАЙДАЛ (тестийн дүнд суурилсан) ================= */
+const MN_MONTHS_SHORT = ['1-р','2-р','3-р','4-р','5-р','6-р','7-р','8-р','9-р','10-р','11-р','12-р'];
+
+function monthKey(year, month) { return `${year}-${String(month).padStart(2,'0')}`; }
+
+async function loadMonthlyAnalysis() {
+  const chartEl = document.getElementById('year-chart');
+  const alertEl = document.getElementById('low-months-alert');
+  if (!chartEl) return;
+  if (!currentUser?.id) { chartEl.innerHTML = ''; alertEl.innerHTML = ''; return; }
+
+  const { data, error } = await sb.from('test_results').select('score, max_score, created_at').eq('user_id', currentUser.id).order('created_at', { ascending:true }).limit(2000);
+  if (error) { console.error('loadMonthlyAnalysis error:', error); return; }
+
+  // Сар бүрийн (сүүлийн 12 сар) түлхүүрийг өнөөдрөөс тооцоолж бэлдэнэ
+  const nowP = getUbParts();
+  const months = [];
+  for (let i=11;i>=0;i--) {
+    let y = nowP.year, m = nowP.month - i;
+    while (m <= 0) { m += 12; y -= 1; }
+    months.push({ year:y, month:m, key: monthKey(y,m) });
+  }
+
+  // Тестийн дүнг сар бүрээр нь бүлэглэж, "сэтгэл зүйн тогтвортой байдлын хувь"-ийг тооцоолно
+  // (хувь өндөр байх тусам сайн — оноо багатай (severity бага) байх тусам хувь өндөр болно)
+  const sums = {}; const counts = {};
+  (data || []).forEach(r => {
+    const p = getUbParts(r.created_at);
+    const key = monthKey(p.year, p.month);
+    const wellness = 100 - Math.round((r.score / r.max_score) * 100);
+    sums[key] = (sums[key] || 0) + wellness;
+    counts[key] = (counts[key] || 0) + 1;
+  });
+
+  const monthly = months.map(m => {
+    if (!counts[m.key]) return { ...m, pct: null };
+    return { ...m, pct: Math.round(sums[m.key] / counts[m.key]) };
+  });
+
+  // ---- Chart ----
+  chartEl.innerHTML = monthly.map(m => {
+    if (m.pct === null) {
+      return `<div class="year-bar-col">
+        <div class="year-bar-val">—</div>
+        <div class="year-bar empty" style="height:6px;"></div>
+        <div class="year-bar-lbl">${MN_MONTHS_SHORT[m.month-1]}</div>
+      </div>`;
+    }
+    const cls = m.pct >= 70 ? 'good' : m.pct >= 50 ? 'mid' : 'low';
+    const h = Math.max(6, Math.round(m.pct / 100 * 130));
+    return `<div class="year-bar-col">
+      <div class="year-bar-val">${m.pct}%</div>
+      <div class="year-bar ${cls}" style="height:${h}px;"></div>
+      <div class="year-bar-lbl">${MN_MONTHS_SHORT[m.month-1]}</div>
+    </div>`;
+  }).join('');
+
+  // ---- 50%-иас доош сарууд + зөвлөгөө авах товч ----
+  const lowMonths = monthly.filter(m => m.pct !== null && m.pct < 50);
+  if (lowMonths.length === 0) {
+    alertEl.innerHTML = '';
+  } else {
+    alertEl.innerHTML = lowMonths.map(m => `
+      <div class="low-month-card">
+        <div class="lm-text"><b>${MN_MONTHS_SHORT[m.month-1]} сар: ${m.pct}%</b> — тестийн дүнгээс харахад энэ сард сэтгэл зүйн байдал 50%-иас доош унасан байна.</div>
+        <button onclick="goto('pros')">Зөвлөгөө авах</button>
+      </div>
+    `).join('');
+  }
+}
 
 /* ================= DIARY (Өнөөдөр би...) ================= */
 const DIARY_EMOS = [
@@ -685,6 +941,7 @@ async function addDiary() {
   const { error } = await sb.from('mood_entries').insert({ user_id: currentUser.id, mood: emoObj.key, note: text });
   if (error) { alert('Хадгалахад алдаа гарлаа: ' + error.message); return; }
   loadDiary();
+  loadWeekMood();
 }
 function renderDiaryList() {
   const el = document.getElementById('diary-list');
@@ -699,7 +956,7 @@ async function loadDiary() {
   if (error) { console.error('loadDiary error:', error); return; }
   diaryEntries = data.map(d => {
     const emoObj = DIARY_EMOS.find(m=>m.key===d.mood) || { e:'💬', l:d.mood };
-    return { emo: emoObj.e, label: emoObj.l, text: d.note, date: new Date(d.created_at).toLocaleDateString('mn-MN') };
+    return { emo: emoObj.e, label: emoObj.l, text: d.note, date: formatUbFull(d.created_at) };
   });
   renderDiaryList();
 }
@@ -758,6 +1015,7 @@ async function scoreModal(key) {
   if (currentUser?.id) {
     const { error } = await sb.from('test_results').insert({ user_id: currentUser.id, test_key: key, score: total, max_score: max, level: levelKey });
     if (error) console.error('test_results save error:', error);
+    loadMonthlyAnalysis();
   }
 
   document.getElementById('modal-box').innerHTML = `
@@ -779,7 +1037,10 @@ function timeAgo(ts) {
   if (s < 60) return 'дөнгөж сая';
   const m = Math.floor(s/60); if (m < 60) return m+' минутын өмнө';
   const h = Math.floor(m/60); if (h < 24) return h+' цагийн өмнө';
-  return Math.floor(h/24)+' өдрийн өмнө';
+  const d = Math.floor(h/24);
+  if (d < 7) return d+' өдрийн өмнө';
+  // 7 хоногоос хуучин бол Улаанбаатарын цагаар тодорхой огноо харуулна
+  return formatUbFull(ts);
 }
 function postHTML(p,i){ return `
   <div class="post">
@@ -883,6 +1144,28 @@ document.getElementById('risk-list').innerHTML = RISKS.map(r => `
   <div class="risk-row"><span class="risk-id">${r.id}</span><span>Автомат үнэлгээ: ${r.score}/100</span><span class="risk-score ${r.level==='high'?'risk-high':'risk-med'}">${r.level==='high'?'Өндөр':'Дунд'}</span></div>
 `).join('');
 
+/* ================= Алба хаагчдын бүрэлдэхүүний статистик (зөвхөн админ) ================= */
+async function loadCompositionStats() {
+  const branchEl = document.getElementById('branch-stats');
+  const roleEl = document.getElementById('role-stats');
+  if (!branchEl) return;
+  const { data, error } = await sb.from('users').select('branch, personnel_type');
+  if (error) { branchEl.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Дүн татахад алдаа гарлаа.</div>'; return; }
+  const total = (data && data.length) || 1;
+  const branchCounts = {}; const roleCounts = {};
+  (data || []).forEach(u => {
+    if (u.branch) branchCounts[u.branch] = (branchCounts[u.branch]||0)+1;
+    if (u.personnel_type) roleCounts[u.personnel_type] = (roleCounts[u.personnel_type]||0)+1;
+  });
+  const renderBars = (counts, labels) => Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([k,c]) => {
+    const pct = Math.round(c/total*100);
+    return `<div class="unit-row"><div class="unit-name">${labels[k]||k}</div><div class="unit-track"><div class="unit-fill" style="width:${pct}%;"></div></div><div class="unit-pct">${c}</div></div>`;
+  }).join('') || '<div style="color:var(--sub);font-size:.85rem;">Одоогоор өгөгдөл алга.</div>';
+
+  branchEl.innerHTML = '<p style="font-weight:800;font-size:.85rem;margin-bottom:.6rem;">Цэргийн төрлөөр</p>' + renderBars(branchCounts, BRANCH_LABELS);
+  roleEl.innerHTML = '<p style="font-weight:800;font-size:.85rem;margin-bottom:.6rem;">Албан хаагчийн төрлөөр</p>' + renderBars(roleCounts, ROLE_LABELS);
+}
+
 /* ================= INIT: эхлээд хэрэглэгч бэлдээд, дараа нь бүх мэдээллийг ачаална ================= */
 async function init() {
   await ensureUser();
@@ -892,8 +1175,16 @@ async function init() {
     document.getElementById('admin-login-card').style.display = 'none';
     document.getElementById('admin-panel').style.display = 'block';
     loadIdentityList();
+    loadCompositionStats();
   }
-  await Promise.all([ loadPosts(), loadPros(), loadDiary() ]);
+  // Шинэ хэрэглэгч бол эхлээд цэргийн төрөл, албан хаагчийн төрлөө сонгуулна
+  if (!currentUser?.branch || !currentUser?.personnel_type) {
+    document.querySelector('.app').style.display = 'none';
+    document.getElementById('onboarding-overlay').style.display = 'block';
+    renderObBranch();
+    return;
+  }
+  await Promise.all([ loadPosts(), loadPros(), loadDiary(), loadWeekMood(), loadMonthlyAnalysis() ]);
 }
 init();
 </script>

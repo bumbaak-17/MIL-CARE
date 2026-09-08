@@ -80,17 +80,34 @@
     background:radial-gradient(circle at 85% 15%, rgba(169,121,58,.22), transparent 45%),
       linear-gradient(135deg, #121D38 0%, #1B2C52 55%, #223868 100%);
     border:1px solid #0E1730; transition:background-image 1.2s ease-in-out;}
-  .hero-tag{display:flex;align-items:center;gap:.55rem;font-size:.74rem;font-weight:700;color:#D8BC8A;letter-spacing:.04em;margin-bottom:.8rem;}
+  .hero-tag{display:flex;align-items:center;gap:.55rem;font-size:.74rem;font-weight:700;color:#D8BC8A;letter-spacing:.04em;margin-bottom:.8rem;position:relative;z-index:2;}
   .hero-tag .tick{width:20px;height:2px;background:#D8BC8A;display:inline-block;border-radius:1px;}
-  .headline{font-size:2.15rem;font-weight:900;letter-spacing:-.02em;line-height:1.14;margin:0 0 .6rem;max-width:520px;color:#FFFFFF;}
-  .hero-sub{color:#AFBBD9;font-size:.95rem;margin:0 0 1.6rem;max-width:440px;line-height:1.5;}
-  .mood-row{display:flex;gap:.7rem;flex-wrap:wrap;}
+  .headline{font-size:2.15rem;font-weight:900;letter-spacing:-.02em;line-height:1.14;margin:0 0 .6rem;max-width:520px;color:#FFFFFF;position:relative;z-index:2;}
+  .hero-sub{color:#AFBBD9;font-size:.95rem;margin:0 0 1.6rem;max-width:440px;line-height:1.5;position:relative;z-index:2;}
+  .mood-row{display:flex;gap:.7rem;flex-wrap:wrap;position:relative;z-index:2;}
   .mood-btn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:12px;
-    padding:1rem 1.3rem;text-align:center;cursor:pointer;min-width:96px;}
-  .mood-btn .emo{font-size:1.6rem;display:block;margin-bottom:.4rem;}
+    padding:1rem 1.3rem;text-align:center;cursor:pointer;min-width:96px;
+    transition:border-color .2s ease, background .2s ease, transform .18s ease;}
+  .mood-btn:hover{transform:translateY(-3px);}
+  .mood-btn .emo{font-size:1.6rem;display:block;margin-bottom:.4rem;
+    transition:transform .25s cubic-bezier(.34,1.56,.64,1);}
+  .mood-btn:hover .emo{transform:scale(1.18) rotate(-6deg);}
+  .mood-btn.selected .emo{transform:scale(1.12); animation:emoPop .5s cubic-bezier(.34,1.56,.64,1);}
   .mood-btn .lbl{font-size:.68rem;font-weight:700;color:#C7D2E8;letter-spacing:.02em;}
   .mood-btn.selected{border-color:#D8BC8A;background:rgba(216,188,138,.16);}
   .mood-btn.selected .lbl{color:#EDDBB8;}
+
+  /* ---------- Hero-ийн хулгана дагасан усан долгионы эффект ---------- */
+  .hero-ripple{position:absolute;width:360px;height:360px;border-radius:50%;pointer-events:none;
+    background:radial-gradient(circle, rgba(190,225,255,.55), rgba(190,225,255,.18) 45%, transparent 72%);
+    filter:blur(8px);top:0;left:0;transform:translate(-1000px,-1000px);mix-blend-mode:screen;
+    transition:transform .55s cubic-bezier(.22,.9,.35,1), opacity .35s ease;opacity:0;z-index:1;}
+  .hero-ripple.active{opacity:1;}
+  .hero-ripple2{position:absolute;width:170px;height:170px;border-radius:50%;pointer-events:none;
+    background:radial-gradient(circle, rgba(255,255,255,.6), transparent 70%);
+    filter:blur(3px);top:0;left:0;transform:translate(-1000px,-1000px);mix-blend-mode:screen;
+    transition:transform .28s ease-out, opacity .3s ease;opacity:0;z-index:1;}
+  .hero-ripple2.active{opacity:1;}
 
   /* ---------- QUICK ACTIONS ---------- */
   .quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.9rem;margin-bottom:1.4rem;}
@@ -220,8 +237,18 @@
   /* ---------- Mood diary ---------- */
   .emo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;margin-bottom:1.3rem;}
   .emo-btn{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:1.1rem .6rem;
-    text-align:center;cursor:pointer;}
-  .emo-btn .e{font-size:1.7rem;display:block;margin-bottom:.4rem;}
+    text-align:center;cursor:pointer;transition:border-color .2s ease, background .2s ease, transform .18s ease;}
+  .emo-btn:hover{transform:translateY(-3px);}
+  .emo-btn .e{font-size:1.7rem;display:block;margin-bottom:.4rem;
+    transition:transform .25s cubic-bezier(.34,1.56,.64,1);}
+  .emo-btn:hover .e{transform:scale(1.18) rotate(-6deg);}
+  .emo-btn.selected .e{transform:scale(1.12); animation:emoPop .5s cubic-bezier(.34,1.56,.64,1);}
+  @keyframes emoPop{
+    0%{transform:scale(1) rotate(0deg);}
+    35%{transform:scale(1.45) rotate(10deg);}
+    65%{transform:scale(.9) rotate(-6deg);}
+    100%{transform:scale(1.12) rotate(0deg);}
+  }
   .emo-btn .l{font-size:.76rem;font-weight:700;color:var(--sub);}
   .emo-btn.selected{border-color:var(--gold);background:var(--gold-soft);}
   .emo-btn.selected .l{color:var(--gold);}
@@ -285,7 +312,7 @@
   .org-lbl{font-size:.8rem;color:var(--sub);font-weight:700;margin-top:.2rem;}
   .unit-row{display:flex;align-items:center;gap:.8rem;padding:.7rem 0;border-bottom:1px solid var(--line);}
   .unit-row:last-child{border-bottom:none;}
-  .unit-name{width:110px;font-size:.83rem;font-weight:700;flex-shrink:0;}
+  .unit-name{width:190px;font-size:.83rem;font-weight:700;flex-shrink:0;}
   .unit-track{flex:1;background:var(--panel-2);border-radius:100px;height:10px;overflow:hidden;}
   .unit-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--gold-deep),var(--gold));}
   .unit-pct{width:40px;text-align:right;font-size:.8rem;color:var(--sub);}
@@ -405,6 +432,8 @@
       <!-- ================= HOME ================= -->
       <div id="view-home" class="view active">
         <div class="hero">
+          <div class="hero-ripple" id="hero-ripple"></div>
+          <div class="hero-ripple2" id="hero-ripple2"></div>
           <div class="hero-tag"><span class="tick"></span>Өнөөдөр</div>
           <h1 class="headline">Өнөөдөр таны<br>сэтгэл санаа ямар байна вэ?</h1>
           <p class="hero-sub">Өөрийгөө ойлгох жижиг алхмыг өнөөдөр эхлүүлээрэй.</p>
@@ -916,6 +945,27 @@ function applyHeroScene() {
 applyHeroScene();
 setInterval(applyHeroScene, 5000); // 5 секунд тутамд солигдоно
 
+/* ================= Hero-ийн хулгана дагасан усан долгионы эффект ================= */
+(function initHeroRipple() {
+  const heroEl = document.querySelector('.hero');
+  const r1 = document.getElementById('hero-ripple');
+  const r2 = document.getElementById('hero-ripple2');
+  if (!heroEl || !r1 || !r2) return;
+  heroEl.addEventListener('mousemove', (e) => {
+    const rect = heroEl.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    r1.style.transform = `translate(${x - 180}px, ${y - 180}px)`;
+    r2.style.transform = `translate(${x - 85}px, ${y - 85}px)`;
+    r1.classList.add('active');
+    r2.classList.add('active');
+  });
+  heroEl.addEventListener('mouseleave', () => {
+    r1.classList.remove('active');
+    r2.classList.remove('active');
+  });
+})();
+
 /* ================= 12 САРЫН СЭТГЭЛ ЗҮЙН БАЙДАЛ (тестийн дүнд суурилсан) ================= */
 const MN_MONTHS_SHORT = ['1-р','2-р','3-р','4-р','5-р','6-р','7-р','8-р','9-р','10-р','11-р','12-р'];
 
@@ -1202,7 +1252,16 @@ async function bookPro(proId, name, type) {
 }
 
 /* ================= ORG ================= */
-const UNITS = [ {name:'1-р анги', pct:74}, {name:'2-р анги', pct:52}, {name:'Штабын салбар', pct:63}, {name:'3-р анги', pct:41} ];
+const UNITS = [
+  { name:'Агаарын цэрэг', pct:58 },
+  { name:'Хуурай замын цэрэг', pct:74 },
+  { name:'Кибер цэргийн командлал', pct:81 },
+  { name:'Инженерийн цэрэг', pct:47 },
+  { name:'Артиллерийн цэрэг', pct:63 },
+  { name:'ЗХЖШ-ын харъяа анги', pct:39 },
+  { name:'БХЯ-ны харъяа', pct:44 },
+  { name:'Бусад', pct:52 },
+];
 document.getElementById('unit-list').innerHTML = UNITS.sort((a,b)=>b.pct-a.pct).map(u => `
   <div class="unit-row"><div class="unit-name">${u.name}</div><div class="unit-track"><div class="unit-fill" style="width:${u.pct}%;"></div></div><div class="unit-pct">${u.pct}%</div></div>
 `).join('');

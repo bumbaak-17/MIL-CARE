@@ -662,8 +662,9 @@ const BRANCHES = [
   { key:'ground', icon:'🪖', label:'Хуурай замын цэрэг' },
   { key:'cyber', icon:'💻', label:'Кибер цэргийн командлал' },
   { key:'engineer', icon:'🏗️', label:'Инженерийн цэрэг' },
-  { key:'artillery', icon:'💥', label:'Артиллерийн анги' },
-  { key:'staff', icon:'📋', label:'Штабын алба' },
+  { key:'artillery', icon:'💥', label:'Артиллерийн цэрэг' },
+  { key:'gs', icon:'🏛️', label:'ЗХЖШ-ын харъяа анги' },
+  { key:'staff', icon:'📋', label:'БХЯ-ны харъяа' },
   { key:'other', icon:'❓', label:'Бусад' },
 ];
 const PERSONNEL_TYPES = [
@@ -1172,13 +1173,13 @@ async function init() {
   applyUserToTopbar();
   await checkAdminStatus();
   if (isAdmin) {
+    // Админ эрхтэй бол onboarding (цэргийн төрөл сонгох) шаардлагагүй, шууд админ панель руу орно
     document.getElementById('admin-login-card').style.display = 'none';
     document.getElementById('admin-panel').style.display = 'block';
     loadIdentityList();
     loadCompositionStats();
-  }
-  // Шинэ хэрэглэгч бол эхлээд цэргийн төрөл, албан хаагчийн төрлөө сонгуулна
-  if (!currentUser?.branch || !currentUser?.personnel_type) {
+  } else if (!currentUser?.branch || !currentUser?.personnel_type) {
+    // Зөвхөн энгийн (админ бус) шинэ хэрэглэгчид цэргийн төрөл, албан хаагчийн төрлөө сонгуулна
     document.querySelector('.app').style.display = 'none';
     document.getElementById('onboarding-overlay').style.display = 'block';
     renderObBranch();

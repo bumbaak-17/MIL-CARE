@@ -107,12 +107,12 @@
   .mood-btn.selected .lbl{color:#EDDBB8;}
 
   /* ---------- Hero-ийн хулгана дагасан усан долгионы эффект ---------- */
-  .hero-ripple{position:absolute;width:230px;height:230px;border-radius:50%;pointer-events:none;
+  .hero-ripple{position:absolute;width:110px;height:110px;border-radius:50%;pointer-events:none;
     background:radial-gradient(circle, rgba(190,225,255,.55), rgba(190,225,255,.18) 45%, transparent 72%);
     filter:blur(8px);top:0;left:0;transform:translate(-1000px,-1000px);mix-blend-mode:screen;
     transition:transform .55s cubic-bezier(.22,.9,.35,1), opacity .35s ease;opacity:0;z-index:1;}
   .hero-ripple.active{opacity:1;}
-  .hero-ripple2{position:absolute;width:105px;height:105px;border-radius:50%;pointer-events:none;
+  .hero-ripple2{position:absolute;width:50px;height:50px;border-radius:50%;pointer-events:none;
     background:radial-gradient(circle, rgba(255,255,255,.6), transparent 70%);
     filter:blur(3px);top:0;left:0;transform:translate(-1000px,-1000px);mix-blend-mode:screen;
     transition:transform .28s ease-out, opacity .3s ease;opacity:0;z-index:1;}
@@ -428,7 +428,7 @@
       <li class="navitem" data-view="tests"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/></svg>Сэтгэл зүйн тестүүд</li>
       <li class="navitem" data-view="memory"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 2A3.5 3.5 0 0 0 6 5.5v.55a2.5 2.5 0 0 0-1.96 3.7A2.5 2.5 0 0 0 3 12v1a2.5 2.5 0 0 0 1.5 2.29V17a3 3 0 0 0 3 3v0a2 2 0 0 0 2-2V5.5A3.5 3.5 0 0 0 9.5 2Z"/><path d="M14.5 2A3.5 3.5 0 0 1 18 5.5v.55a2.5 2.5 0 0 1 1.96 3.7A2.5 2.5 0 0 1 21 12v1a2.5 2.5 0 0 1-1.5 2.29V17a3 3 0 0 1-3 3v0a2 2 0 0 1-2-2V5.5A3.5 3.5 0 0 1 14.5 2Z"/></svg>Санах ой, анхаарлыг хөгжүүлэх тест</li>
       <li class="navitem" data-view="attention"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>Анхаарал шалгах тест</li>
-      <li class="navitem" data-view="feed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 5h4v4"/></svg>Нийтлэл, хуваалцах</li>
+      <li class="navitem" data-view="feed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 5h4v4"/></svg>Сэтгэгдлээ хуваалцах</li>
       <li class="navitem" data-view="pros"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>Сэтгэл зүйч</li>
       <li class="navitem" data-view="analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>Миний сэтгэл зүй</li>
 
@@ -513,7 +513,7 @@
               <div class="test-row" id="test-row-preview"></div>
             </div>
             <div class="section-card">
-              <div class="section-head"><h3>Нийтлэл, хуваалцах</h3><span class="more" data-goto="feed">Бүгдийг харах</span></div>
+              <div class="section-head"><h3>Сэтгэгдлээ хуваалцах</h3><span class="more" data-goto="feed">Бүгдийг харах</span></div>
               <div id="feed-preview"></div>
             </div>
           </div>
@@ -612,7 +612,7 @@
 
       <!-- ================= FEED (community) ================= -->
       <div id="view-feed" class="view">
-        <div class="page-head"><h2>Нийтлэл, хуваалцах</h2><p>Нэрээ нуусан орон зайд мэдрэмжээ хуваалцаж, дэмжлэг үзүүлээрэй.</p></div>
+        <div class="page-head"><h2>Сэтгэгдлээ хуваалцах</h2><p>Нэрээ нуусан орон зайд мэдрэмжээ хуваалцаж, дэмжлэг үзүүлээрэй.</p></div>
         <div class="section-card">
           <div id="feed-list-full"></div>
           <div class="composer"><input type="text" id="post-input" placeholder="Мэдрэмжээ нэрээ нуулцан бичих..."><button onclick="addPost()">Илгээх</button></div>
@@ -623,7 +623,7 @@
       <div id="view-pros" class="view">
         <div class="page-head"><h2>Сэтгэл зүйч</h2><p>Мэргэжилтэн хайж, текст эсвэл видео зөвлөгөө товлоорой.</p></div>
         <div class="filter-bar">
-          <select id="f-issue"><option value="">Асуудлаар</option><option>Стресс</option><option>Гэр бүл</option><option>Цэргийн сэтгэл зүй</option><option>Burnout</option></select>
+          <select id="f-issue"><option value="">Асуудлаар</option><option>Стресс</option><option>Гэр бүл</option><option>Цэргийн сэтгэл зүй</option><option>Ажлын хэт их ядралт</option></select>
           <select id="f-loc"><option value="">Байршлаар</option><option>Улаанбаатар</option><option>Орон нутаг</option><option>Онлайн</option></select>
           <select id="f-rating"><option value="">Үнэлгээгээр</option><option value="desc">Өндөрөөс бага руу</option></select>
           <select id="f-price"><option value="">Үнээр</option><option value="asc">Хямдаас өндөр рүү</option><option value="desc">Өндрөөс хямд руу</option></select>
@@ -636,7 +636,7 @@
         <div class="page-head"><h2>Миний сэтгэл зүй</h2><p>Сүүлийн 30 хоногийн үзүүлэлт. Зөвхөн та харна.</p></div>
         <div class="section-card">
           <div class="metric-row"><div class="metric-top"><span>Стресс</span><span>72%</span></div><div class="metric-track"><div class="metric-fill stress" style="width:72%;"></div></div></div>
-          <div class="metric-row"><div class="metric-top"><span>Burnout</span><span>58%</span></div><div class="metric-track"><div class="metric-fill burnout" style="width:58%;"></div></div></div>
+          <div class="metric-row"><div class="metric-top"><span>Ажлын хэт их ядралт</span><span>58%</span></div><div class="metric-track"><div class="metric-fill burnout" style="width:58%;"></div></div></div>
           <div class="metric-row"><div class="metric-top"><span>Сэтгэл ханамж</span><span>42%</span></div><div class="metric-track"><div class="metric-fill sat" style="width:42%;"></div></div></div>
           <div class="trend-note">📈 Таны стресс сүүлийн 14 хоногт буурсан байна.</div>
         </div>
@@ -659,7 +659,7 @@
           <div class="org-card"><div class="org-num">1,250</div><div class="org-lbl">Нийт ажилтан</div></div>
           <div class="org-card"><div class="org-num">876</div><div class="org-lbl">Судалгаанд хамрагдсан</div></div>
           <div class="org-card"><div class="org-num">61%</div><div class="org-lbl">Дундаж стресс</div></div>
-          <div class="org-card"><div class="org-num">17%</div><div class="org-lbl">Burnout-ийн өндөр эрсдэл</div></div>
+          <div class="org-card"><div class="org-num">17%</div><div class="org-lbl">Ажлын хэт их ядралтын өндөр эрсдэл</div></div>
           <div class="org-card"><div class="org-num">68%</div><div class="org-lbl">Ажлын сэтгэл ханамж</div></div>
           <div class="org-card"><div class="org-num">876/1250</div><div class="org-lbl">Хамрагдалтын түвшин</div></div>
         </div>
@@ -771,7 +771,7 @@
         <div class="section-card">
           <div class="section-head"><h3>Нууцлал ба өгөгдөл</h3></div>
           <div class="privacy-note" style="margin-top:0;">
-            Таны дневник, тестийн дүн зөвхөн танд харагдана (Row-Level Security-ээр database-ийн түвшинд хамгаалагдсан). Нийтлэл, хуваалцах хэсэгт бичсэн зүйл нэрээ нуусан, санамсаргүй нэрээр харагдана.
+            Таны дневник, тестийн дүн зөвхөн танд харагдана (Row-Level Security-ээр database-ийн түвшинд хамгаалагдсан). Сэтгэгдлээ хуваалцах хэсэгт бичсэн зүйл нэрээ нуусан, санамсаргүй нэрээр харагдана.
           </div>
         </div>
       </div>
@@ -1216,8 +1216,8 @@ setInterval(applyHeroScene, 5000); // 5 секунд тутамд солигдо
   const r2 = document.getElementById('hero-ripple2');
   if (!heroEl || !r1 || !r2) return;
   function moveTo(x, y) {
-    r1.style.transform = `translate(${x - 115}px, ${y - 115}px)`;
-    r2.style.transform = `translate(${x - 52.5}px, ${y - 52.5}px)`;
+    r1.style.transform = `translate(${x - 55}px, ${y - 55}px)`;
+    r2.style.transform = `translate(${x - 25}px, ${y - 25}px)`;
   }
   // Эхнээс нь hero-ийн төвд байрлуулж, шууд харагдахаар болгоно (холоос гүйж ирэхгүй)
   function setInitialCenter() {

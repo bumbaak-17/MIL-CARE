@@ -580,6 +580,16 @@
             </div>
           </div>
         </div>
+
+        <div class="section-card" style="margin-top:1.4rem;">
+          <div class="section-head"><h3>🧠 Анхаарлын сарнилтын түвшин</h3></div>
+          <p style="font-size:.85rem;color:var(--sub);margin:0 0 1.1rem;">Насанд хүрсэн хүний анхаарал хэр сарнидгийг хэмжих 24 асуулттай стандарт тест (Др. Голдберг).</p>
+          <div class="test-card" onclick="openAttentionScaleTest()" style="max-width:320px;">
+            <span class="test-emo">🧠</span>
+            <div class="test-title">Анхаарлын сарнилтын тест</div>
+            <div class="test-blurb">24 асуулт — 10 минут</div>
+          </div>
+        </div>
       </div>
 
       <!-- ================= FEED (community) ================= -->
@@ -1217,8 +1227,11 @@ async function loadMonthlyAnalysis() {
   if (!chartEl) return;
   if (!currentUser?.id) { chartEl.innerHTML = ''; alertEl.innerHTML = ''; return; }
 
-  const { data, error } = await sb.from('test_results').select('score, max_score, created_at, test_key').eq('user_id', currentUser.id).neq('test_key', 'color_vision').order('created_at', { ascending:true }).limit(2000);
+  const { data: rawData, error } = await sb.from('test_results').select('score, max_score, created_at, test_key').eq('user_id', currentUser.id).order('created_at', { ascending:true }).limit(2000);
   if (error) { console.error('loadMonthlyAnalysis error:', error); return; }
+  // Сэтгэл зүйн шинжтэй бус тестүүдийг (өнгө ялгах, анхаарлын сарнилт) нэгдсэн сэтгэл зүйн дүн шинжилгээнд оруулахгүй
+  const EXCLUDED_FROM_WELLNESS = ['color_vision', 'attention_scale'];
+  const data = (rawData || []).filter(r => !EXCLUDED_FROM_WELLNESS.includes(r.test_key));
 
   // Сар бүрийн (сүүлийн 12 сар) түлхүүрийг өнөөдрөөс тооцоолж бэлдэнэ
   const nowP = getUbParts();
@@ -1388,37 +1401,137 @@ function evaluateSymptoms() {
   const recommendedKeys = new Set();
   checkedCats.forEach(ci => { SYMPTOM_CATEGORIES[ci].tests.forEach(k => recommendedKeys.add(k)); });
 
-  let html = `<h3>🧭 Санал болгож буй тестүүд</h3>`;
+  if (recommendedKeys.size === 0 && !hasRisk) {
+    document.getElementById('modal-box').innerHTML = `
+      <h3>🧭 Санал болгож буй тестүүд</h3>
+      <p style="color:var(--sub);font-size:.9rem;">Одоогоор тодорхой шинж тэмдэг тэмдэглээгүй байна. Хэрэв та ямар нэгэн зүйл мэдэрч байгаа бол, дээрх жагсаалтаас сонгож дахин үзнэ үү.</p>
+      <div class="modal-actions" style="margin-top:1.1rem;"><button class="modal-close" onclick="renderSymptomForm()">← Буцах</button><button class="modal-close" onclick="closeModal()">Хаах</button></div>
+    `;
+    return;
+  }
+
+  // Шинж тэмдэг сонгогдсон бол товч дарах шаардлагагүйгээр шууд бөглөх талбар руу шилжинэ
+  startCombinedTests(Array.from(recommendedKeys), hasRisk);
+}
+
+/* ================= Санал болгосон тестүүдийг нэг дор бөглөж, нэгдсэн дүн гаргах ================= */
+function startCombinedTests(keys, hasRisk) {
+  window._combinedKeys = keys;
+  let html = `<h3>🧭 Нэгдсэн үнэлгээ</h3>`;
 
   if (hasRisk) {
     html += `
       <div class="disclaimer-note" style="background:var(--red-soft);border-left:3px solid var(--red);padding:1rem;border-radius:8px;margin-bottom:1.1rem;">
         <b style="color:var(--red);">⚠️ Танд яаралтай дэмжлэг хэрэгтэй байж болзошгүй.</b><br>
         Хэрэв та амиа хорлох тухай бодож байгаа, эсвэл өөртөө гэм хийхийг хүсэж байгаа бол, <b>одоо шууд</b> Яаралтай тусламжийн <b>103</b> дугаарт залгах, эсвэл итгэмжит хүн, мэргэжлийн сэтгэл зүйчид хандахыг хатуу зөвлөж байна. Та ганцаараа биш.
+        <div style="margin-top:.7rem;"><button class="connect-btn" style="width:auto;padding:.5rem 1.1rem;font-size:.82rem;" onclick="closeModal(); goto('pros');">Мэргэжилтэнтэй холбогдох</button></div>
       </div>
     `;
   }
 
-  if (recommendedKeys.size === 0 && !hasRisk) {
-    html += `<p style="color:var(--sub);font-size:.9rem;">Одоогоор тодорхой шинж тэмдэг тэмдэглээгүй байна. Хэрэв та ямар нэгэн зүйл мэдэрч байгаа бол, дээрх жагсаалтаас сонгож дахин үзнэ үү.</p>`;
-  } else if (recommendedKeys.size > 0) {
-    html += `<p style="color:var(--sub);font-size:.85rem;margin-bottom:1rem;">Таны сонгосон шинж тэмдэгт үндэслэн дараах тестүүдийг бөглөхийг санал болгож байна:</p>`;
-    html += `<div class="test-grid">` + Array.from(recommendedKeys).map(k => {
-      const t = TESTS[k];
-      if (!t) return '';
-      return `<div class="test-card" onclick="closeModal(); openModal('${k}');"><span class="test-emo">${t.emo}</span><div class="test-title">${t.title}</div><div class="test-blurb">${t.blurb}</div><div class="test-dur">${t.dur}</div></div>`;
-    }).join('') + `</div>`;
-  }
-
-  if (hasRisk) {
-    html += `<div class="modal-actions" style="margin-top:1.1rem;"><button class="modal-close" onclick="renderSymptomForm()">← Буцах</button><button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" onclick="closeModal(); goto('pros');">Мэргэжилтэнтэй холбогдох</button></div>`;
+  if (keys.length > 0) {
+    html += `<p class="msub">Доорх бүх асуултад хариулна уу — эцэст нь бүгдийг нэгтгэсэн ганц дүн шинжилгээ гарна.</p><div id="mq-wrap">`;
+    keys.forEach(key => {
+      const t = TESTS[key];
+      if (!t) return;
+      html += `<div style="margin-bottom:1.3rem;">
+        <div style="font-weight:800;font-size:.9rem;margin-bottom:.5rem;color:var(--gold);">${t.emo} ${t.title}</div>
+        ${t.qs.map((q,i)=>`
+          <div class="q-block"><div class="q-text">${i+1}. ${q}</div>
+            <div class="q-opts">${OPTS.map((o,v)=>`<label><input type="radio" name="cq_${key}_${i}" value="${v}"> ${o}</label>`).join('')}</div>
+          </div>`).join('')}
+      </div>`;
+    });
+    html += `</div><div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="scoreCombinedTests()">Дүн харах</button></div>`;
   } else {
-    html += `<div class="modal-actions" style="margin-top:1.1rem;"><button class="modal-close" onclick="renderSymptomForm()">← Буцах</button><button class="modal-close" onclick="closeModal()">Хаах</button></div>`;
+    html += `<div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button></div>`;
   }
 
   document.getElementById('modal-box').innerHTML = html;
 }
 
+/* Давамгайлж буй чиглэлд тохирсон, амьдралд ойр практик зөвлөгөө */
+const PRACTICAL_ADVICE = {
+  stress: ['Өдөрт багадаа 10 минут гүнзгий амьсгалын дасгал хийж, биеэ тайвшируулаарай.','Ажлаа жижиг алхмуудад хуваан, нэг дор бүгдийг хийхийг бүү оролдоорой.','Кофе, эрчим хүчний ундаа хэтрүүлэхгүй байхыг хичээгээрэй.'],
+  anxiety: ['Санаа зовж буй зүйлээ цаасан дээр бичиж, аль нь бодитоор өөрчлөх боломжтойг ялгаж үзээрэй.','Булчин сулруулах энгийн дасгал хийж, биеэ тайвшируулаарай.','Мэдээ, сошиал сүлжээ үзэх цагаа хязгаарлаж, тодорхой цагт л шалгаарай.'],
+  depression: ['Өдөр бүр богино хугацаагаар ч гэсэн гадаа алхаж, нар харах нь сэтгэл санаанд эерэгээр нөлөөлдөг.','Өөртөө өчүүхэн ч гэсэн зорилго тавьж, биелүүлсэн үедээ өөрийгөө урамшуулаарай.','Ганцаараа бүү байгаарай — итгэмжит хүнтэйгээ богино ч гэсэн ярилцаж үзээрэй.'],
+  burnout: ['Ажлаас тодорхой цагт "унтраадаг" зуршил тогтоож, амралтын цагаа хамгаалаарай.','Өдөрт багахан ч болов зөвхөн өөртөө зориулсан цаг гаргаарай.','Ажлын ачааллаа тэргүүлэх дарааллаар нь эрэмбэлж, бүгдийг нэг дор хийхийг бүү оролдоорой.'],
+  work_stress: ['Ажлын ачааллаа тэргүүлэх дарааллаар нь эрэмбэлж, ахлагчтайгаа хуваалцаарай.','Ажлаас гарсны дараа ажлын талаар бодохоо зогсоох "шилжилтийн зан үйл" бий болгоорой (жишээ нь алхах, дасгал хийх).','Хамт олноороо дэмжлэг үзүүлж, бэрхшээлээ хуваалцаарай.'],
+  sleep: ['Унтахаасаа 1 цагийн өмнө утас, дэлгэцнээс зайлсхийгээрэй.','Өдөр бүр ойролцоо цагт унтаж, сэрэх дэглэм баримтлаарай.','Орой хүнд хоол, кофейн агуулсан зүйл хэрэглэхээс зайлсхийгээрэй.'],
+  satisfaction: ['Амьдралдаа талархаж буй 3 зүйлээ өдөр бүр бичих дадал зуршил болгоорой.','Өөрийн дуртай хийдэг зүйлдээ тогтмол цаг гаргаарай.','Ойр дотны хүмүүстэйгээ илүү их цаг өнгөрөөхийг хичээгээрэй.'],
+  self_esteem: ['Өөрийгөө бусадтай харьцуулахаа больж, өөрийн ахиц дэвшилдээ анхаарлаа хандуулаарай.','Өдөр бүр өөртөө эерэгээр ханддаг нэг зүйл хэлж, бичиж үзээрэй.','Өөрийн давуу тал, амжилтаа тэмдэглэж, тогтмол эргэн харж байгаарай.'],
+  relationship: ['Ойр дотны хүмүүстэйгээ илэн далангүй, шударгаар ярилцах цаг гаргаарай.','Бусдыг сонсохдоо яаралгүй, идэвхтэй анхаарч сонсохыг хичээгээрэй.','Зөрчилдөөнийг тэвчихийн оронд, тайван орчинд ярьж шийдвэрлээрэй.'],
+};
+
+async function scoreCombinedTests() {
+  const keys = window._combinedKeys || [];
+  const results = [];
+  for (const key of keys) {
+    const t = TESTS[key];
+    if (!t) continue;
+    let total = 0, answered = 0;
+    for (let i=0;i<t.qs.length;i++){ const sel=document.querySelector(`input[name="cq_${key}_${i}"]:checked`); if(sel){answered++; total+=parseInt(sel.value,10);} }
+    if (answered < t.qs.length) { showToast(`"${t.title}" тестийн бүх асуултад хариулна уу.`, 'warn'); return; }
+    const max = t.qs.length*3;
+    const pct = Math.round((total/max)*100);
+    const level = pct < 34 ? 'Тайван' : pct < 62 ? 'Дунд зэрэг' : 'Өндөр анхаарал шаардлагатай';
+    const levelKey = pct < 34 ? 'low' : pct < 62 ? 'medium' : 'high';
+    results.push({ key, t, total, max, pct, level, levelKey });
+  }
+
+  if (currentUser?.id) {
+    for (const r of results) {
+      const { error } = await sb.from('test_results').insert({ user_id: currentUser.id, test_key: r.key, score: r.total, max_score: r.max, level: r.levelKey });
+      if (error) console.error('test_results save error:', error);
+    }
+    loadMonthlyAnalysis();
+  }
+
+  const avgPct = Math.round(results.reduce((s,r)=>s+r.pct,0) / results.length);
+  const overallLevel = avgPct < 34 ? 'Тайван' : avgPct < 62 ? 'Дунд зэрэг' : 'Өндөр анхаарал шаардлагатай';
+  const highAreas = results.filter(r => r.levelKey === 'high').map(r => r.t.title);
+  const medAreas = results.filter(r => r.levelKey === 'medium').map(r => r.t.title);
+
+  let summaryText;
+  if (highAreas.length) {
+    summaryText = `Дараах чиглэлд <b style="color:var(--red);">өндөр анхаарал</b> шаардлагатай үзүүлэлт ажиглагдлаа: <b>${highAreas.join(', ')}</b>.`;
+  } else if (medAreas.length) {
+    summaryText = `Дараах чиглэлд <b style="color:var(--brass);">дунд зэргийн анхаарал</b> шаардлагатай үзүүлэлт ажиглагдлаа: <b>${medAreas.join(', ')}</b>.`;
+  } else {
+    summaryText = 'Ерөнхийдөө тайван, тогтвортой үзүүлэлттэй байна. Одоогийн дадлаа үргэлжлүүлээрэй.';
+  }
+
+  // Хамгийн өндөр хувьтай (давамгайлж буй) чиглэлийг тодорхойлж, түүнд тохирсон практик зөвлөгөө өгнө
+  const dominant = results.reduce((max, r) => (r.pct > max.pct ? r : max), results[0]);
+  const dominantTips = PRACTICAL_ADVICE[dominant.key] || [];
+  const dominantHtml = dominant.pct >= 34 && dominantTips.length ? `
+    <div class="section-card" style="margin:1rem 0;background:var(--gold-soft);border:1px solid var(--gold);">
+      <div style="font-weight:800;font-size:.9rem;margin-bottom:.6rem;">🎯 Танд хамгийн их нөлөөлж буй тал: <span style="color:var(--gold-deep);">${dominant.t.emo} ${dominant.t.title}</span></div>
+      <div style="font-size:.83rem;color:var(--sub);margin-bottom:.7rem;">Амьдралдаа хэрэгжүүлж болох энгийн алхмууд:</div>
+      <ul class="result-list">${dominantTips.map(tip => `<li>${tip}</li>`).join('')}</ul>
+    </div>
+  ` : '';
+
+  const html = `
+    <h3>🧭 Нэгдсэн дүн шинжилгээ</h3>
+    <div class="result-level">${overallLevel} (дундаж ${avgPct}%)</div>
+    <div class="result-block">${summaryText}</div>
+    <div style="margin:1.1rem 0;">
+      ${results.map(r => `
+        <div style="margin-bottom:.9rem;">
+          <div style="display:flex;justify-content:space-between;font-size:.84rem;font-weight:700;margin-bottom:.3rem;">
+            <span>${r.t.emo} ${r.t.title}</span><span>${r.level} · ${r.pct}%</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" style="width:${r.pct}%;"></div></div>
+        </div>
+      `).join('')}
+    </div>
+    ${dominantHtml}
+    <div class="disclaimer-note">⚠️ Энэ бол эмнэлгийн онош биш, зөвхөн эрт анхаарал татах зорилготой нэгдсэн скрининг үр дүн. Дэлгэрэнгүй мэдээллийг "Миний сэтгэл зүй" хуудаснаас харах боломжтой.</div>
+    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="closeModal(); goto('pros');">Мэргэжилтэнтэй холбогдох</button></div>
+  `;
+  document.getElementById('modal-box').innerHTML = html;
+}
 
 function renderTestCard(key, t) {
   return `<div class="test-card" onclick="openModal('${key}')"><span class="test-emo">${t.emo}</span><div class="test-title">${t.title}</div><div class="test-blurb">${t.blurb}</div><div class="test-dur">${t.dur}</div></div>`;
@@ -1438,6 +1551,79 @@ const ISHIHARA_PLATES = [
 let ishiharaIdx = 0;
 let ishiharaCorrect = 0;
 let ishiharaAnswers = [];
+
+/* ================= АНХААРЛЫН САРНИЛТЫН ТЕСТ (Др. Голдберг, 24 асуулт) ================= */
+const ATTENTION_SCALE_QS = [
+  'Гэр, ажил дээр онцын сонирхолгүй зүйлд анхаарал татагддаг.',
+  'Онц сонирхолтой санагдахгүй бол эсвэл амархан биш л бол юм уншдаггүй.',
+  'Ялангуяа багийн дунд яригдаж байгаа ярианд анхаарлаа төвлөрүүлэх хэцүү байдаг.',
+  'Хурдан сэтгэл хөдөлж, хурдан намждаг.',
+  'Ихэнхдээ сэтгэл тавгүй байдаг. Жижиг юманд уур хүрдэг.',
+  'Бодолгүйгээр хэлсэн үгээ дараа нь үгүйсгэдэг.',
+  'Муу үр дүнд хүрэхийг тооцоололгүй бодлогогүй хурдан шийдвэр гаргадаг.',
+  'Эхлээд яриад дараа нь боддог маань хүмүүстэй харьцахад сөргөөр нөлөөлдөг.',
+  'Сэтгэл санаа үргэлж тогтворгүй байдаг.',
+  'Ямар нэг ажил хийх, хөөцөлдөхийн тулд төлөвлөгөө гаргах нь надад хэцүү байдаг.',
+  'Хурдан сэтгэлээр унадаг.',
+  'Би маш эмзэг хүн. Тиймээс хурдан гомддог.',
+  'Үргэлж юманд явах гэж байгаа юм шиг санагддаг.',
+  'Явж байх нь сууж байхаас илүү сайхан байдаг.',
+  'Ихэнхдээ асуултыг бүрэн сонсолгүй хариулж эхэлдэг.',
+  'Нэг дор олон юмыг зэрэг эхэлдэг ч ихэнхдээ дуусгаж чаддаггүй.',
+  'Үргэлж янз бүрийн юм бодож байдаг.',
+  'Дуугүй сууж байхдаа хүртэл хөл гараа хөдөлгөж байдаг.',
+  'Багаар ажиллаж байхдаа өөрийнхөө ээлж ирэхийг тэсэн ядан хүлээдэг.',
+  'Ухаан санаа минь байнга онцын чухал биш зүйлээр дүүрэн байдаг.',
+  'Ухаан санаа минь хананд ойж байгаа бөмбөг адил ийш тийш цойлж байдаг.',
+  'Миний тархи нэг дор олон суваг харуулдаг зурагт шиг ажилладаг.',
+  'Өдрийн цагаар ч мөрөөдөлдөө умбах ч энүүхэнд шүү.',
+  'Замбараагүй, эмх цэгцгүй бодлоос болоод стресст ордог.',
+];
+const OPTS6 = ['Хэзээ ч үгүй','Бага','Бага зэрэг','Дунд зэрэг','Нэлээд их','Маш их'];
+
+function openAttentionScaleTest() {
+  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('modal-box').innerHTML = `
+    <h3>🧠 Анхаарлын сарнилтын тест</h3>
+    <p class="msub">Насанд хүрсэн хүний анхаарал хэр сарнидгийг хэмжих стандарт тест. Асуулт бүрд өөрт хамгийн тохирох хариултыг сонгоно уу.</p>
+    <div id="mq-wrap">${ATTENTION_SCALE_QS.map((q,i)=>`
+      <div class="q-block"><div class="q-text">${i+1}. ${q}</div>
+        <div class="q-opts">${OPTS6.map((o,v)=>`<label><input type="radio" name="aq${i}" value="${v}"> ${o}</label>`).join('')}</div>
+      </div>`).join('')}</div>
+    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="scoreAttentionScaleTest()">Дүн харах</button></div>
+  `;
+}
+
+async function scoreAttentionScaleTest() {
+  let total = 0, answered = 0;
+  for (let i=0;i<ATTENTION_SCALE_QS.length;i++){
+    const sel = document.querySelector(`input[name="aq${i}"]:checked`);
+    if (sel) { answered++; total += parseInt(sel.value,10); }
+  }
+  if (answered < ATTENTION_SCALE_QS.length) { showToast('Бүх асуултад хариулна уу.', 'warn'); return; }
+  const max = ATTENTION_SCALE_QS.length * 5;
+  const pct = Math.round((total/max)*100);
+  const highRisk = total >= 70;
+  const level = highRisk ? 'Өндөр' : 'Хэвийн';
+  const levelKey = highRisk ? 'high' : 'low';
+  const interpretation = highRisk
+    ? 'Таны оноо 70-аас дээш байна. Др. Голдбергийн судалгаагаар ийм оноотой хүмүүсийн анхаарал 95%-ийн магадлалтайгаар сарнидаг байна.'
+    : 'Таны оноо 70-аас доогуур байна. Энэ нь анхаарал сарнилтын өндөр эрсдэлгүй болохыг илтгэж байна.';
+
+  if (currentUser?.id) {
+    const { error } = await sb.from('test_results').insert({ user_id: currentUser.id, test_key: 'attention_scale', score: total, max_score: max, level: levelKey });
+    if (error) console.error('attention scale save error:', error);
+  }
+
+  document.getElementById('modal-box').innerHTML = `
+    <h3>Анхаарлын сарнилтын тест — Үр дүн</h3>
+    <div class="result-level">${total} / ${max} оноо (${pct}%) — ${level}</div>
+    <div class="bar-row"><div class="bar-track"><div class="bar-fill" style="width:${pct}%;"></div></div></div>
+    <div class="result-block"><b>Тайлбар:</b> ${interpretation}</div>
+    <div class="disclaimer-note">⚠️ Энэ тест нь эмнэлгийн онош биш, зөвхөн эрт анхаарал татах зорилготой энгийн скрининг хэрэгсэл.</div>
+    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="closeModal(); goto('pros');">Мэргэжилтэнтэй холбогдох</button></div>
+  `;
+}
 
 function openColorTest() {
   ishiharaIdx = 0; ishiharaCorrect = 0; ishiharaAnswers = [];

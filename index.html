@@ -60,6 +60,8 @@
   .bell svg{width:20px;height:20px;}
   .bell .dot{position:absolute;top:-4px;right:-5px;background:var(--red);color:#fff;font-size:.6rem;
     font-weight:800;border-radius:100px;padding:.05rem .35rem;}
+  .nav-badge{background:var(--red);color:#fff;font-size:.65rem;font-weight:800;border-radius:100px;
+    padding:.05rem .4rem;margin-left:auto;}
   .user-chip{display:flex;align-items:center;gap:.6rem;cursor:pointer;}
   .user-avatar{width:34px;height:34px;border-radius:50%;background:var(--panel-3);
     display:flex;align-items:center;justify-content:center;font-size:1rem;}
@@ -473,12 +475,13 @@
       <li class="navitem" data-view="memory"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 2A3.5 3.5 0 0 0 6 5.5v.55a2.5 2.5 0 0 0-1.96 3.7A2.5 2.5 0 0 0 3 12v1a2.5 2.5 0 0 0 1.5 2.29V17a3 3 0 0 0 3 3v0a2 2 0 0 0 2-2V5.5A3.5 3.5 0 0 0 9.5 2Z"/><path d="M14.5 2A3.5 3.5 0 0 1 18 5.5v.55a2.5 2.5 0 0 1 1.96 3.7A2.5 2.5 0 0 1 21 12v1a2.5 2.5 0 0 1-1.5 2.29V17a3 3 0 0 1-3 3v0a2 2 0 0 1-2-2V5.5A3.5 3.5 0 0 1 14.5 2Z"/></svg>Санах ой, анхаарлыг хөгжүүлэх тест</li>
       <li class="navitem" data-view="attention"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>Анхаарал шалгах тест</li>
       <li class="navitem" data-view="feed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 5h4v4"/></svg>Сэтгэгдлээ хуваалцах</li>
-      <li class="navitem" data-view="pros"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>Сэтгэл зүйч</li>
+      <li class="navitem" data-view="pros"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>Сэтгэл зүйч<span id="pros-nav-badge" class="nav-badge" style="display:none;">0</span></li>
       <li class="navitem" data-view="analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>Миний сэтгэл зүй</li>
 
       <div class="navgroup-label">БАЙГУУЛЛАГА</div>
       <li class="navitem" data-view="org"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg>Нийт статистик үзүүлэлт</li>
       <li class="navitem" data-view="admin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82 2 2 0 1 1-2.83 2.83 1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33 2 2 0 1 1-2.83-2.83A1.65 1.65 0 0 0 4.6 15 1.65 1.65 0 0 0 3 14H2.91a2 2 0 0 1 0-4H3a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82 2 2 0 1 1 2.83-2.83A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33 2 2 0 1 1 2.83 2.83A1.65 1.65 0 0 0 19.4 9c.36.14.63.44.77.83H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Админ систем</li>
+      <li class="navitem" data-view="proportal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 6v6c0 5 3.5 8.5 9 10 5.5-1.5 9-5 9-10V6z"/><path d="M9 12l2 2 4-4"/></svg>Мэргэжилтний портал<span id="proportal-nav-badge" class="nav-badge" style="display:none;">0</span></li>
 
       <div class="navgroup-label">ХЭРЭГЛЭГЧ</div>
       <li class="navitem" data-view="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>Миний профайл</li>
@@ -662,7 +665,6 @@
         <div class="filter-bar">
           <select id="f-issue"><option value="">Асуудлаар</option><option>Стресс</option><option>Гэр бүл</option><option>Цэргийн сэтгэл зүй</option><option>Ажлын хэт их ядралт</option></select>
           <select id="f-loc"><option value="">Байршлаар</option><option>Улаанбаатар</option><option>Орон нутаг</option><option>Онлайн</option></select>
-          <select id="f-rating"><option value="">Үнэлгээгээр</option><option value="desc">Өндөрөөс бага руу</option></select>
           <select id="f-price"><option value="">Үнээр</option><option value="asc">Хямдаас өндөр рүү</option><option value="desc">Өндрөөс хямд руу</option></select>
         </div>
         <div id="pro-list-full"></div>
@@ -709,6 +711,12 @@
         </div>
       </div>
 
+      <!-- ================= МЭРГЭЖИЛТНИЙ ПОРТАЛ ================= -->
+      <div id="view-proportal" class="view">
+        <div class="page-head"><h2>Мэргэжилтний портал</h2><p>Танд ирсэн зөвлөгөөний хүсэлтэд шууд хариулах хэсэг.</p></div>
+        <div id="proportal-content"><div class="section-card"><div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div></div></div>
+      </div>
+
       <!-- ================= ADMIN ================= -->
       <div id="view-admin" class="view">
         <div class="page-head"><h2>Админ систем</h2><p>Платформын удирдлагын самбар.</p></div>
@@ -733,6 +741,59 @@
             <div class="section-head"><h3>📧 Бүртгэлтэй хэрэглэгчид (зөвхөн админ)</h3></div>
             <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Имэйл/нууц үгээр бүртгүүлсэн хэрэглэгчдийн жагсаалт.</p>
             <div id="registered-users-list"></div>
+          </div>
+          <div class="section-card">
+            <div class="section-head"><h3>💬 Мэргэжилтний чат (зөвхөн админ)</h3></div>
+            <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Хэрэглэгчдийн мэргэжилтэнтэй чатласан мессежүүд. Мэргэжилтний нэрийн өмнөөс хариулах боломжтой.</p>
+            <div id="admin-chat-threads"></div>
+          </div>
+          <div class="section-card" id="admin-professionals-section">
+            <div class="section-head"><h3>👩‍⚕️ Мэргэжилтнүүдийг удирдах</h3></div>
+            <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Жинхэнэ сэтгэл зүйч, мэргэжилтний мэдээллийг энд нэмж, засаж, устгаж болно. Энд орсон мэдээлэл шууд "Сэтгэл зүйч" хуудсанд харагдана.</p>
+
+            <div id="admin-pro-form-wrap">
+              <input type="hidden" id="pro-edit-id" value="">
+              <div class="filter-bar" style="margin-bottom:.7rem;">
+                <input type="text" id="pro-name" placeholder="Овог нэр (жишээ: Б.Ануударь)" style="border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
+                <input type="text" id="pro-spec" placeholder="Мэргэжил (жишээ: Клиникийн сэтгэл зүйч)" style="border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
+                <input type="number" id="pro-years" placeholder="Туршлага (жил)" min="0" style="border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
+                <input type="number" id="pro-price" placeholder="Үнэ (₮)" min="0" step="1000" style="border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
+              </div>
+              <div class="filter-bar" style="margin-bottom:.9rem;">
+                <select id="pro-location" style="border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
+                  <option value="Улаанбаатар">Улаанбаатар</option>
+                  <option value="Орон нутаг">Орон нутаг</option>
+                  <option value="Онлайн">Онлайн</option>
+                </select>
+                <select id="pro-issue-tag" style="border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
+                  <option value="Стресс">Стресс</option>
+                  <option value="Гэр бүл">Гэр бүл</option>
+                  <option value="Цэргийн сэтгэл зүй">Цэргийн сэтгэл зүй</option>
+                  <option value="Ажлын хэт их ядралт">Ажлын хэт их ядралт</option>
+                </select>
+                <input type="number" id="pro-rating" placeholder="Үнэлгээ (1-5)" min="1" max="5" step="0.1" value="5" style="border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
+              </div>
+              <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" id="pro-save-btn" onclick="saveProfessional()">Нэмэх</button>
+              <button class="modal-close" style="margin-left:.6rem;display:none;" id="pro-cancel-btn" onclick="cancelEditProfessional()">Цуцлах</button>
+              <div id="pro-form-msg" style="font-size:.82rem;margin-top:.7rem;"></div>
+            </div>
+
+            <div id="admin-pro-list" style="margin-top:1.3rem;"></div>
+          </div>
+
+          <div class="section-card" id="admin-pro-link-section">
+            <div class="section-head"><h3>🔗 Мэргэжилтний нэвтрэх эрхийг холбох</h3></div>
+            <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">
+              Мэргэжилтэн эхлээд өөрөө сайтад имэйл/нууц үгээрээ бүртгүүлсэн байх ёстой (жирийн хэрэглэгчийн адилаар). Дараа нь энд түүний профайлыг сонгож, бүртгүүлсэн имэйлийг нь оруулснаар тэр өөрөө "Мэргэжилтний портал"-даа шууд орж чатад хариулах эрхтэй болно.
+            </p>
+            <div class="field"><label style="display:block;margin-bottom:.4rem;">Мэргэжилтэн</label>
+              <select id="pro-link-select" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);"></select>
+            </div>
+            <div class="field"><label style="display:block;margin-bottom:.4rem;">Бүртгүүлсэн имэйл</label>
+              <input type="email" id="pro-link-email" placeholder="mergejilten@jishee.mn" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);">
+            </div>
+            <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" onclick="linkProfessionalAccount()">Холбох</button>
+            <div id="pro-link-msg" style="font-size:.82rem;margin-top:.7rem;"></div>
           </div>
           <div class="section-card">
             <div class="section-head"><h3>🚨 Эрсдэлийн дохио (жишээ)</h3></div>
@@ -1378,6 +1439,8 @@ async function adminLogin() {
     loadIdentityList();
     loadCompositionStats();
     loadRegisteredUsers();
+    loadAdminChatThreads();
+    loadAdminProfessionals();
   } else {
     msgEl.style.color='var(--red)';
     msgEl.textContent='Энэ бүртгэл админ эрхгүй байна.';
@@ -1427,6 +1490,8 @@ function goto(view, pushState) {
   if (view === 'memory') { memoryIdx = 0; renderMemoryExercise(0); }
   if (view === 'analytics') { loadAnalyticsSummary(); loadMonthlyAnalysis(); }
   if (view === 'org') { loadOrgStats(); }
+  if (view === 'pros') { loadPros(); }
+  if (view === 'proportal') { loadProPortal(); }
   // Хөтчийн "Буцах" товч ажиллахын тулд history-д хуудсаа бүртгэнэ
   if (pushState !== false) {
     history.pushState({ view: view }, '', '#' + view);
@@ -2340,10 +2405,8 @@ let PROS = [];
 function renderPros() {
   const issue = document.getElementById('f-issue')?.value;
   const loc = document.getElementById('f-loc')?.value;
-  const ratingSort = document.getElementById('f-rating')?.value;
   const priceSort = document.getElementById('f-price')?.value;
   let list = PROS.filter(p => (!issue || p.issue_tag===issue) && (!loc || p.location===loc));
-  if (ratingSort==='desc') list = [...list].sort((a,b)=>b.rating-a.rating);
   if (priceSort==='asc') list = [...list].sort((a,b)=>a.price-b.price);
   if (priceSort==='desc') list = [...list].sort((a,b)=>b.price-a.price);
   const el = document.getElementById('pro-list-full');
@@ -2358,7 +2421,7 @@ function renderPros() {
         <div class="pro-price">${p.price.toLocaleString()}₮</div>
       </div>
       <div class="pro-actions">
-        <button class="txt" onclick="bookPro('${p.id}','${p.name}','Текст зөвлөгөө')">Текст зөвлөгөө</button>
+        <button class="txt" onclick="openChat('${p.id}','${p.name}')">💬 Чатаар холбогдох</button>
         <button class="vid" onclick="bookPro('${p.id}','${p.name}','Видео зөвлөгөө')">Видео зөвлөгөө</button>
       </div>
     </div>`).join('');
@@ -2369,7 +2432,307 @@ async function loadPros() {
   PROS = data;
   renderPros();
 }
-['f-issue','f-loc','f-rating','f-price'].forEach(id => document.getElementById(id).addEventListener('change', renderPros));
+['f-issue','f-loc','f-price'].forEach(id => document.getElementById(id).addEventListener('change', renderPros));
+
+/* ================= ХЭРЭГЛЭГЧИЙН ТАЛ: Мэргэжилтнээс ирсэн хариултын мэдэгдэл ================= */
+let userUnreadReplyCount = 0;
+let userGlobalChatChannel = null;
+
+async function refreshUserUnreadReplies() {
+  if (!currentUser?.id) return;
+  const { data, error } = await sb.from('chat_messages').select('professional_id, sender, created_at')
+    .eq('user_id', currentUser.id).order('created_at', { ascending: true });
+  if (error) { console.error('refreshUserUnreadReplies error:', error); return; }
+  const lastSenderByThread = {};
+  (data || []).forEach(m => { lastSenderByThread[m.professional_id] = m.sender; });
+  userUnreadReplyCount = Object.values(lastSenderByThread).filter(s => s !== 'user').length;
+  renderUserChatBadge();
+}
+
+function renderUserChatBadge() {
+  const navBadge = document.getElementById('pros-nav-badge');
+  if (navBadge) {
+    navBadge.textContent = userUnreadReplyCount;
+    navBadge.style.display = userUnreadReplyCount > 0 ? 'inline-block' : 'none';
+  }
+  // Хонх дээр: мэргэжилтний session биш л бол хэрэглэгчийн хариултын тоог харуулна
+  if (!myProId) {
+    const bellDot = document.querySelector('.bell .dot');
+    if (bellDot) {
+      bellDot.textContent = userUnreadReplyCount;
+      bellDot.style.display = userUnreadReplyCount > 0 ? 'block' : 'none';
+    }
+  }
+}
+
+function subscribeUserGlobalChat() {
+  if (!currentUser?.id) return;
+  if (userGlobalChatChannel) { sb.removeChannel(userGlobalChatChannel); userGlobalChatChannel = null; }
+  userGlobalChatChannel = sb.channel('user-chat-global-' + currentUser.id)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages' }, (payload) => {
+      if (payload.new.user_id !== currentUser.id) return;
+      refreshUserUnreadReplies();
+      if (payload.new.sender !== 'user') {
+        showToast('💬 Мэргэжилтнээс шинэ хариу ирлээ! "Сэтгэл зүйч" хэсгээс харна уу.', 'info', 6000);
+      }
+    })
+    .subscribe();
+}
+
+/* ================= МЭРГЭЖИЛТНИЙ ШИНЭ ЗУРВАСЫН МЭДЭГДЭЛ (Facebook-ийн badge шиг) ================= */
+let proUnreadCount = 0;
+let proGlobalRealtimeChannel = null;
+
+async function initProfessionalNotifications() {
+  const { data, error } = await sb.rpc('get_my_professional_profile');
+  if (error || !data || !data.length) return; // энэ хэрэглэгч мэргэжилтэн биш
+  myProId = data[0].id;
+  myProName = data[0].name;
+  await refreshProUnreadCount();
+  subscribeProGlobalRealtime();
+}
+
+async function refreshProUnreadCount() {
+  if (!myProId) return;
+  const { data, error } = await sb.from('chat_messages').select('user_id, sender, created_at')
+    .eq('professional_id', myProId).order('created_at', { ascending: true });
+  if (error) { console.error('refreshProUnreadCount error:', error); return; }
+  const lastSenderByThread = {};
+  (data || []).forEach(m => { lastSenderByThread[m.user_id] = m.sender; }); // ascending тул сүүлийнх нь дараа бичигдэж давхарлагдана
+  proUnreadCount = Object.values(lastSenderByThread).filter(s => s === 'user').length;
+  renderProNotificationBadge();
+}
+
+function renderProNotificationBadge() {
+  const navBadge = document.getElementById('proportal-nav-badge');
+  if (navBadge) {
+    navBadge.textContent = proUnreadCount;
+    navBadge.style.display = proUnreadCount > 0 ? 'inline-block' : 'none';
+  }
+  const bellDot = document.querySelector('.bell .dot');
+  if (bellDot && myProId) { // зөвхөн мэргэжилтэн session дээр л хонхыг бодит тоогоор дарж бичнэ
+    bellDot.textContent = proUnreadCount;
+    bellDot.style.display = proUnreadCount > 0 ? 'block' : 'none';
+  }
+}
+
+function subscribeProGlobalRealtime() {
+  if (!myProId) return;
+  if (proGlobalRealtimeChannel) { sb.removeChannel(proGlobalRealtimeChannel); proGlobalRealtimeChannel = null; }
+  proGlobalRealtimeChannel = sb.channel('pro-global-' + myProId)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages' }, (payload) => {
+      if (payload.new.professional_id !== myProId) return;
+      refreshProUnreadCount();
+      if (payload.new.sender === 'user') {
+        showToast('💬 Шинэ зөвлөгөөний хүсэлт ирлээ! "Мэргэжилтний портал"-аас хариулаарай.', 'info', 6000);
+      }
+    })
+    .subscribe();
+}
+
+/* ================= МЭРГЭЖИЛТНИЙ ПОРТАЛ (бодит мэргэжилтэн өөрийн имэйлээрээ хариулах) ================= */
+let myProId = null;
+let myProName = '';
+let proChatChannel = null;
+let currentProChatUserId = null;
+
+async function loadProPortal() {
+  const el = document.getElementById('proportal-content');
+  if (!currentUser?.id) return;
+  el.innerHTML = '<div class="section-card"><div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div></div>';
+  const { data, error } = await sb.rpc('get_my_professional_profile');
+  if (error) {
+    console.error('get_my_professional_profile error:', error);
+    el.innerHTML = '<div class="section-card"><div style="color:var(--sub);font-size:.85rem;">Ачаалж чадсангүй (SQL функц тохируулагдаагүй байж болзошгүй).</div></div>';
+    return;
+  }
+  if (!data || !data.length) {
+    el.innerHTML = `
+      <div class="section-card">
+        <div class="section-head"><h3>🔒 Танд мэргэжилтний эрх алга</h3></div>
+        <p style="font-size:.85rem;color:var(--sub);margin:0;">Хэрэв та манай платформын бодит мэргэжилтэн бөгөөд хэрэглэгчидтэй чатлах эрх авах шаардлагатай бол, одоогийн энэ имэйлээрээ (${currentUser.email || 'бүртгэлгүй'}) админтай холбогдоно уу.</p>
+      </div>`;
+    return;
+  }
+  myProId = data[0].id;
+  myProName = data[0].name;
+  el.innerHTML = `
+    <div class="section-card">
+      <div class="section-head"><h3>👋 Тавтай морил, ${myProName}!</h3></div>
+      <p style="font-size:.85rem;color:var(--sub);margin:0;">Танд ирсэн зөвлөгөөний хүсэлтүүд доор жагсаагдана. Нэг мөрийг дарж, хариулаарай.</p>
+    </div>
+    <div class="section-card">
+      <div class="section-head"><h3>💬 Ирсэн хүсэлтүүд</h3></div>
+      <div id="pro-chat-threads"></div>
+    </div>
+  `;
+  loadProChatThreads();
+}
+
+async function loadProChatThreads() {
+  const el = document.getElementById('pro-chat-threads');
+  if (!el) return;
+  el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div>';
+  const { data, error } = await sb.from('chat_messages').select('user_id, body, sender, created_at')
+    .eq('professional_id', myProId).order('created_at', { ascending: false });
+  if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж чадсангүй.</div>'; return; }
+  const threads = {};
+  (data || []).forEach(m => { if (!threads[m.user_id]) threads[m.user_id] = m; });
+  const list = Object.entries(threads);
+  if (!list.length) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор танд бичсэн хэн ч алга.</div>'; return; }
+  el.innerHTML = list.map(([uid, m]) => `
+    <div class="unit-row" style="cursor:pointer;" onclick="openProChat('${uid}')">
+      <div class="unit-name">Нэрээ нуусан хэрэглэгч #${uid.slice(0,8)}…</div>
+      <div style="color:var(--sub);font-size:.78rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.sender === 'user' ? '👤' : '✅'} ${m.body}</div>
+    </div>
+  `).join('');
+}
+
+function openProChat(uid) {
+  currentProChatUserId = uid;
+  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('modal-box').innerHTML = `
+    <h3>💬 Нэрээ нуусан хэрэглэгч #${uid.slice(0,8)}…</h3>
+    <div id="pro-chat-messages" style="max-height:320px;overflow-y:auto;border:1px solid var(--line);border-radius:12px;padding:.8rem;margin:.8rem 0;background:var(--panel-2);"></div>
+    <div style="display:flex;gap:.5rem;">
+      <input type="text" id="pro-chat-input" placeholder="Хариу бичих..." onkeydown="if(event.key==='Enter'){sendProChatMessage();}" style="flex:1;border:1px solid var(--line);border-radius:10px;padding:.6rem .8rem;font-family:inherit;font-size:.9rem;background:#fff;color:var(--cream);">
+      <button class="connect-btn" style="width:auto;padding:.6rem 1.1rem;" onclick="sendProChatMessage()">Илгээх</button>
+    </div>
+    <div class="modal-actions" style="margin-top:.9rem;"><button class="modal-close" onclick="closeProChat()">Хаах</button></div>
+  `;
+  loadProChatMessages();
+  subscribeProChatRealtime();
+}
+
+async function loadProChatMessages() {
+  const el = document.getElementById('pro-chat-messages');
+  if (!el) return;
+  const { data, error } = await sb.from('chat_messages').select('*')
+    .eq('user_id', currentProChatUserId).eq('professional_id', myProId)
+    .order('created_at', { ascending: true });
+  if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалахад алдаа гарлаа.</div>'; return; }
+  if (!data.length) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;text-align:center;">Мессеж алга.</div>'; return; }
+  el.innerHTML = data.map(m => `
+    <div style="display:flex;justify-content:${m.sender !== 'user' ? 'flex-end' : 'flex-start'};margin-bottom:.5rem;">
+      <div style="max-width:75%;padding:.5rem .8rem;border-radius:12px;font-size:.85rem;
+        background:${m.sender !== 'user' ? 'var(--gold)' : '#fff'};
+        color:${m.sender !== 'user' ? '#fff' : 'var(--cream)'};
+        border:1px solid var(--line);">${m.body}</div>
+    </div>`).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+async function sendProChatMessage() {
+  const input = document.getElementById('pro-chat-input');
+  const body = input.value.trim();
+  if (!body) return;
+  input.value = '';
+  const { error } = await sb.from('chat_messages').insert({
+    user_id: currentProChatUserId, professional_id: myProId, sender: 'pro', body
+  });
+  if (error) { showToast('Илгээхэд алдаа гарлаа: ' + error.message, 'error'); return; }
+  loadProChatMessages();
+  refreshProUnreadCount();
+}
+
+function subscribeProChatRealtime() {
+  if (proChatChannel) { sb.removeChannel(proChatChannel); proChatChannel = null; }
+  proChatChannel = sb.channel('pro-chat-' + myProId + '-' + currentProChatUserId)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages' }, (payload) => {
+      if (payload.new.user_id === currentProChatUserId && payload.new.professional_id === myProId) {
+        loadProChatMessages();
+      }
+    })
+    .subscribe();
+}
+
+function closeProChat() {
+  if (proChatChannel) { sb.removeChannel(proChatChannel); proChatChannel = null; }
+  closeModal();
+  loadProChatThreads();
+  refreshProUnreadCount();
+}
+
+/* ================= ЧАТ: Мэргэжилтэнтэй бодит цагийн харилцаа (Supabase Realtime) ================= */
+let currentChatProId = null;
+let currentChatProName = '';
+let chatRealtimeChannel = null;
+
+function openChat(proId, name) {
+  if (!currentUser?.id) { showToast('Чат ашиглахын тулд эхлээд нэвтэрнэ үү.', 'warn'); return; }
+  currentChatProId = proId;
+  currentChatProName = name;
+  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('modal-box').innerHTML = `
+    <h3>💬 ${name}-тэй чатлах</h3>
+    <p class="msub">Таны мессежийг зөвхөн энэ мэргэжилтэн болон таны эрх бүхий админ харна. Нэрээ нуусан хэвээр байна.</p>
+    <div id="chat-messages" style="max-height:320px;overflow-y:auto;border:1px solid var(--line);border-radius:12px;padding:.8rem;margin:.8rem 0;background:var(--panel-2);"></div>
+    <div style="display:flex;gap:.5rem;">
+      <input type="text" id="chat-input" placeholder="Мессежээ бичих..." onkeydown="if(event.key==='Enter'){sendChatMessage();}" style="flex:1;border:1px solid var(--line);border-radius:10px;padding:.6rem .8rem;font-family:inherit;font-size:.9rem;background:#fff;color:var(--cream);">
+      <button class="connect-btn" style="width:auto;padding:.6rem 1.1rem;" onclick="sendChatMessage()">Илгээх</button>
+    </div>
+    <div class="modal-actions" style="margin-top:.9rem;"><button class="modal-close" onclick="closeChat()">Хаах</button></div>
+  `;
+  loadChatMessages();
+  subscribeChatRealtime();
+}
+
+async function loadChatMessages() {
+  const el = document.getElementById('chat-messages');
+  if (!el || !currentUser?.id) return;
+  const { data, error } = await sb.from('chat_messages').select('*')
+    .eq('user_id', currentUser.id).eq('professional_id', currentChatProId)
+    .order('created_at', { ascending: true });
+  if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Мессеж ачаалахад алдаа гарлаа (chat_messages хүснэгт үүсээгүй байж болзошгүй).</div>'; return; }
+  renderChatMessages(data || []);
+}
+
+function renderChatMessages(msgs) {
+  const el = document.getElementById('chat-messages');
+  if (!el) return;
+  if (!msgs.length) {
+    el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;text-align:center;padding:1rem 0;">Мессеж алга. Эхний мессежээ бичээрэй 👇</div>';
+    return;
+  }
+  el.innerHTML = msgs.map(m => `
+    <div style="display:flex;justify-content:${m.sender === 'user' ? 'flex-end' : 'flex-start'};margin-bottom:.5rem;">
+      <div style="max-width:75%;padding:.5rem .8rem;border-radius:12px;font-size:.85rem;
+        background:${m.sender === 'user' ? 'var(--gold)' : '#fff'};
+        color:${m.sender === 'user' ? '#fff' : 'var(--cream)'};
+        border:1px solid var(--line);">${m.body}</div>
+    </div>`).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+async function sendChatMessage() {
+  const input = document.getElementById('chat-input');
+  const body = input.value.trim();
+  if (!body || !currentUser?.id) return;
+  input.value = '';
+  const { error } = await sb.from('chat_messages').insert({
+    user_id: currentUser.id, professional_id: currentChatProId, sender: 'user', body
+  });
+  if (error) { showToast('Илгээхэд алдаа гарлаа: ' + error.message, 'error'); return; }
+  loadChatMessages();
+  refreshUserUnreadReplies();
+}
+
+function subscribeChatRealtime() {
+  if (chatRealtimeChannel) { sb.removeChannel(chatRealtimeChannel); chatRealtimeChannel = null; }
+  chatRealtimeChannel = sb.channel('chat-' + currentChatProId + '-' + currentUser.id)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages' }, (payload) => {
+      if (payload.new.user_id === currentUser.id && payload.new.professional_id === currentChatProId) {
+        loadChatMessages();
+      }
+    })
+    .subscribe();
+}
+
+function closeChat() {
+  if (chatRealtimeChannel) { sb.removeChannel(chatRealtimeChannel); chatRealtimeChannel = null; }
+  closeModal();
+  refreshUserUnreadReplies();
+}
 
 async function bookPro(proId, name, type) {
   const code = 'MC-' + Math.floor(1000+Math.random()*9000);
@@ -2434,7 +2797,7 @@ const ADMIN_ITEMS = [
   {icon:'💳',label:'Төлбөр'}, {icon:'📊',label:'Статистик'}, {icon:'🚨',label:'Эрсдэлийн дохио'}, {icon:'📰',label:'Нийтлэл'}, {icon:'🎓',label:'Сургалт'},
 ];
 document.getElementById('admin-grid').innerHTML = ADMIN_ITEMS.map(a => `
-  <div class="admin-card" onclick="showToast('${a.label} — demo хувилбарт зөвхөн харагдацтай, production дээр бүрэн удирдах боломжтой.', 'info')"><div class="admin-icon">${a.icon}</div><div class="admin-lbl">${a.label}</div></div>
+  <div class="admin-card" onclick="${a.label === 'Мэргэжилтэн' ? "document.getElementById('admin-professionals-section').scrollIntoView({behavior:'smooth'})" : `showToast('${a.label} — demo хувилбарт зөвхөн харагдацтай, production дээр бүрэн удирдах боломжтой.', 'info')`}"><div class="admin-icon">${a.icon}</div><div class="admin-lbl">${a.label}</div></div>
 `).join('');
 const RISKS = [ {id:'Anonymous #4821', score:82, level:'high'}, {id:'Anonymous #1902', score:61, level:'med'}, {id:'Anonymous #7745', score:58, level:'med'} ];
 document.getElementById('risk-list').innerHTML = RISKS.map(r => `
@@ -2442,6 +2805,211 @@ document.getElementById('risk-list').innerHTML = RISKS.map(r => `
 `).join('');
 
 /* ================= Алба хаагчдын бүрэлдэхүүний статистик (зөвхөн админ) ================= */
+/* ================= АДМИН: Мэргэжилтнүүдийг удирдах (нэмэх/засах/устгах) ================= */
+async function loadAdminProfessionals() {
+  const el = document.getElementById('admin-pro-list');
+  if (!el) return;
+  el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div>';
+  const { data, error } = await sb.from('professionals').select('*').order('name');
+  if (error) {
+    console.error('loadAdminProfessionals error:', error);
+    el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж чадсангүй.</div>';
+    return;
+  }
+  PROS = data || [];
+  if (!data || !data.length) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор мэргэжилтэн бүртгэгдээгүй байна.</div>'; return; }
+  el.innerHTML = data.map(p => `
+    <div class="unit-row">
+      <div class="unit-name" style="width:auto;flex:1;">
+        <b>${p.name}</b> <span style="color:var(--sub);font-weight:400;">— ${p.spec}, ${p.location}, ${p.price.toLocaleString()}₮, ★${p.rating}</span>
+        ${p.auth_user_id ? '<span style="color:var(--gold);font-size:.72rem;font-weight:800;"> ✓ Нэвтрэх эрхтэй</span>' : '<span style="color:var(--sub);font-size:.72rem;"> · Нэвтрэх эрхгүй</span>'}
+      </div>
+      <button class="modal-close" style="padding:.3rem .8rem;font-size:.78rem;" onclick='editProfessional(${JSON.stringify(p).replace(/'/g, "&apos;")})'>Засах</button>
+      <button class="modal-close" style="padding:.3rem .8rem;font-size:.78rem;margin-left:.4rem;color:var(--red);border-color:rgba(192,69,58,.4);" onclick="deleteProfessional('${p.id}')">Устгах</button>
+    </div>
+  `).join('');
+  const linkSelect = document.getElementById('pro-link-select');
+  if (linkSelect) {
+    linkSelect.innerHTML = data.map(p => `<option value="${p.id}">${p.name}${p.auth_user_id ? ' (холбогдсон)' : ''}</option>`).join('');
+  }
+}
+
+async function linkProfessionalAccount() {
+  const proId = document.getElementById('pro-link-select').value;
+  const email = document.getElementById('pro-link-email').value.trim();
+  const msg = document.getElementById('pro-link-msg');
+  if (!proId || !email) { msg.style.color = 'var(--red)'; msg.textContent = 'Мэргэжилтэн, имэйл хоёуланг сонгоно уу.'; return; }
+  msg.style.color = 'var(--sub)'; msg.textContent = 'Холбож байна...';
+  const { data, error } = await sb.rpc('link_professional_account', { pro_id: proId, pro_email: email });
+  if (error) { msg.style.color = 'var(--red)'; msg.textContent = 'Алдаа: ' + error.message; return; }
+  msg.style.color = 'var(--gold)';
+  msg.textContent = 'Амжилттай холбогдлоо! Тэр өөрийн имэйлээрээ нэвтэрч, "Мэргэжилтний портал" руу орж чатад хариулах боломжтой боллоо.';
+  showToast('Мэргэжилтний нэвтрэх эрх холбогдлоо.', 'success');
+  document.getElementById('pro-link-email').value = '';
+  loadAdminProfessionals();
+}
+
+async function saveProfessional() {
+  const editId = document.getElementById('pro-edit-id').value;
+  const msg = document.getElementById('pro-form-msg');
+  const payload = {
+    name: document.getElementById('pro-name').value.trim(),
+    spec: document.getElementById('pro-spec').value.trim(),
+    years: parseInt(document.getElementById('pro-years').value, 10) || 0,
+    price: parseInt(document.getElementById('pro-price').value, 10) || 0,
+    location: document.getElementById('pro-location').value,
+    issue_tag: document.getElementById('pro-issue-tag').value,
+    rating: parseFloat(document.getElementById('pro-rating').value) || 5,
+  };
+  if (!payload.name || !payload.spec) { msg.style.color = 'var(--red)'; msg.textContent = 'Нэр, мэргэжлийг заавал бөглөнө үү.'; return; }
+  msg.style.color = 'var(--sub)'; msg.textContent = 'Хадгалж байна...';
+
+  let error;
+  if (editId) {
+    ({ error } = await sb.from('professionals').update(payload).eq('id', editId));
+  } else {
+    ({ error } = await sb.from('professionals').insert(payload));
+  }
+  if (error) { msg.style.color = 'var(--red)'; msg.textContent = 'Алдаа: ' + error.message; return; }
+  msg.style.color = 'var(--gold)';
+  msg.textContent = editId ? 'Амжилттай шинэчлэгдлээ.' : 'Амжилттай нэмэгдлээ.';
+  showToast(editId ? 'Мэргэжилтний мэдээлэл шинэчлэгдлээ.' : 'Шинэ мэргэжилтэн нэмэгдлээ.', 'success');
+  cancelEditProfessional();
+  loadAdminProfessionals();
+}
+
+function editProfessional(p) {
+  document.getElementById('pro-edit-id').value = p.id;
+  document.getElementById('pro-name').value = p.name || '';
+  document.getElementById('pro-spec').value = p.spec || '';
+  document.getElementById('pro-years').value = p.years || '';
+  document.getElementById('pro-price').value = p.price || '';
+  document.getElementById('pro-location').value = p.location || 'Улаанбаатар';
+  document.getElementById('pro-issue-tag').value = p.issue_tag || 'Стресс';
+  document.getElementById('pro-rating').value = p.rating || 5;
+  document.getElementById('pro-save-btn').textContent = 'Шинэчлэх';
+  document.getElementById('pro-cancel-btn').style.display = 'inline-block';
+  document.getElementById('admin-professionals-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+function cancelEditProfessional() {
+  document.getElementById('pro-edit-id').value = '';
+  document.getElementById('pro-name').value = '';
+  document.getElementById('pro-spec').value = '';
+  document.getElementById('pro-years').value = '';
+  document.getElementById('pro-price').value = '';
+  document.getElementById('pro-rating').value = 5;
+  document.getElementById('pro-save-btn').textContent = 'Нэмэх';
+  document.getElementById('pro-cancel-btn').style.display = 'none';
+  document.getElementById('pro-form-msg').textContent = '';
+}
+
+async function deleteProfessional(id) {
+  if (!confirm('Энэ мэргэжилтнийг устгахдаа итгэлтэй байна уу?')) return;
+  const { error } = await sb.from('professionals').delete().eq('id', id);
+  if (error) { showToast('Устгахад алдаа гарлаа: ' + error.message, 'error'); return; }
+  showToast('Мэргэжилтэн устгагдлаа.', 'success');
+  loadAdminProfessionals();
+}
+
+/* ================= АДМИН: Мэргэжилтний чатыг удирдах ================= */
+let currentAdminChatUserId = null;
+let currentAdminChatProId = null;
+let adminChatRealtimeChannel = null;
+
+async function loadAdminChatThreads() {
+  const el = document.getElementById('admin-chat-threads');
+  if (!el) return;
+  el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div>';
+  if (!PROS.length) { await loadPros(); } // админ session-д ердийн ачаалалт алгасагддаг тул шаардлагатай бол энд ачаална
+  const { data, error } = await sb.from('chat_messages').select('user_id, professional_id, body, sender, created_at').order('created_at', { ascending: false });
+  if (error) {
+    console.error('loadAdminChatThreads error:', error);
+    el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Чат ачаалж чадсангүй (chat_messages хүснэгт үүсээгүй байж болзошгүй).</div>';
+    return;
+  }
+  const threads = {};
+  (data || []).forEach(m => {
+    const key = m.user_id + '|' + m.professional_id;
+    if (!threads[key]) threads[key] = m; // хамгийн сүүлийн мессеж (order desc тул эхнийх нь хамгийн сүүлийнх)
+  });
+  const list = Object.entries(threads);
+  if (!list.length) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор чат алга.</div>'; return; }
+  el.innerHTML = list.map(([key, m]) => {
+    const [uid, proId] = key.split('|');
+    const proName = (PROS.find(p => String(p.id) === String(proId)) || {}).name || ('Мэргэжилтэн #' + proId);
+    return `<div class="unit-row" style="cursor:pointer;" onclick="openAdminChat('${uid}','${proId}','${proName.replace(/'/g,"\\'")}')">
+      <div class="unit-name">Anonymous ${uid.slice(0,8)}… → ${proName}</div>
+      <div style="color:var(--sub);font-size:.78rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.sender === 'user' ? '👤' : '👩‍⚕️'} ${m.body}</div>
+    </div>`;
+  }).join('');
+}
+
+function openAdminChat(uid, proId, proName) {
+  currentAdminChatUserId = uid;
+  currentAdminChatProId = proId;
+  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('modal-box').innerHTML = `
+    <h3>💬 ${proName}-ийн нэрийн өмнөөс хариулах</h3>
+    <p class="msub">Хэрэглэгч: Anonymous ${uid.slice(0,8)}…</p>
+    <div id="admin-chat-messages" style="max-height:320px;overflow-y:auto;border:1px solid var(--line);border-radius:12px;padding:.8rem;margin:.8rem 0;background:var(--panel-2);"></div>
+    <div style="display:flex;gap:.5rem;">
+      <input type="text" id="admin-chat-input" placeholder="Хариу бичих..." onkeydown="if(event.key==='Enter'){sendAdminChatMessage();}" style="flex:1;border:1px solid var(--line);border-radius:10px;padding:.6rem .8rem;font-family:inherit;font-size:.9rem;background:#fff;color:var(--cream);">
+      <button class="connect-btn" style="width:auto;padding:.6rem 1.1rem;" onclick="sendAdminChatMessage()">Илгээх</button>
+    </div>
+    <div class="modal-actions" style="margin-top:.9rem;"><button class="modal-close" onclick="closeAdminChat()">Хаах</button></div>
+  `;
+  loadAdminChatMessages();
+  subscribeAdminChatRealtime();
+}
+
+async function loadAdminChatMessages() {
+  const el = document.getElementById('admin-chat-messages');
+  if (!el) return;
+  const { data, error } = await sb.from('chat_messages').select('*')
+    .eq('user_id', currentAdminChatUserId).eq('professional_id', currentAdminChatProId)
+    .order('created_at', { ascending: true });
+  if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалахад алдаа гарлаа.</div>'; return; }
+  if (!data.length) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;text-align:center;">Мессеж алга.</div>'; return; }
+  el.innerHTML = data.map(m => `
+    <div style="display:flex;justify-content:${m.sender === 'admin' ? 'flex-end' : 'flex-start'};margin-bottom:.5rem;">
+      <div style="max-width:75%;padding:.5rem .8rem;border-radius:12px;font-size:.85rem;
+        background:${m.sender === 'admin' ? 'var(--gold)' : '#fff'};
+        color:${m.sender === 'admin' ? '#fff' : 'var(--cream)'};
+        border:1px solid var(--line);">${m.body}</div>
+    </div>`).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+async function sendAdminChatMessage() {
+  const input = document.getElementById('admin-chat-input');
+  const body = input.value.trim();
+  if (!body) return;
+  input.value = '';
+  const { error } = await sb.from('chat_messages').insert({
+    user_id: currentAdminChatUserId, professional_id: currentAdminChatProId, sender: 'admin', body
+  });
+  if (error) { showToast('Илгээхэд алдаа гарлаа: ' + error.message, 'error'); return; }
+  loadAdminChatMessages();
+}
+
+function subscribeAdminChatRealtime() {
+  if (adminChatRealtimeChannel) { sb.removeChannel(adminChatRealtimeChannel); adminChatRealtimeChannel = null; }
+  adminChatRealtimeChannel = sb.channel('admin-chat-' + currentAdminChatProId + '-' + currentAdminChatUserId)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages' }, (payload) => {
+      if (payload.new.user_id === currentAdminChatUserId && payload.new.professional_id === currentAdminChatProId) {
+        loadAdminChatMessages();
+      }
+    })
+    .subscribe();
+}
+
+function closeAdminChat() {
+  if (adminChatRealtimeChannel) { sb.removeChannel(adminChatRealtimeChannel); adminChatRealtimeChannel = null; }
+  closeModal();
+  loadAdminChatThreads();
+}
+
 /* ================= Бүртгэлтэй хэрэглэгчдийн жагсаалт (зөвхөн админ, RPC-ээр) ================= */
 async function loadRegisteredUsers() {
   const el = document.getElementById('registered-users-list');
@@ -2508,6 +3076,10 @@ async function init() {
   await ensureUser();
   applyUserToTopbar();
   await checkAdminStatus();
+  initProfessionalNotifications(); // тухайн session мэргэжилтэнтэй холбогдсон эсэхийг чимээгүй шалгаад, шинэ зурвасын мэдэгдлийг эхлүүлнэ
+  refreshUserUnreadReplies();
+  subscribeUserGlobalChat();
+
 
   // Хөгжүүлэлт/турших зорилгоор: ?onboarding=1 бүхий URL-аар орвол,
   // хэрэглэгчийн бодит branch/role-ийг өөрчлөхгүйгээр onboarding урсгалыг л дахин үзүүлнэ
@@ -2520,6 +3092,8 @@ async function init() {
     loadIdentityList();
     loadCompositionStats();
     loadRegisteredUsers();
+    loadAdminChatThreads();
+    loadAdminProfessionals();
   } else if (!currentUser?.branch || !currentUser?.personnel_type || forcePreview) {
     // Шинэ хэрэглэгч эсвэл ?onboarding=1 урьдчилан үзэх горимд цэргийн төрөл, албан хаагчийн төрлөө сонгуулна
     document.querySelector('.app').style.display = 'none';

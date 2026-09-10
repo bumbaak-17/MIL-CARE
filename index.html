@@ -395,14 +395,27 @@
       <p style="color:var(--sub);font-size:.9rem;max-width:480px;margin:0 auto;">Үргэлжлүүлэхийн өмнө дараах товч мэдээллийг сонгоно уу. Таны нэрийг хэн ч харахгүй — зөвхөн нэгтгэсэн, нэрээ нуусан статистикт ашиглагдана.</p>
     </div>
 
-    <div id="ob-step-branch">
-      <p class="ob-step-title">1. Цэргийн төрлөө сонгоно уу</p>
+    <div id="ob-step-auth">
+      <p class="ob-step-title">1. Бүртгүүлэх (санал болгож байна)</p>
+      <p class="ob-step-sub">Имэйлээр бүртгүүлбэл өгөгдлөө (тест, дневник) алдалгүй өөр утас, компьютер дээрээс ч ашиглах боломжтой. Хүсвэл алгасаад дараа нь бүртгүүлж болно.</p>
+      <div id="ob-auth-form">
+        <div class="field"><label style="display:block;margin-bottom:.4rem;">Имэйл</label><input type="email" id="ob-auth-email" placeholder="tany@jishee.mn" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);"></div>
+        <div class="field"><label style="display:block;margin-bottom:.4rem;" id="ob-auth-pw-label">Нууц үг (доод тал нь 6 тэмдэгт)</label><input type="password" id="ob-auth-password" placeholder="••••••••" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);"></div>
+        <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" id="ob-auth-submit-btn" onclick="obSignUp()">Бүртгүүлээд үргэлжлүүлэх</button>
+        <button class="modal-close" style="margin-left:.6rem;" onclick="obSkipAuth()">Алгасах</button>
+        <div id="ob-auth-msg" style="font-size:.82rem;margin-top:.7rem;"></div>
+        <div style="margin-top:.9rem;font-size:.82rem;color:var(--sub);" id="ob-auth-toggle-wrap">Өмнө нь бүртгүүлсэн үү? <a href="#" onclick="obToggleAuthMode();return false;" style="color:var(--gold);font-weight:700;">Нэвтрэх</a></div>
+      </div>
+    </div>
+
+    <div id="ob-step-branch" style="display:none;">
+      <p class="ob-step-title">2. Цэргийн төрлөө сонгоно уу</p>
       <p class="ob-step-sub">Та харьяалагдах цэргийн төрлийг сонгоно уу.</p>
       <div class="ob-grid" id="ob-branch-grid"></div>
     </div>
 
     <div id="ob-step-role" style="display:none;">
-      <p class="ob-step-title">2. Албан хаагчийн төрлөө сонгоно уу</p>
+      <p class="ob-step-title">3. Албан хаагчийн төрлөө сонгоно уу</p>
       <p class="ob-step-sub">Сүүлийн алхам.</p>
       <div class="ob-grid" id="ob-role-grid"></div>
       <button class="modal-close" style="margin-top:1.2rem;" onclick="obBack()">← Буцах</button>
@@ -656,13 +669,14 @@
       <div id="view-org" class="view">
         <div class="page-head"><h2>Нийт статистик үзүүлэлт</h2><p></p></div>
         <div class="org-grid">
-          <div class="org-card"><div class="org-num">1,250</div><div class="org-lbl">Нийт ажилтан</div></div>
-          <div class="org-card"><div class="org-num">876</div><div class="org-lbl">Судалгаанд хамрагдсан</div></div>
-          <div class="org-card"><div class="org-num">61%</div><div class="org-lbl">Дундаж стресс</div></div>
-          <div class="org-card"><div class="org-num">17%</div><div class="org-lbl">Ажлын хэт их ядралтын өндөр эрсдэл</div></div>
-          <div class="org-card"><div class="org-num">68%</div><div class="org-lbl">Ажлын сэтгэл ханамж</div></div>
-          <div class="org-card"><div class="org-num">876/1250</div><div class="org-lbl">Хамрагдалтын түвшин</div></div>
+          <div class="org-card"><div class="org-num" id="org-total-users">—</div><div class="org-lbl">Платформ ашигласан нийт хүн</div></div>
+          <div class="org-card"><div class="org-num" id="org-surveyed">—</div><div class="org-lbl">Судалгаанд хамрагдсан</div></div>
+          <div class="org-card"><div class="org-num" id="org-avg-stress">—</div><div class="org-lbl">Дундаж стресс</div></div>
+          <div class="org-card"><div class="org-num" id="org-burnout-risk">—</div><div class="org-lbl">Ажлын хэт их ядралтын өндөр эрсдэл</div></div>
+          <div class="org-card"><div class="org-num" id="org-avg-sat">—</div><div class="org-lbl">Ажлын сэтгэл ханамж</div></div>
+          <div class="org-card"><div class="org-num" id="org-participation">—</div><div class="org-lbl">Хамрагдалтын түвшин</div></div>
         </div>
+        <div id="org-stats-note" style="font-size:.78rem;color:var(--sub);margin:-.6rem 0 1.1rem;"></div>
         <div class="section-card">
           <div class="section-head"><h3>Аль нэгжид стресс өндөр байна</h3></div>
           <div id="unit-list"></div>
@@ -722,6 +736,9 @@
             </div>
           </div>
         </div>
+
+        <!-- Олон төхөөрөмж дээр ашиглах (Имэйл бүртгэл) -->
+        <div class="section-card" id="auth-section"></div>
 
         <!-- Миний идэвхжил -->
         <div class="section-card">
@@ -843,22 +860,102 @@ async function ensureUser() {
     session = data.session;
   }
   const uid = session.user.id;
+  const userEmail = session.user.email || null;
+  const userIsAnon = !userEmail; // имэйлээр баталгаажаагүй бол нэрээ нуусан гэж үзнэ
 
   // 2. Тухайн auth хэрэглэгчид харгалзах users мөр байгаа эсэхийг шалгах
   const { data: existing, error: selErr } = await sb.from('users').select('*').eq('id', uid).maybeSingle();
   if (selErr) { console.error('users select error:', selErr); }
 
   if (existing) {
-    currentUser = { id: uid, handle: existing.anon_handle, branch: existing.branch, personnel_type: existing.personnel_type, createdAt: existing.created_at };
+    currentUser = { id: uid, handle: existing.anon_handle, branch: existing.branch, personnel_type: existing.personnel_type, createdAt: existing.created_at, email: userEmail, isAnonymous: userIsAnon };
     return;
   }
 
   // 3. Байхгүй бол шинэ, нэрээ нуусан профайл үүсгэх (id нь auth.uid()-тэй яг адилхан)
   const handle = randomHandle();
   const { data: inserted, error: insErr } = await sb.from('users').insert({ id: uid, anon_handle: handle }).select().single();
-  if (insErr) { console.error('users insert error:', insErr); currentUser = { id: uid, handle }; return; }
-  currentUser = { id: uid, handle: inserted.anon_handle, branch: inserted.branch, personnel_type: inserted.personnel_type, createdAt: inserted.created_at };
+  if (insErr) { console.error('users insert error:', insErr); currentUser = { id: uid, handle, email: userEmail, isAnonymous: userIsAnon }; return; }
+  currentUser = { id: uid, handle: inserted.anon_handle, branch: inserted.branch, personnel_type: inserted.personnel_type, createdAt: inserted.created_at, email: userEmail, isAnonymous: userIsAnon };
 }
+/* ================= ИМЭЙЛ БҮРТГЭЛ (олон төхөөрөмж дээр өгөгдлөө үргэлжлүүлэн ашиглах) =================
+   Anonymous хэрэглэгч имэйл/нууц үг холбовол (updateUser) яг ижил user_id хэвээр үлдэж,
+   өмнөх бүх тест/дневникийн түүх алдагдалгүй, зөвхөн "байнгын" статустай болно. */
+let authMode = 'signup';
+function toggleAuthMode() { authMode = (authMode === 'signup') ? 'signin' : 'signup'; renderAuthSection(); }
+
+function renderAuthSection() {
+  const el = document.getElementById('auth-section');
+  if (!el || !currentUser) return;
+
+  if (currentUser.isAnonymous === false && currentUser.email) {
+    el.innerHTML = `
+      <div class="section-head"><h3>🔐 Олон төхөөрөмж дээр ашиглах</h3></div>
+      <p style="font-size:.85rem;color:var(--sub);margin:0 0 1rem;">Та <b>${currentUser.email}</b> имэйлээр бүртгэлтэй байна. Өөр утас, компьютер дээрээс энэ имэйлээрээ нэвтэрч, өгөгдлөө үргэлжлүүлэн ашиглах боломжтой.</p>
+      <button class="modal-close" onclick="signOutUser()">Гарах</button>
+    `;
+    return;
+  }
+
+  if (authMode === 'signup') {
+    el.innerHTML = `
+      <div class="section-head"><h3>🔐 Олон төхөөрөмж дээр ашиглах</h3></div>
+      <p style="font-size:.85rem;color:var(--sub);margin:0 0 1rem;">Одоогоор та зөвхөн энэ төхөөрөмж дээр танигдана. Имэйлээр бүртгүүлбэл өгөгдлөө (тест, дневник) алдалгүй өөр утас, компьютер дээрээс ч нэвтрэх боломжтой.</p>
+      <div class="field"><label style="display:block;margin-bottom:.4rem;">Имэйл</label><input type="email" id="auth-email" placeholder="tany@jishee.mn" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);"></div>
+      <div class="field"><label style="display:block;margin-bottom:.4rem;">Нууц үг (доод тал нь 6 тэмдэгт)</label><input type="password" id="auth-password" placeholder="••••••••" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);"></div>
+      <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" onclick="signUpWithEmail()">Бүртгүүлж, өгөгдлөө хадгалах</button>
+      <div id="auth-msg" style="font-size:.82rem;margin-top:.7rem;"></div>
+      <div style="margin-top:.9rem;font-size:.82rem;color:var(--sub);">Өмнө нь өөр төхөөрөмж дээр бүртгүүлсэн үү? <a href="#" onclick="toggleAuthMode();return false;" style="color:var(--gold);font-weight:700;">Нэвтрэх</a></div>
+    `;
+  } else {
+    el.innerHTML = `
+      <div class="section-head"><h3>🔐 Олон төхөөрөмж дээр ашиглах</h3></div>
+      <p style="font-size:.85rem;color:var(--sub);margin:0 0 1rem;">Өмнө нь имэйлээр бүртгүүлсэн бол энд нэвтэрч, өөрийн түүхээ энэ төхөөрөмж дээр үргэлжлүүлээрэй.</p>
+      <div class="field"><label style="display:block;margin-bottom:.4rem;">Имэйл</label><input type="email" id="auth-email" placeholder="tany@jishee.mn" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);"></div>
+      <div class="field"><label style="display:block;margin-bottom:.4rem;">Нууц үг</label><input type="password" id="auth-password" placeholder="••••••••" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);"></div>
+      <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" onclick="signInWithEmail()">Нэвтрэх</button>
+      <div id="auth-msg" style="font-size:.82rem;margin-top:.7rem;"></div>
+      <div style="margin-top:.9rem;font-size:.82rem;color:var(--sub);">Данс байхгүй юу? <a href="#" onclick="toggleAuthMode();return false;" style="color:var(--gold);font-weight:700;">Бүртгүүлэх</a></div>
+    `;
+  }
+}
+
+async function signUpWithEmail() {
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const msg = document.getElementById('auth-msg');
+  if (!email || !password || password.length < 6) {
+    msg.style.color = 'var(--red)'; msg.textContent = 'Имэйл болон 6-аас дээш тэмдэгттэй нууц үг оруулна уу.'; return;
+  }
+  msg.style.color = 'var(--sub)'; msg.textContent = 'Уншиж байна...';
+  // Anonymous session-ийг байнгын болгож "холбоно" — ижил user_id хэвээр үлдэх тул өмнөх бүх өгөгдөл хадгалагдана
+  const { error } = await sb.auth.updateUser({ email, password });
+  if (error) { msg.style.color = 'var(--red)'; msg.textContent = 'Алдаа: ' + error.message; return; }
+  msg.style.color = 'var(--gold)';
+  msg.textContent = 'Амжилттай! Шаардлагатай бол имэйл рүү илгээсэн баталгаажуулах холбоосыг шалгана уу.';
+  showToast('Бүртгэл имэйлтэй холбогдлоо. Одоо өөр төхөөрөмж дээрээс энэ имэйлээр нэвтэрч болно.', 'success');
+  await ensureUser();
+  applyUserToTopbar();
+  renderAuthSection();
+}
+
+async function signInWithEmail() {
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const msg = document.getElementById('auth-msg');
+  if (!email || !password) { msg.style.color = 'var(--red)'; msg.textContent = 'Имэйл, нууц үгээ оруулна уу.'; return; }
+  msg.style.color = 'var(--sub)'; msg.textContent = 'Нэвтэрч байна...';
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) { msg.style.color = 'var(--red)'; msg.textContent = 'Алдаа: ' + error.message; return; }
+  showToast('Амжилттай нэвтэрлээ.', 'success');
+  location.reload();
+}
+
+async function signOutUser() {
+  await sb.auth.signOut();
+  location.reload();
+}
+
 function applyUserToTopbar() {
   const nameEl = document.querySelector('.user-chip .user-name');
   if (nameEl && currentUser) nameEl.textContent = currentUser.handle;
@@ -885,6 +982,63 @@ const BRANCH_LABELS = Object.fromEntries(BRANCHES.map(b => [b.key, b.label]));
 const ROLE_LABELS = Object.fromEntries(PERSONNEL_TYPES.map(r => [r.key, r.label]));
 
 let obSelectedBranch = null, obSelectedRole = null;
+let obAuthMode = 'signup';
+
+function obToggleAuthMode() {
+  obAuthMode = (obAuthMode === 'signup') ? 'signin' : 'signup';
+  const submitBtn = document.getElementById('ob-auth-submit-btn');
+  const pwLabel = document.getElementById('ob-auth-pw-label');
+  const toggleWrap = document.getElementById('ob-auth-toggle-wrap');
+  const msg = document.getElementById('ob-auth-msg');
+  msg.textContent = '';
+  if (obAuthMode === 'signin') {
+    submitBtn.textContent = 'Нэвтрэх';
+    submitBtn.setAttribute('onclick', 'obSignIn()');
+    pwLabel.textContent = 'Нууц үг';
+    toggleWrap.innerHTML = 'Данс байхгүй юу? <a href="#" onclick="obToggleAuthMode();return false;" style="color:var(--gold);font-weight:700;">Бүртгүүлэх</a>';
+  } else {
+    submitBtn.textContent = 'Бүртгүүлээд үргэлжлүүлэх';
+    submitBtn.setAttribute('onclick', 'obSignUp()');
+    pwLabel.textContent = 'Нууц үг (доод тал нь 6 тэмдэгт)';
+    toggleWrap.innerHTML = 'Өмнө нь бүртгүүлсэн үү? <a href="#" onclick="obToggleAuthMode();return false;" style="color:var(--gold);font-weight:700;">Нэвтрэх</a>';
+  }
+}
+
+function obGotoBranchStep() {
+  document.getElementById('ob-step-auth').style.display = 'none';
+  document.getElementById('ob-step-branch').style.display = 'block';
+  renderObBranch();
+}
+
+function obSkipAuth() { obGotoBranchStep(); }
+
+async function obSignUp() {
+  const email = document.getElementById('ob-auth-email').value.trim();
+  const password = document.getElementById('ob-auth-password').value;
+  const msg = document.getElementById('ob-auth-msg');
+  if (!email || !password || password.length < 6) {
+    msg.style.color = 'var(--red)'; msg.textContent = 'Имэйл болон 6-аас дээш тэмдэгттэй нууц үг оруулна уу.'; return;
+  }
+  msg.style.color = 'var(--sub)'; msg.textContent = 'Уншиж байна...';
+  const { error } = await sb.auth.updateUser({ email, password });
+  if (error) { msg.style.color = 'var(--red)'; msg.textContent = 'Алдаа: ' + error.message; return; }
+  await ensureUser();
+  applyUserToTopbar();
+  showToast('Бүртгэл имэйлтэй холбогдлоо. Одоо өөр төхөөрөмж дээрээс энэ имэйлээр нэвтэрч болно.', 'success');
+  obGotoBranchStep();
+}
+
+async function obSignIn() {
+  const email = document.getElementById('ob-auth-email').value.trim();
+  const password = document.getElementById('ob-auth-password').value;
+  const msg = document.getElementById('ob-auth-msg');
+  if (!email || !password) { msg.style.color = 'var(--red)'; msg.textContent = 'Имэйл, нууц үгээ оруулна уу.'; return; }
+  msg.style.color = 'var(--sub)'; msg.textContent = 'Нэвтэрч байна...';
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) { msg.style.color = 'var(--red)'; msg.textContent = 'Алдаа: ' + error.message; return; }
+  showToast('Амжилттай нэвтэрлээ.', 'success');
+  location.reload();
+}
 
 function renderObBranch() {
   const el = document.getElementById('ob-branch-grid');
@@ -969,6 +1123,7 @@ async function saveClassification() {
 }
 async function loadProfilePage() {
   if (!currentUser?.id) return;
+  renderAuthSection();
   document.getElementById('profile-branch-badge').textContent = BRANCH_LABELS[currentUser.branch] || 'Тодорхойгүй';
   document.getElementById('profile-role-badge').textContent = ROLE_LABELS[currentUser.personnel_type] || 'Тодорхойгүй';
   document.getElementById('profile-since').textContent = currentUser.createdAt
@@ -1043,7 +1198,7 @@ async function loadIdentityList() {
 /* ================= NAV ROUTING ================= */
 document.getElementById('hamburger').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
 
-function goto(view) {
+function goto(view, pushState) {
   document.querySelectorAll('.navitem').forEach(n => n.classList.remove('active'));
   document.querySelector(`.navitem[data-view="${view}"]`)?.classList.add('active');
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -1052,8 +1207,24 @@ function goto(view) {
   window.scrollTo({top:0, behavior:'smooth'});
   if (view === 'profile') loadProfilePage();
   if (view === 'memory') { memoryIdx = 0; renderMemoryExercise(0); }
+  if (view === 'analytics') { loadAnalyticsSummary(); loadMonthlyAnalysis(); }
+  if (view === 'org') { loadOrgStats(); }
+  // Хөтчийн "Буцах" товч ажиллахын тулд history-д хуудсаа бүртгэнэ
+  if (pushState !== false) {
+    history.pushState({ view: view }, '', '#' + view);
+  }
 }
 document.querySelectorAll('.navitem').forEach(el => el.addEventListener('click', () => goto(el.dataset.view)));
+
+// Хөтчийн "Буцах"/"Урагшлах" товч дарахад тохирох хэсэг рүү шилжинэ
+window.addEventListener('popstate', (e) => {
+  const view = (e.state && e.state.view) || (location.hash ? location.hash.slice(1) : 'home');
+  if (document.getElementById('view-' + view)) {
+    goto(view, false);
+  }
+});
+// Эхний ачаалалтад одоогийн байрлалыг history-д бүртгэнэ (буцах товч анхнаасаа ажиллахын тулд)
+history.replaceState({ view: 'home' }, '', '#home');
 document.querySelectorAll('[data-goto]').forEach(el => el.addEventListener('click', () => goto(el.dataset.goto)));
 
 /* ================= Helpers ================= */
@@ -1084,6 +1255,16 @@ const MOODS = [
 ];
 // Нүүр хуудасны 5-шатлалт mood-ыг "Өнөөдөр би..." дневникийн 8 мэдрэмжийн аль тохирохтой нь холбоно
 const MOOD5_TO_DIARY = { great:'grateful', good:'happy', ok:'calm', bad:'tired', worst:'sad' };
+const DIARY_TO_MOOD5 = { grateful:'great', happy:'good', calm:'ok', tired:'bad', sad:'worst' };
+
+// Өнөөдрийн өдөрт аль хэдийн хадгалагдсан mood байвал, тохирох товчийг тодруулж харуулна
+function applyTodaySelection() {
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+  const mood5Key = DIARY_TO_MOOD5[weekMoods[6]];
+  if (mood5Key) {
+    document.querySelector(`.mood-btn[data-mood="${mood5Key}"]`)?.classList.add('selected');
+  }
+}
 
 function renderMoodRow() {
   const el = document.getElementById('mood-row');
@@ -1094,11 +1275,16 @@ function renderMoodRow() {
     const diaryKey = MOOD5_TO_DIARY[b.dataset.mood];
     if (currentUser?.id) {
       const { error } = await sb.from('mood_entries').insert({ user_id: currentUser.id, mood: diaryKey, note: 'Нүүр хуудасны хурдан бүртгэл' });
-      if (error) { console.error('quick mood insert error:', error); }
+      if (error) {
+        console.error('quick mood insert error:', error);
+        showToast('Мэдрэмж хадгалахад алдаа гарлаа. Дахин оролдоно уу.', 'error');
+        b.classList.remove('selected');
+        return;
+      }
       await loadWeekMood();
       loadDiary();
     } else {
-      weekMoods[6] = diaryKey; renderWeek();
+      weekMoods[6] = diaryKey; renderWeek(); applyTodaySelection();
     }
   }));
 }
@@ -1123,6 +1309,7 @@ async function loadWeekMood() {
   for (let i=6;i>=0;i--) { result.push(byDate[formatUbFull(nowMs - i*86400000)] || 'none'); }
   weekMoods = result;
   renderWeek();
+  applyTodaySelection();
 }
 renderMoodRow(); renderWeek();
 
@@ -1239,6 +1426,85 @@ setInterval(applyHeroScene, 5000); // 5 секунд тутамд солигдо
 const MN_MONTHS_SHORT = ['1-р','2-р','3-р','4-р','5-р','6-р','7-р','8-р','9-р','10-р','11-р','12-р'];
 
 function monthKey(year, month) { return `${year}-${String(month).padStart(2,'0')}`; }
+
+/* ================= Сүүлийн 30 хоногийн үзүүлэлт: бодит тест/mood өгөгдөлд суурилсан тооцоолол ================= */
+// Тест өгөгдөлгүй үед өдөр тутмын 8 мэдрэмжээс (mood_entries) чиглэл тодорхойлох "дохио" утга
+const MOOD_STRESS_SIGNAL   = { anxious:100, angry:90, tired:60, sad:55, lonely:50, calm:15, happy:8,  grateful:5  };
+const MOOD_BURNOUT_SIGNAL  = { tired:100,  lonely:70, sad:55,  angry:40, anxious:35, calm:15, happy:10, grateful:5  };
+const MOOD_SAT_SIGNAL      = { grateful:100, happy:90, calm:70, lonely:35, sad:25, tired:30, angry:15, anxious:20 };
+
+async function loadAnalyticsSummary() {
+  const noteEl = document.querySelector('.trend-note');
+  if (!currentUser?.id) { return; }
+  const nowMs = Date.now();
+  const from30 = nowMs - 30*86400000;
+
+  const [testsRes, moodsRes] = await Promise.all([
+    sb.from('test_results').select('test_key, score, max_score, created_at').eq('user_id', currentUser.id).gte('created_at', new Date(from30).toISOString()),
+    sb.from('mood_entries').select('mood, created_at').eq('user_id', currentUser.id).gte('created_at', new Date(from30).toISOString()),
+  ]);
+  if (testsRes.error) console.error('analytics tests error:', testsRes.error);
+  if (moodsRes.error) console.error('analytics moods error:', moodsRes.error);
+  const tests = testsRes.data || [];
+  const moods = moodsRes.data || [];
+
+  // Тодорхой цонхны (window) дундаж хувийг тест эсвэл mood дохио дээр үндэслэн тооцоолно.
+  // Тест бөглөсөн бодит үр дүн байвал үүнийг тэргүүн ач холбогдолтой эх сурвалж болгоно, үгүй бол өдрийн мэдрэмжээс дүгнэнэ.
+  function windowPct(testKey, moodSignalMap, fromMs, toMs) {
+    const relevantTests = tests.filter(r => r.test_key === testKey && r.max_score && new Date(r.created_at).getTime() >= fromMs && new Date(r.created_at).getTime() < toMs);
+    if (relevantTests.length) {
+      const avg = relevantTests.reduce((s,r) => s + (r.score / r.max_score * 100), 0) / relevantTests.length;
+      return { pct: avg, source: 'test' };
+    }
+    const relevantMoods = moods.filter(m => moodSignalMap[m.mood] !== undefined && new Date(m.created_at).getTime() >= fromMs && new Date(m.created_at).getTime() < toMs);
+    if (relevantMoods.length) {
+      const avg = relevantMoods.reduce((s,m) => s + moodSignalMap[m.mood], 0) / relevantMoods.length;
+      return { pct: avg, source: 'mood' };
+    }
+    return { pct: null, source: 'none' };
+  }
+
+  function applyMetric(fillClass, result) {
+    const fill = document.querySelector(`.metric-fill.${fillClass}`);
+    if (!fill) return;
+    const row = fill.closest('.metric-row');
+    const pctSpan = row.querySelector('.metric-top span:last-child');
+    if (result.pct === null) {
+      pctSpan.textContent = '—';
+      fill.style.width = '0%';
+    } else {
+      const rounded = Math.round(result.pct);
+      pctSpan.textContent = rounded + '%';
+      fill.style.width = rounded + '%';
+    }
+  }
+
+  const stress30 = windowPct('stress', MOOD_STRESS_SIGNAL, from30, nowMs);
+  const burnout30 = windowPct('burnout', MOOD_BURNOUT_SIGNAL, from30, nowMs);
+  const sat30 = windowPct('satisfaction', MOOD_SAT_SIGNAL, from30, nowMs);
+  applyMetric('stress', stress30);
+  applyMetric('burnout', burnout30);
+  applyMetric('sat', sat30);
+
+  // Сүүлийн 14 хоног ба өмнөх 14 хоногийг харьцуулж, стрессийн бодит хандлагыг гаргана
+  const half = 14 * 86400000;
+  const recentFrom = nowMs - half;
+  const recentStress = windowPct('stress', MOOD_STRESS_SIGNAL, recentFrom, nowMs);
+  const prevStress = windowPct('stress', MOOD_STRESS_SIGNAL, from30, recentFrom);
+
+  if (recentStress.pct === null || prevStress.pct === null) {
+    noteEl.textContent = 'ℹ️ Хандлагыг харьцуулахад хангалттай өгөгдөл алга. Тогтмол тест бөглөж, өдрөө тэмдэглэсээр байвал энд бодит хандлагын дүн шинжилгээ гарч ирнэ.';
+  } else {
+    const diff = Math.round(prevStress.pct - recentStress.pct); // эерэг = буурсан (сайжирсан)
+    if (diff >= 5) {
+      noteEl.textContent = `📈 Таны стресс сүүлийн 14 хоногт ${diff} нэгжээр буурсан байна.`;
+    } else if (diff <= -5) {
+      noteEl.textContent = `📉 Таны стресс сүүлийн 14 хоногт ${Math.abs(diff)} нэгжээр нэмэгдсэн байна. Анхаарал хандуулаарай.`;
+    } else {
+      noteEl.textContent = '➖ Таны стресс сүүлийн 14 хоногт харьцангуй тогтвортой байна.';
+    }
+  }
+}
 
 async function loadMonthlyAnalysis() {
   const chartEl = document.getElementById('year-chart');
@@ -1906,6 +2172,28 @@ const UNITS = [
   { name:'Барилга инженерийн цэргийн удирдах газар', pct:47 },
   { name:'Иргэний байгууллагууд', pct:52 },
 ];
+/* ================= НИЙТ СТАТИСТИК (бүх хэрэглэгчийн нэгтгэсэн, аюулгүй RPC-ээр) ================= */
+async function loadOrgStats() {
+  const noteEl = document.getElementById('org-stats-note');
+  const { data, error } = await sb.rpc('get_org_stats');
+  if (error || !data || !data.length) {
+    console.error('get_org_stats error:', error);
+    ['org-total-users','org-surveyed','org-avg-stress','org-burnout-risk','org-avg-sat','org-participation'].forEach(id => {
+      document.getElementById(id).textContent = '—';
+    });
+    if (noteEl) noteEl.textContent = 'ℹ️ Нэгтгэсэн статистикийг ачаалж чадсангүй. Тохиргоо дуусаагүй байж болзошгүй тул түр хугацаанд өгөгдөл харагдахгүй байна.';
+    return;
+  }
+  const s = data[0];
+  document.getElementById('org-total-users').textContent = (s.total_users ?? 0).toLocaleString('mn-MN');
+  document.getElementById('org-surveyed').textContent = (s.surveyed_users ?? 0).toLocaleString('mn-MN');
+  document.getElementById('org-avg-stress').textContent = s.avg_stress_pct != null ? s.avg_stress_pct + '%' : '—';
+  document.getElementById('org-burnout-risk').textContent = s.burnout_high_risk_pct != null ? s.burnout_high_risk_pct + '%' : '—';
+  document.getElementById('org-avg-sat').textContent = s.avg_satisfaction_pct != null ? s.avg_satisfaction_pct + '%' : '—';
+  document.getElementById('org-participation').textContent = `${(s.surveyed_users ?? 0).toLocaleString('mn-MN')}/${(s.total_users ?? 0).toLocaleString('mn-MN')}`;
+  if (noteEl) noteEl.textContent = '';
+}
+
 document.getElementById('unit-list').innerHTML = UNITS.sort((a,b)=>b.pct-a.pct).map(u => `
   <div class="unit-row"><div class="unit-name">${u.name}</div><div class="unit-track"><div class="unit-fill" style="width:${u.pct}%;"></div></div><div class="unit-pct">${u.pct}%</div></div>
 `).join('');
@@ -1950,17 +2238,25 @@ async function init() {
   await ensureUser();
   applyUserToTopbar();
   await checkAdminStatus();
-  if (isAdmin) {
+
+  // Хөгжүүлэлт/турших зорилгоор: ?onboarding=1 бүхий URL-аар орвол,
+  // хэрэглэгчийн бодит branch/role-ийг өөрчлөхгүйгээр onboarding урсгалыг л дахин үзүүлнэ
+  const forcePreview = new URLSearchParams(location.search).get('onboarding') === '1';
+
+  if (isAdmin && !forcePreview) {
     // Админ эрхтэй бол onboarding (цэргийн төрөл сонгох) шаардлагагүй, шууд админ панель руу орно
     document.getElementById('admin-login-card').style.display = 'none';
     document.getElementById('admin-panel').style.display = 'block';
     loadIdentityList();
     loadCompositionStats();
-  } else if (!currentUser?.branch || !currentUser?.personnel_type) {
-    // Зөвхөн энгийн (админ бус) шинэ хэрэглэгчид цэргийн төрөл, албан хаагчийн төрлөө сонгуулна
+  } else if (!currentUser?.branch || !currentUser?.personnel_type || forcePreview) {
+    // Шинэ хэрэглэгч эсвэл ?onboarding=1 урьдчилан үзэх горимд цэргийн төрөл, албан хаагчийн төрлөө сонгуулна
     document.querySelector('.app').style.display = 'none';
     document.getElementById('onboarding-overlay').style.display = 'block';
-    renderObBranch();
+    const skipAuthStep = currentUser?.isAnonymous === false && !forcePreview;
+    document.getElementById('ob-step-auth').style.display = skipAuthStep ? 'none' : 'block';
+    document.getElementById('ob-step-branch').style.display = skipAuthStep ? 'block' : 'none';
+    if (skipAuthStep) { renderObBranch(); }
     return;
   }
   await Promise.all([ loadPosts(), loadPros(), loadDiary(), loadWeekMood(), loadMonthlyAnalysis(), updateStreakBadge() ]);

@@ -401,7 +401,7 @@
       <div id="ob-auth-form">
         <div class="field"><label style="display:block;margin-bottom:.4rem;">Имэйл</label><input type="email" id="ob-auth-email" placeholder="tany@jishee.mn" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);"></div>
         <div class="field"><label style="display:block;margin-bottom:.4rem;" id="ob-auth-pw-label">Нууц үг (доод тал нь 6 тэмдэгт)</label><input type="password" id="ob-auth-password" placeholder="••••••••" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);"></div>
-        <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" id="ob-auth-submit-btn" onclick="obSignUp()">Бүртгүүлээд үргэлжлүүлэх</button>
+        <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" id="ob-auth-submit-btn" onclick="obSignUp()">Бүртгүүлэх</button>
         <button class="modal-close" style="margin-left:.6rem;" onclick="obSkipAuth()">Алгасах</button>
         <div id="ob-auth-msg" style="font-size:.82rem;margin-top:.7rem;"></div>
         <div style="margin-top:.9rem;font-size:.82rem;color:var(--sub);" id="ob-auth-toggle-wrap">Өмнө нь бүртгүүлсэн үү? <a href="#" onclick="obToggleAuthMode();return false;" style="color:var(--gold);font-weight:700;">Нэвтрэх</a></div>
@@ -997,7 +997,7 @@ function obToggleAuthMode() {
     pwLabel.textContent = 'Нууц үг';
     toggleWrap.innerHTML = 'Данс байхгүй юу? <a href="#" onclick="obToggleAuthMode();return false;" style="color:var(--gold);font-weight:700;">Бүртгүүлэх</a>';
   } else {
-    submitBtn.textContent = 'Бүртгүүлээд үргэлжлүүлэх';
+    submitBtn.textContent = 'Бүртгүүлэх';
     submitBtn.setAttribute('onclick', 'obSignUp()');
     pwLabel.textContent = 'Нууц үг (доод тал нь 6 тэмдэгт)';
     toggleWrap.innerHTML = 'Өмнө нь бүртгүүлсэн үү? <a href="#" onclick="obToggleAuthMode();return false;" style="color:var(--gold);font-weight:700;">Нэвтрэх</a>';

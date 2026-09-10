@@ -730,6 +730,11 @@
             <div id="role-stats" style="margin-top:1.1rem;"></div>
           </div>
           <div class="section-card">
+            <div class="section-head"><h3>📧 Бүртгэлтэй хэрэглэгчид (зөвхөн админ)</h3></div>
+            <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Имэйл/нууц үгээр бүртгүүлсэн хэрэглэгчдийн жагсаалт.</p>
+            <div id="registered-users-list"></div>
+          </div>
+          <div class="section-card">
             <div class="section-head"><h3>🚨 Эрсдэлийн дохио (жишээ)</h3></div>
             <div id="risk-list"></div>
             <div class="privacy-note">Эрсдэлийн дохио зөвхөн автомат үнэлгээгээр эрт анхаарал татахад зориулагдсан бөгөөд эцсийн шийдвэрийг зөвхөн мэргэжилтэн гаргана.</div>
@@ -1372,6 +1377,7 @@ async function adminLogin() {
     document.getElementById('admin-panel').style.display = 'block';
     loadIdentityList();
     loadCompositionStats();
+    loadRegisteredUsers();
   } else {
     msgEl.style.color='var(--red)';
     msgEl.textContent='Энэ бүртгэл админ эрхгүй байна.';
@@ -2436,6 +2442,46 @@ document.getElementById('risk-list').innerHTML = RISKS.map(r => `
 `).join('');
 
 /* ================= Алба хаагчдын бүрэлдэхүүний статистик (зөвхөн админ) ================= */
+/* ================= Бүртгэлтэй хэрэглэгчдийн жагсаалт (зөвхөн админ, RPC-ээр) ================= */
+async function loadRegisteredUsers() {
+  const el = document.getElementById('registered-users-list');
+  if (!el) return;
+  el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div>';
+  const { data, error } = await sb.rpc('get_registered_users');
+  if (error) {
+    console.error('get_registered_users error:', error);
+    el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Жагсаалтыг ачаалж чадсангүй (SQL функц тохируулагдаагүй байж болзошгүй).</div>';
+    return;
+  }
+  if (!data || !data.length) {
+    el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор имэйлээр бүртгэлтэй хэрэглэгч алга.</div>';
+    return;
+  }
+  el.innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:.83rem;">
+      <thead>
+        <tr style="border-bottom:1px solid var(--line);text-align:left;">
+          <th style="padding:.5rem .4rem;">Имэйл</th>
+          <th style="padding:.5rem .4rem;">Нэрээ нуусан ID</th>
+          <th style="padding:.5rem .4rem;">Цэргийн төрөл</th>
+          <th style="padding:.5rem .4rem;">Бүртгүүлсэн огноо</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${data.map(u => `
+          <tr style="border-bottom:1px solid var(--line);">
+            <td style="padding:.5rem .4rem;font-weight:700;">${u.email}</td>
+            <td style="padding:.5rem .4rem;color:var(--sub);">${u.anon_handle || '—'}</td>
+            <td style="padding:.5rem .4rem;color:var(--sub);">${BRANCH_LABELS[u.branch] || '—'}</td>
+            <td style="padding:.5rem .4rem;color:var(--sub);">${formatUbFull(u.registered_at)}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+    <div class="privacy-note" style="margin-top:.9rem;">Энэ жагсаалт зөвхөн баталгаажсан админд харагдана.</div>
+  `;
+}
+
 async function loadCompositionStats() {
   const branchEl = document.getElementById('branch-stats');
   const roleEl = document.getElementById('role-stats');
@@ -2473,6 +2519,7 @@ async function init() {
     document.getElementById('admin-panel').style.display = 'block';
     loadIdentityList();
     loadCompositionStats();
+    loadRegisteredUsers();
   } else if (!currentUser?.branch || !currentUser?.personnel_type || forcePreview) {
     // Шинэ хэрэглэгч эсвэл ?onboarding=1 урьдчилан үзэх горимд цэргийн төрөл, албан хаагчийн төрлөө сонгуулна
     document.querySelector('.app').style.display = 'none';

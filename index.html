@@ -1072,12 +1072,24 @@ function isAlreadyRegisteredError(error) {
   return m.includes('already registered') || m.includes('already been registered');
 }
 
+// Нэвтрэхийн өмнө одоогийн session нь ХООСОН, шинэ (branch/role сонгоогүй)
+// anonymous профайл байвал, session солигдохоос өмнө устгаж, users хүснэгтэд
+// хоосон "хог" мөр хуримтлагдахаас сэргийлнэ. Аль хэдийн өгөгдөлтэй
+// (branch/role сонгосон) anonymous хэрэглэгчийг ХЭЗЭЭ Ч устгахгүй.
+async function cleanupEmptyAnonBeforeSwitch() {
+  if (currentUser?.id && currentUser.isAnonymous !== false && !currentUser.branch && !currentUser.personnel_type) {
+    try { await sb.from('users').delete().eq('id', currentUser.id); }
+    catch (e) { console.error('empty anon cleanup error:', e); }
+  }
+}
+
 async function signInWithEmail() {
   const email = document.getElementById('auth-email').value.trim();
   const password = document.getElementById('auth-password').value;
   const msg = document.getElementById('auth-msg');
   if (!email || !password) { msg.style.color = 'var(--red)'; msg.textContent = 'Имэйл, нууц үгээ оруулна уу.'; return; }
   msg.style.color = 'var(--sub)'; msg.textContent = 'Нэвтэрч байна...';
+  await cleanupEmptyAnonBeforeSwitch();
   const { error } = await sb.auth.signInWithPassword({ email, password });
   if (error) { msg.style.color = 'var(--red)'; msg.textContent = friendlyAuthError(error); return; }
   showToast('Амжилттай нэвтэрлээ.', 'success');
@@ -1225,6 +1237,7 @@ async function obSignIn() {
   const msg = document.getElementById('ob-auth-msg');
   if (!email || !password) { msg.style.color = 'var(--red)'; msg.textContent = 'Имэйл, нууц үгээ оруулна уу.'; return; }
   msg.style.color = 'var(--sub)'; msg.textContent = 'Нэвтэрч байна...';
+  await cleanupEmptyAnonBeforeSwitch();
   const { error } = await sb.auth.signInWithPassword({ email, password });
   if (error) { msg.style.color = 'var(--red)'; msg.textContent = friendlyAuthError(error); return; }
   showToast('Амжилттай нэвтэрлээ.', 'success');

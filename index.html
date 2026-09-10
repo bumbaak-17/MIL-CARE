@@ -577,7 +577,7 @@
 
       <!-- ================= DIARY (Өнөөдөр би...) ================= -->
       <div id="view-diary" class="view">
-        <div class="page-head"><h2>Өнөөдөр би...</h2><p>Мэдрэмжээ сонгоод, юу болсныг нэрээ нуулцан бичээрэй. Зөвхөн та л харах хувийн тэмдэглэл.</p>
+        <div class="page-head"><h2>Өнөөдөр би...</h2><p>Өнөөдрийн өөрийгөө илэрхийлэх эможигоо сонгоод, мэдрэмжээ бусадтай хуваалцаарай.</p>
           <div id="streak-badge-diary" class="streak-badge" style="margin-top:.7rem;">🌱 Ачаалж байна...</div>
         </div>
         <div class="section-card">
@@ -1489,7 +1489,7 @@ function goto(view, pushState) {
   if (view === 'profile') loadProfilePage();
   if (view === 'memory') { memoryIdx = 0; renderMemoryExercise(0); }
   if (view === 'analytics') { loadAnalyticsSummary(); loadMonthlyAnalysis(); }
-  if (view === 'org') { loadOrgStats(); }
+  if (view === 'org') { loadOrgStats(); loadUnitStress(); }
   if (view === 'pros') { loadPros(); }
   if (view === 'proportal') { loadProPortal(); }
   // Хөтчийн "Буцах" товч ажиллахын тулд history-д хуудсаа бүртгэнэ
@@ -2744,16 +2744,6 @@ async function bookPro(proId, name, type) {
 }
 
 /* ================= ORG ================= */
-const UNITS = [
-  { name:'БХЯ-ны харъяа байгууллагууд', pct:44 },
-  { name:'Хуурай замын цэргийн командлал', pct:63 },
-  { name:'Агаарын цэргийн командлал', pct:58 },
-  { name:'Тусгай хүчний цэргийн командлал', pct:74 },
-  { name:'Кибер цэргийн командлал', pct:81 },
-  { name:'ЗХЖШ-ын харъяа анги, байгууллагууд', pct:39 },
-  { name:'Барилга инженерийн цэргийн удирдах газар', pct:47 },
-  { name:'Иргэний байгууллагууд', pct:52 },
-];
 /* ================= НИЙТ СТАТИСТИК (бүх хэрэглэгчийн нэгтгэсэн, аюулгүй RPC-ээр) ================= */
 async function loadOrgStats() {
   const noteEl = document.getElementById('org-stats-note');
@@ -2787,9 +2777,25 @@ async function loadOrgStats() {
   if (noteEl) noteEl.textContent = '';
 }
 
-document.getElementById('unit-list').innerHTML = UNITS.sort((a,b)=>b.pct-a.pct).map(u => `
-  <div class="unit-row"><div class="unit-name">${u.name}</div><div class="unit-track"><div class="unit-fill" style="width:${u.pct}%;"></div></div><div class="unit-pct">${u.pct}%</div></div>
-`).join('');
+/* "Аль нэгжид стресс өндөр байна" — бодит тестийн дүнгээс тооцоолсон (админ хасагдсан) */
+async function loadUnitStress() {
+  const el = document.getElementById('unit-list');
+  if (!el) return;
+  el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div>';
+  const { data, error } = await sb.rpc('get_stress_by_unit');
+  if (error) {
+    console.error('get_stress_by_unit error:', error);
+    el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж чадсангүй (SQL функц тохируулагдаагүй байж болзошгүй).</div>';
+    return;
+  }
+  if (!data || !data.length) {
+    el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор хангалттай тестийн өгөгдөл алга.</div>';
+    return;
+  }
+  el.innerHTML = data.map(u => `
+    <div class="unit-row"><div class="unit-name">${BRANCH_LABELS[u.branch] || u.branch}</div><div class="unit-track"><div class="unit-fill" style="width:${u.avg_stress_pct}%;"></div></div><div class="unit-pct">${u.avg_stress_pct}%</div></div>
+  `).join('');
+}
 
 /* ================= ADMIN ================= */
 const ADMIN_ITEMS = [

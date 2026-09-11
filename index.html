@@ -410,20 +410,18 @@
     </div>
 
     <div id="ob-step-auth">
-      <p class="ob-step-title" id="ob-auth-title">1. Нэвтрэх</p>
-      <p class="ob-step-sub" id="ob-auth-sub">Өмнө нь бүртгүүлсэн бол имэйл, нууц үгээрээ нэвтэрнэ үү.</p>
-      <div id="ob-auth-form">
-        <div class="field"><label style="display:block;margin-bottom:.4rem;">Имэйл</label><input type="email" id="ob-auth-email" placeholder="tany@jishee.mn" onkeydown="if(event.key==='Enter'){document.getElementById('ob-auth-submit-btn').click();}" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);"></div>
-        <div class="field"><label style="display:block;margin-bottom:.4rem;" id="ob-auth-pw-label">Нууц үг</label>
-          <div style="position:relative;">
-            <input type="password" id="ob-auth-password" placeholder="••••••••" onkeydown="if(event.key==='Enter'){document.getElementById('ob-auth-submit-btn').click();}" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem 2.6rem .7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);">
-            <button type="button" onclick="togglePwVisibility('ob-auth-password', this)" aria-label="Нууц үг харах" style="position:absolute;right:.6rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.05rem;color:var(--sub);padding:.2rem;line-height:1;">👁️</button>
-          </div>
-        </div>
-        <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" id="ob-auth-submit-btn" onclick="obSignIn()">Нэвтрэх</button>
-        <div id="ob-auth-msg" style="font-size:.82rem;margin-top:.7rem;"></div>
-        <div style="margin-top:.9rem;font-size:.82rem;color:var(--sub);" id="ob-auth-toggle-wrap">Данс байхгүй юу? <a href="#" onclick="obToggleAuthMode();return false;" style="color:var(--gold);font-weight:700;">Бүртгүүлэх</a> &nbsp;·&nbsp; <a href="#" onclick="requestPasswordReset('ob-auth-email','ob-auth-msg');return false;" style="color:var(--gold);font-weight:700;">Нууц үгээ мартсан уу?</a></div>
-      </div>
+      <p class="ob-step-title">1. Нэвтрэх</p>
+      <p class="ob-step-sub">Аюулгүй, найдвартай байлгах үүднээс зөвхөн баталгаажсан Google эсвэл Facebook бүртгэлээр нэвтэрдэг. Нууц үг санах шаардлагагүй.</p>
+      <button type="button" onclick="obGoogleAuth()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:.6rem;border:1px solid var(--line);border-radius:12px;padding:.8rem .9rem;background:#fff;color:#3c4043;font-family:inherit;font-size:.97rem;font-weight:600;cursor:pointer;margin-bottom:.8rem;">
+        <svg width="19" height="19" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.9-2.26 5.36-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Google (Gmail) бүртгэлээр нэвтрэх
+      </button>
+      <button type="button" onclick="obFacebookAuth()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:.6rem;border:none;border-radius:12px;padding:.8rem .9rem;background:#1877F2;color:#fff;font-family:inherit;font-size:.97rem;font-weight:600;cursor:pointer;margin-bottom:1rem;">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="#fff"><path d="M22 12.06C22 6.51 17.52 2 12 2S2 6.51 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.51 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.91h-2.33V22c4.78-.79 8.44-4.94 8.44-9.94z"/></svg>
+        Facebook бүртгэлээр нэвтрэх
+      </button>
+      <p style="font-size:.76rem;color:var(--sub);text-align:center;margin:0;">Нэвтэрсэн имэйл/бүртгэлийн хаяг тань автоматаар хадгалагдана — дараа удаа нэвтрэхэд мөн адил товч дарахад л хангалттай.</p>
+      <div id="ob-auth-msg" style="font-size:.82rem;margin-top:.9rem;text-align:center;"></div>
     </div>
 
     <div id="ob-step-branch" style="display:none;">
@@ -438,33 +436,6 @@
       <div class="ob-grid" id="ob-role-grid"></div>
       <button class="modal-close" style="margin-top:1.2rem;" onclick="obBack()">← Буцах</button>
     </div>
-  </div>
-</div>
-
-<div id="recovery-overlay" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:110;overflow-y:auto;">
-  <div style="max-width:480px;margin:0 auto;padding:4rem 1.5rem 4rem;">
-    <div style="text-align:center;margin-bottom:2rem;">
-      <svg width="52" height="52" viewBox="0 0 48 48" fill="none" style="margin-bottom:.8rem;">
-        <path d="M24 3 L43 10 V22 C43 34 35 42 24 46 C13 42 5 34 5 22 V10 Z" fill="#2F6FED" stroke="#1E54C0" stroke-width="1.6"/>
-        <path d="M24 30 C24 30 15 22.5 15 16.5 C15 13 17.5 10.5 20.5 11.7 C22 12.3 24 14 24 14 C24 14 26 12.3 27.5 11.7 C30.5 10.5 33 13 33 16.5 C33 22.5 24 30 24 30 Z" fill="#FFFFFF"/>
-      </svg>
-      <h2 style="margin:0 0 .4rem;font-size:1.4rem;color:var(--gold-deep);">Шинэ нууц үг тохируулах</h2>
-      <p style="color:var(--sub);font-size:.85rem;">Доор шинэ нууц үгээ оруулаад баталгаажуулна уу.</p>
-    </div>
-    <div class="field"><label style="display:block;margin-bottom:.4rem;">Шинэ нууц үг (доод тал нь 6 тэмдэгт)</label>
-      <div style="position:relative;">
-        <input type="password" id="recovery-pw1" placeholder="••••••••" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem 2.6rem .7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);">
-        <button type="button" onclick="togglePwVisibility('recovery-pw1', this)" aria-label="Нууц үг харах" style="position:absolute;right:.6rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.05rem;color:var(--sub);padding:.2rem;line-height:1;">👁️</button>
-      </div>
-    </div>
-    <div class="field"><label style="display:block;margin-bottom:.4rem;">Шинэ нууц үг давтах</label>
-      <div style="position:relative;">
-        <input type="password" id="recovery-pw2" placeholder="••••••••" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem 2.6rem .7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);">
-        <button type="button" onclick="togglePwVisibility('recovery-pw2', this)" aria-label="Нууц үг харах" style="position:absolute;right:.6rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.05rem;color:var(--sub);padding:.2rem;line-height:1;">👁️</button>
-      </div>
-    </div>
-    <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" onclick="submitPasswordRecovery()">Нууц үг шинэчлэх</button>
-    <div id="recovery-msg" style="font-size:.82rem;margin-top:.7rem;"></div>
   </div>
 </div>
 
@@ -740,11 +711,8 @@
         <div class="page-head"><h2>Админ систем</h2><p>Платформын удирдлагын самбар.</p></div>
 
         <div class="section-card" id="admin-login-card">
-          <div class="section-head"><h3>Админ нэвтрэх</h3></div>
-          <div class="field"><label style="display:block;margin-bottom:.4rem;">Имэйл</label><input type="text" id="admin-email" placeholder="admin@mil-care.mn" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);"></div>
-          <div class="field"><label style="display:block;margin-bottom:.4rem;">Нууц үг</label><input type="password" id="admin-password" placeholder="••••••••" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);"></div>
-          <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" onclick="adminLogin()">Нэвтрэх</button>
-          <div id="admin-login-msg" style="font-size:.82rem;margin-top:.7rem;"></div>
+          <div class="section-head"><h3>Админ эрх</h3></div>
+          <p style="font-size:.85rem;color:var(--sub);margin:0;">Танд админ эрх байхгүй байна. Хэрэв та MIL-CARE-ийн админ мөн бол, өөрийн Google/Facebook бүртгэлээр нэвтэрсэн эсэхээ шалгаад дахин оролдоно уу — эрх нь автоматаар танигдана.</p>
         </div>
 
         <div id="admin-panel" style="display:none;">
@@ -856,28 +824,8 @@
           </div>
         </div>
 
-        <!-- Олон төхөөрөмж дээр ашиглах (Имэйл бүртгэл) -->
+        <!-- Нэвтэрсэн бүртгэлийн мэдээлэл -->
         <div class="section-card" id="auth-section"></div>
-
-        <!-- Нууц үг солих (зөвхөн имэйлээр бүртгэлтэй хэрэглэгчид) -->
-        <div class="section-card" id="password-change-section" style="display:none;">
-          <div class="section-head"><h3>🔑 Нууц үг солих</h3></div>
-          <p style="font-size:.85rem;color:var(--sub);margin:0 0 1rem;">Нууц үгээ шинэчлэхэд, дараагийн удаа нэвтрэхдээ зөвхөн шинэ нууц үгээрээ орох боломжтой болно.</p>
-          <div class="field"><label style="display:block;margin-bottom:.4rem;">Шинэ нууц үг (доод тал нь 6 тэмдэгт)</label>
-            <div style="position:relative;">
-              <input type="password" id="pw-new" placeholder="••••••••" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem 2.6rem .7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);">
-              <button type="button" onclick="togglePwVisibility('pw-new', this)" aria-label="Нууц үг харах" style="position:absolute;right:.6rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.05rem;color:var(--sub);padding:.2rem;line-height:1;">👁️</button>
-            </div>
-          </div>
-          <div class="field"><label style="display:block;margin-bottom:.4rem;">Шинэ нууц үг давтах</label>
-            <div style="position:relative;">
-              <input type="password" id="pw-new-confirm" placeholder="••••••••" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem 2.6rem .7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);">
-              <button type="button" onclick="togglePwVisibility('pw-new-confirm', this)" aria-label="Нууц үг харах" style="position:absolute;right:.6rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.05rem;color:var(--sub);padding:.2rem;line-height:1;">👁️</button>
-            </div>
-          </div>
-          <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" onclick="changePassword()">Нууц үг солих</button>
-          <div id="pw-change-msg" style="font-size:.82rem;margin-top:.7rem;"></div>
-        </div>
 
         <!-- Миний идэвхжил -->
         <div class="section-card">
@@ -956,50 +904,6 @@ const SUPABASE_URL = 'https://zsceezpxjigxdcwfrlkm.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_t5jPFZ1ZQS3_LsXSUq3ftg_OPpH0nxb';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-/* ================= НУУЦ ҮГ СЭРГЭЭХ ================= */
-async function requestPasswordReset(emailInputId, msgId) {
-  const emailEl = document.getElementById(emailInputId);
-  const msg = document.getElementById(msgId);
-  const email = emailEl ? emailEl.value.trim() : '';
-  if (!email) { msg.style.color = 'var(--red)'; msg.textContent = 'Эхлээд имэйл хаягаа дээрх талбарт оруулна уу.'; return; }
-  msg.style.color = 'var(--sub)'; msg.textContent = 'Илгээж байна...';
-  const redirectTo = location.origin + location.pathname;
-  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo });
-  if (error) { msg.style.color = 'var(--red)'; msg.textContent = friendlyAuthError(error); return; }
-  msg.style.color = 'var(--gold)';
-  msg.textContent = `Нууц үг сэргээх холбоос ${email} хаяг руу илгээгдлээ. Имэйлээ шалгаж, холбоос дээр дарна уу.`;
-}
-
-async function submitPasswordRecovery() {
-  const pw1 = document.getElementById('recovery-pw1').value;
-  const pw2 = document.getElementById('recovery-pw2').value;
-  const msg = document.getElementById('recovery-msg');
-  if (!pw1 || pw1.length < 6) { msg.style.color = 'var(--red)'; msg.textContent = 'Нууц үг 6-аас дээш тэмдэгттэй байх ёстой.'; return; }
-  if (pw1 !== pw2) { msg.style.color = 'var(--red)'; msg.textContent = 'Хоёр нууц үг таарахгүй байна.'; return; }
-  msg.style.color = 'var(--sub)'; msg.textContent = 'Шинэчилж байна...';
-  const { error } = await sb.auth.updateUser({ password: pw1 });
-  if (error) { msg.style.color = 'var(--red)'; msg.textContent = friendlyAuthError(error); return; }
-  msg.style.color = 'var(--gold)';
-  msg.textContent = 'Амжилттай! Шинэ нууц үгээрээ нэвтэрлээ.';
-  showToast('Нууц үг амжилттай шинэчлэгдлээ.', 'success');
-  setTimeout(() => { location.href = location.pathname; }, 900);
-}
-
-// Хэрэглэгч имэйл дэх "нууц үг сэргээх" холбоос дээр дарж ирэхэд Supabase
-// автоматаар PASSWORD_RECOVERY эвент дуудна — тэр үед нүүр хуудсыг нуугаад
-// шинэ нууц үг тохируулах цонхыг харуулна.
-if (location.hash.includes('type=recovery')) {
-  document.querySelector('.app').style.display = 'none';
-}
-sb.auth.onAuthStateChange((event) => {
-  if (event === 'PASSWORD_RECOVERY') {
-    document.querySelector('.app').style.display = 'none';
-    document.getElementById('onboarding-overlay').style.display = 'none';
-    document.getElementById('recovery-overlay').style.display = 'block';
-  }
-});
-
-
 /* ================= ANONYMOUS USER (localStorage-д тогтвортой хадгалагдана) ================= */
 /* ---- Монголын цагийн бүс (Asia/Ulaanbaatar) — Intl.DateTimeFormat ашиглан найдвартай тооцоолно ----
    Тайлбар: mn-MN locale-ийн нэр (сар, гарагийн нэр) зарим хөтчид дутуу байдаг тул,
@@ -1071,139 +975,14 @@ async function ensureUser() {
 /* ================= ИМЭЙЛ БҮРТГЭЛ (олон төхөөрөмж дээр өгөгдлөө үргэлжлүүлэн ашиглах) =================
    Anonymous хэрэглэгч имэйл/нууц үг холбовол (updateUser) яг ижил user_id хэвээр үлдэж,
    өмнөх бүх тест/дневникийн түүх алдагдалгүй, зөвхөн "байнгын" статустай болно. */
-let authMode = 'signin';
-function toggleAuthMode() { authMode = (authMode === 'signup') ? 'signin' : 'signup'; renderAuthSection(); }
-function handleAuthEnter() { if (authMode === 'signup') signUpWithEmail(); else signInWithEmail(); }
-
 function renderAuthSection() {
   const el = document.getElementById('auth-section');
   if (!el || !currentUser) return;
-
-  if (currentUser.isAnonymous === false && currentUser.email) {
-    el.innerHTML = `
-      <div class="section-head"><h3>🔐 Олон төхөөрөмж дээр ашиглах</h3></div>
-      <p style="font-size:.85rem;color:var(--sub);margin:0 0 1rem;">Та <b>${currentUser.email}</b> имэйлээр бүртгэлтэй байна. Өөр утас, компьютер дээрээс энэ имэйлээрээ нэвтэрч, өгөгдлөө үргэлжлүүлэн ашиглах боломжтой.</p>
-      <button class="modal-close" onclick="confirmLogout()">Гарах</button>
-    `;
-    return;
-  }
-
-  if (authMode === 'signup') {
-    el.innerHTML = `
-      <div class="section-head"><h3>🔐 Олон төхөөрөмж дээр ашиглах</h3></div>
-      <p style="font-size:.85rem;color:var(--sub);margin:0 0 1rem;">Одоогоор та зөвхөн энэ төхөөрөмж дээр танигдана. Имэйлээр бүртгүүлбэл өгөгдлөө (тест, дневник) алдалгүй өөр утас, компьютер дээрээс ч нэвтрэх боломжтой.</p>
-      <div class="field"><label style="display:block;margin-bottom:.4rem;">Имэйл</label><input type="email" id="auth-email" placeholder="tany@jishee.mn" onkeydown="if(event.key==='Enter'){handleAuthEnter();}" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);"></div>
-      <div class="field"><label style="display:block;margin-bottom:.4rem;">Нууц үг (доод тал нь 6 тэмдэгт)</label>
-        <div style="position:relative;">
-          <input type="password" id="auth-password" placeholder="••••••••" onkeydown="if(event.key==='Enter'){handleAuthEnter();}" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem 2.6rem .7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);">
-          <button type="button" onclick="togglePwVisibility('auth-password', this)" aria-label="Нууц үг харах" style="position:absolute;right:.6rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.05rem;color:var(--sub);padding:.2rem;line-height:1;">👁️</button>
-        </div>
-      </div>
-      <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" onclick="signUpWithEmail()">Бүртгүүлэх</button>
-      <div id="auth-msg" style="font-size:.82rem;margin-top:.7rem;"></div>
-      <div style="margin-top:.9rem;font-size:.82rem;color:var(--sub);">Өмнө нь өөр төхөөрөмж дээр бүртгүүлсэн үү? <a href="#" onclick="toggleAuthMode();return false;" style="color:var(--gold);font-weight:700;">Нэвтрэх</a></div>
-    `;
-  } else {
-    el.innerHTML = `
-      <div class="section-head"><h3>🔐 Олон төхөөрөмж дээр ашиглах</h3></div>
-      <p style="font-size:.85rem;color:var(--sub);margin:0 0 1rem;">Өмнө нь имэйлээр бүртгүүлсэн бол энд нэвтэрч, өөрийн түүхээ энэ төхөөрөмж дээр үргэлжлүүлээрэй.</p>
-      <div class="field"><label style="display:block;margin-bottom:.4rem;">Имэйл</label><input type="email" id="auth-email" placeholder="tany@jishee.mn" onkeydown="if(event.key==='Enter'){handleAuthEnter();}" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);"></div>
-      <div class="field"><label style="display:block;margin-bottom:.4rem;">Нууц үг</label>
-        <div style="position:relative;">
-          <input type="password" id="auth-password" placeholder="••••••••" onkeydown="if(event.key==='Enter'){handleAuthEnter();}" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem 2.6rem .7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);">
-          <button type="button" onclick="togglePwVisibility('auth-password', this)" aria-label="Нууц үг харах" style="position:absolute;right:.6rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.05rem;color:var(--sub);padding:.2rem;line-height:1;">👁️</button>
-        </div>
-      </div>
-      <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" onclick="signInWithEmail()">Нэвтрэх</button>
-      <div id="auth-msg" style="font-size:.82rem;margin-top:.7rem;"></div>
-      <div style="margin-top:.9rem;font-size:.82rem;color:var(--sub);">Данс байхгүй юу? <a href="#" onclick="toggleAuthMode();return false;" style="color:var(--gold);font-weight:700;">Бүртгүүлэх</a> &nbsp;·&nbsp; <a href="#" onclick="requestPasswordReset('auth-email','auth-msg');return false;" style="color:var(--gold);font-weight:700;">Нууц үгээ мартсан уу?</a></div>
-    `;
-  }
-}
-
-async function signUpWithEmail() {
-  const email = document.getElementById('auth-email').value.trim();
-  const password = document.getElementById('auth-password').value;
-  const msg = document.getElementById('auth-msg');
-  if (!email || !password || password.length < 6) {
-    msg.style.color = 'var(--red)'; msg.textContent = 'Имэйл болон 6-аас дээш тэмдэгттэй нууц үг оруулна уу.'; return;
-  }
-  msg.style.color = 'var(--sub)'; msg.textContent = 'Уншиж байна...';
-  // Anonymous session-ийг байнгын болгож "холбоно" — ижил user_id хэвээр үлдэх тул өмнөх бүх өгөгдөл хадгалагдана
-  const { error } = await sb.auth.updateUser({ email, password });
-  if (error) {
-    msg.style.color = 'var(--red)';
-    msg.textContent = friendlyAuthError(error);
-    if (isAlreadyRegisteredError(error)) {
-      authMode = 'signin';
-      renderAuthSection();
-      document.getElementById('auth-email').value = email;
-      const newMsg = document.getElementById('auth-msg');
-      newMsg.style.color = 'var(--red)';
-      newMsg.textContent = 'Энэ имэйл өмнө нь бүртгэгдсэн байна. Нууц үгээ оруулаад "Нэвтрэх" дарна уу.';
-    }
-    return;
-  }
-  msg.style.color = 'var(--gold)';
-  msg.textContent = 'Амжилттай! Шаардлагатай бол имэйл рүү илгээсэн баталгаажуулах холбоосыг шалгана уу.';
-  showToast('Бүртгэл имэйлтэй холбогдлоо. Одоо өөр төхөөрөмж дээрээс энэ имэйлээр нэвтэрч болно.', 'success');
-  await ensureUser();
-  applyUserToTopbar();
-  renderAuthSection();
-}
-
-// Supabase-ийн техникийн алдааны мессежийг хэрэглэгчид ойлгомжтой монгол хэл рүү хөрвүүлнэ
-function friendlyAuthError(error) {
-  const m = (error?.message || '').toLowerCase();
-  if (m.includes('invalid login credentials')) return 'Таны имэйл эсвэл нууц үг буруу байна.';
-  if (m.includes('email not confirmed')) return 'Имэйл хаягаа баталгаажуулаагүй байна. Имэйл рүүгээ ирсэн холбоосыг шалгана уу.';
-  if (isAlreadyRegisteredError(error)) return 'Энэ имэйл хаяг өмнө нь бүртгэгдсэн байна. "Нэвтрэх"-ийг ашиглана уу.';
-  return 'Алдаа гарлаа: ' + (error?.message || 'Тодорхойгүй алдаа.');
-}
-// "already registered" эсвэл "already been registered" аль ч хэлбэрээр ирсэн эсэхийг шалгана
-function isAlreadyRegisteredError(error) {
-  const m = (error?.message || '').toLowerCase();
-  return m.includes('already registered') || m.includes('already been registered');
-}
-
-// Нэвтрэхийн өмнө одоогийн session нь ХООСОН, шинэ (branch/role сонгоогүй)
-// anonymous профайл байвал, session солигдохоос өмнө устгаж, users хүснэгтэд
-// хоосон "хог" мөр хуримтлагдахаас сэргийлнэ. Аль хэдийн өгөгдөлтэй
-// (branch/role сонгосон) anonymous хэрэглэгчийг ХЭЗЭЭ Ч устгахгүй.
-async function cleanupEmptyAnonBeforeSwitch() {
-  if (currentUser?.id && currentUser.isAnonymous !== false && !currentUser.branch && !currentUser.personnel_type) {
-    try { await sb.from('users').delete().eq('id', currentUser.id); }
-    catch (e) { console.error('empty anon cleanup error:', e); }
-  }
-}
-
-async function signInWithEmail() {
-  const email = document.getElementById('auth-email').value.trim();
-  const password = document.getElementById('auth-password').value;
-  const msg = document.getElementById('auth-msg');
-  if (!email || !password) { msg.style.color = 'var(--red)'; msg.textContent = 'Имэйл, нууц үгээ оруулна уу.'; return; }
-  msg.style.color = 'var(--sub)'; msg.textContent = 'Нэвтэрч байна...';
-  await cleanupEmptyAnonBeforeSwitch();
-  const { error } = await sb.auth.signInWithPassword({ email, password });
-  if (error) { msg.style.color = 'var(--red)'; msg.textContent = friendlyAuthError(error); return; }
-  showToast('Амжилттай нэвтэрлээ.', 'success');
-  location.reload();
-}
-
-async function changePassword() {
-  const pw1 = document.getElementById('pw-new').value;
-  const pw2 = document.getElementById('pw-new-confirm').value;
-  const msg = document.getElementById('pw-change-msg');
-  if (!pw1 || pw1.length < 6) { msg.style.color = 'var(--red)'; msg.textContent = 'Шинэ нууц үг 6-аас дээш тэмдэгттэй байх ёстой.'; return; }
-  if (pw1 !== pw2) { msg.style.color = 'var(--red)'; msg.textContent = 'Хоёр нууц үг таарахгүй байна.'; return; }
-  msg.style.color = 'var(--sub)'; msg.textContent = 'Шинэчилж байна...';
-  const { error } = await sb.auth.updateUser({ password: pw1 });
-  if (error) { msg.style.color = 'var(--red)'; msg.textContent = 'Алдаа: ' + error.message; return; }
-  msg.style.color = 'var(--gold)';
-  msg.textContent = 'Нууц үг амжилттай солигдлоо. Дараагийн удаа нэвтрэхдээ шинэ нууц үгээ ашиглана уу.';
-  document.getElementById('pw-new').value = '';
-  document.getElementById('pw-new-confirm').value = '';
-  showToast('Нууц үг шинэчлэгдлээ.', 'success');
+  el.innerHTML = `
+    <div class="section-head"><h3>🔐 Нэвтэрсэн бүртгэл</h3></div>
+    <p style="font-size:.85rem;color:var(--sub);margin:0 0 1rem;">Та <b>${currentUser.email || '—'}</b> бүртгэлээр нэвтэрсэн байна. Өөр утас, компьютер дээрээс ч мөн адил Google/Facebook товч дараад, энэ бүртгэлээрээ шууд нэвтэрч, өгөгдлөө үргэлжлүүлэн ашиглах боломжтой.</p>
+    <button class="modal-close" onclick="confirmLogout()">Гарах</button>
+  `;
 }
 
 async function signOutUser() {
@@ -1254,40 +1033,22 @@ const BRANCH_LABELS = Object.fromEntries(BRANCHES.map(b => [b.key, b.label]));
 const ROLE_LABELS = Object.fromEntries(PERSONNEL_TYPES.map(r => [r.key, r.label]));
 
 let obSelectedBranch = null, obSelectedRole = null;
-let obAuthMode = 'signin';
-
-function obToggleAuthMode() {
-  obAuthMode = (obAuthMode === 'signup') ? 'signin' : 'signup';
-  const submitBtn = document.getElementById('ob-auth-submit-btn');
-  const pwLabel = document.getElementById('ob-auth-pw-label');
-  const toggleWrap = document.getElementById('ob-auth-toggle-wrap');
-  const titleEl = document.getElementById('ob-auth-title');
-  const subEl = document.getElementById('ob-auth-sub');
-  const msg = document.getElementById('ob-auth-msg');
-  msg.textContent = '';
-  if (obAuthMode === 'signin') {
-    titleEl.textContent = '1. Нэвтрэх';
-    subEl.textContent = 'Өмнө нь бүртгүүлсэн бол имэйл, нууц үгээрээ нэвтэрнэ үү.';
-    submitBtn.textContent = 'Нэвтрэх';
-    submitBtn.setAttribute('onclick', 'obSignIn()');
-    pwLabel.textContent = 'Нууц үг';
-    toggleWrap.innerHTML = 'Данс байхгүй юу? <a href="#" onclick="obToggleAuthMode();return false;" style="color:var(--gold);font-weight:700;">Бүртгүүлэх</a> &nbsp;·&nbsp; <a href="#" onclick="requestPasswordReset(\'ob-auth-email\',\'ob-auth-msg\');return false;" style="color:var(--gold);font-weight:700;">Нууц үгээ мартсан уу?</a>';
-  } else {
-    titleEl.textContent = '1. Бүртгүүлэх (санал болгож байна)';
-    subEl.textContent = 'Үргэлжлүүлэхийн тулд имэйл, нууц үгээрээ бүртгүүлнэ үү. Ингэснээр таны өгөгдөл (тест, дневник) алдагдалгүй хадгалагдаж, өөр утас, компьютер дээрээс ч ашиглах боломжтой болно.';
-    submitBtn.textContent = 'Бүртгүүлэх';
-    submitBtn.setAttribute('onclick', 'obSignUp()');
-    pwLabel.textContent = 'Нууц үг (доод тал нь 6 тэмдэгт)';
-    toggleWrap.innerHTML = 'Өмнө нь бүртгүүлсэн үү? <a href="#" onclick="obToggleAuthMode();return false;" style="color:var(--gold);font-weight:700;">Нэвтрэх</a>';
-  }
-}
-
-// Нууц үг талбарын жижиг "нүд" дарж, бичсэн нууц үгээ харах/нуух
+// Нууц үг талбарын жижиг "нүд" дарж, бичсэн нууц үгээ харах/нуух (профайл дотор бусад зорилгоор ашиглагдаж болзошгүй тул үлдээв)
 function togglePwVisibility(inputId, btn) {
   const input = document.getElementById(inputId);
   if (!input) return;
   if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; }
   else { input.type = 'password'; btn.textContent = '👁️'; }
+}
+
+// Google/Facebook руу шилжихийн өмнө, хоосон (branch/personnel_type тохируулаагүй) anonymous
+// хэрэглэгчийн мөрийг устгаж, дата санд хэрэггүй "orphan" мөр хуримтлагдахаас сэргийлнэ.
+async function cleanupEmptyAnonBeforeSwitch() {
+  if (!currentUser?.id || currentUser.isAnonymous === false) return;
+  if (currentUser.branch || currentUser.personnel_type) return; // аль хэдийн өгөгдөлтэй бол устгахгүй
+  try {
+    await sb.from('users').delete().eq('id', currentUser.id);
+  } catch (e) { console.error('cleanupEmptyAnonBeforeSwitch error:', e); }
 }
 
 function obGotoBranchStep() {
@@ -1296,46 +1057,27 @@ function obGotoBranchStep() {
   renderObBranch();
 }
 
-async function obSignUp() {
-  const email = document.getElementById('ob-auth-email').value.trim();
-  const password = document.getElementById('ob-auth-password').value;
+async function obGoogleAuth() {
   const msg = document.getElementById('ob-auth-msg');
-  if (!email || !password || password.length < 6) {
-    msg.style.color = 'var(--red)'; msg.textContent = 'Имэйл болон 6-аас дээш тэмдэгттэй нууц үг оруулна уу.'; return;
-  }
-  msg.style.color = 'var(--sub)'; msg.textContent = 'Уншиж байна...';
-  const { error } = await sb.auth.updateUser({ email, password });
-  if (error) {
-    msg.style.color = 'var(--red)';
-    msg.textContent = friendlyAuthError(error);
-    // Хэрэв энэ имэйл өмнө нь бүртгэгдсэн бол хэрэглэгчийг шууд "Нэвтрэх" горим руу шилжүүлж, имэйлийг нь хадгалж үлдээнэ
-    if (isAlreadyRegisteredError(error)) {
-      obAuthMode = 'signup';
-      obToggleAuthMode();
-      document.getElementById('ob-auth-email').value = email;
-      const newMsg = document.getElementById('ob-auth-msg');
-      newMsg.style.color = 'var(--red)';
-      newMsg.textContent = 'Энэ имэйл өмнө нь бүртгэгдсэн байна. Нууц үгээ оруулаад "Нэвтрэх" дарна уу.';
-    }
-    return;
-  }
-  await ensureUser();
-  applyUserToTopbar();
-  showToast('Бүртгэл имэйлтэй холбогдлоо. Одоо өөр төхөөрөмж дээрээс энэ имэйлээр нэвтэрч болно.', 'success');
-  obGotoBranchStep();
+  msg.style.color = 'var(--sub)'; msg.textContent = 'Google руу шилжиж байна...';
+  await cleanupEmptyAnonBeforeSwitch();
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: location.origin + location.pathname }
+  });
+  if (error) { msg.style.color = 'var(--red)'; msg.textContent = 'Google-ээр нэвтрэхэд алдаа гарлаа: ' + error.message; }
+  // Амжилттай бол хөтөч Google руу шилжинэ; буцаж ирэхэд session автоматаар тогтоно
 }
 
-async function obSignIn() {
-  const email = document.getElementById('ob-auth-email').value.trim();
-  const password = document.getElementById('ob-auth-password').value;
+async function obFacebookAuth() {
   const msg = document.getElementById('ob-auth-msg');
-  if (!email || !password) { msg.style.color = 'var(--red)'; msg.textContent = 'Имэйл, нууц үгээ оруулна уу.'; return; }
-  msg.style.color = 'var(--sub)'; msg.textContent = 'Нэвтэрч байна...';
+  msg.style.color = 'var(--sub)'; msg.textContent = 'Facebook руу шилжиж байна...';
   await cleanupEmptyAnonBeforeSwitch();
-  const { error } = await sb.auth.signInWithPassword({ email, password });
-  if (error) { msg.style.color = 'var(--red)'; msg.textContent = friendlyAuthError(error); return; }
-  showToast('Амжилттай нэвтэрлээ.', 'success');
-  location.reload();
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'facebook',
+    options: { redirectTo: location.origin + location.pathname }
+  });
+  if (error) { msg.style.color = 'var(--red)'; msg.textContent = 'Facebook-ээр нэвтрэхэд алдаа гарлаа: ' + error.message; }
 }
 
 function renderObBranch() {
@@ -1422,8 +1164,6 @@ async function saveClassification() {
 async function loadProfilePage() {
   if (!currentUser?.id) return;
   renderAuthSection();
-  const pwSection = document.getElementById('password-change-section');
-  if (pwSection) { pwSection.style.display = (currentUser.isAnonymous === false) ? 'block' : 'none'; }
   const logoutNote = document.getElementById('logout-note');
   if (logoutNote) {
     logoutNote.textContent = currentUser.isAnonymous !== false
@@ -1453,29 +1193,6 @@ async function loadProfilePage() {
 
 /* ================= ADMIN: имэйл+нууц үгээр нэвтрэх ================= */
 let isAdmin = false;
-async function adminLogin() {
-  const email = document.getElementById('admin-email').value.trim();
-  const password = document.getElementById('admin-password').value;
-  const msgEl = document.getElementById('admin-login-msg');
-  if (!email || !password) { msgEl.style.color='var(--red)'; msgEl.textContent='Имэйл, нууц үгээ бичнэ үү.'; return; }
-  const { data, error } = await sb.auth.signInWithPassword({ email, password });
-  if (error) { msgEl.style.color='var(--red)'; msgEl.textContent='Нэвтрэхэд алдаа гарлаа: ' + error.message; return; }
-  await checkAdminStatus();
-  if (isAdmin) {
-    document.getElementById('admin-login-card').style.display = 'none';
-    document.getElementById('admin-panel').style.display = 'block';
-    loadIdentityList();
-    loadCompositionStats();
-    loadRegisteredUsers();
-    loadAdminChatThreads();
-    loadAdminProfessionals();
-  } else {
-    msgEl.style.color='var(--red)';
-    msgEl.textContent='Энэ бүртгэл админ эрхгүй байна.';
-    await sb.auth.signOut();
-    await ensureUser(); // буцаад энгийн anonymous session рүү шилжинэ
-  }
-}
 async function checkAdminStatus() {
   const { data: sessionData } = await sb.auth.getSession();
   const uid = sessionData?.session?.user?.id;

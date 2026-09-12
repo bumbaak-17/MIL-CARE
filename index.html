@@ -475,7 +475,6 @@
       <li class="navitem" data-view="attention"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>Анхаарал шалгах тест</li>
       <li class="navitem" data-view="group-exercise"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="3"/><path d="M2 21v-1a5 5 0 0 1 5-5h2a5 5 0 0 1 5 5v1"/><circle cx="17" cy="7" r="3"/><path d="M14 15.5a5 5 0 0 1 4.5 4.5"/></svg>Сэтгэл зүйн бүлгийн дасгал</li>
       <li class="navitem" data-view="projective"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19c-4-3-8-6-8-10a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 4-4 7-8 10-.5.4-1.5.4-2 0Z"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/></svg>Хувь хүнийг тодорхойлох проектив аргууд</li>
-      <li class="navitem" data-view="feed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 5h4v4"/></svg>Сэтгэгдлээ хуваалцах</li>
       <li class="navitem" data-view="pros"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>Сэтгэл зүйч<span id="pros-nav-badge" class="nav-badge" style="display:none;">0</span></li>
       <li class="navitem" data-view="analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>Миний сэтгэл зүй</li>
 
@@ -567,7 +566,7 @@
               <div class="test-row" id="test-row-preview"></div>
             </div>
             <div class="section-card">
-              <div class="section-head"><h3>Сэтгэгдлээ хуваалцах</h3><span class="more" data-goto="feed">Бүгдийг харах</span></div>
+              <div class="section-head"><h3>Өнөөдөр би...</h3><span class="more" data-goto="diary">Бүгдийг харах</span></div>
               <div id="feed-preview"></div>
             </div>
           </div>
@@ -591,10 +590,15 @@
           <div class="emo-grid" id="emo-grid"></div>
           <label style="font-size:.83rem;color:var(--sub);font-weight:700;display:block;margin-bottom:.5rem;">Юу болсон бэ?</label>
           <textarea id="diary-text" placeholder="Таны нэр нууцлалтай харагдах учир санаа зоволтгүй мэдрэмжээ хуваалцаарай..." style="width:100%;min-height:90px;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:.8rem 1rem;color:var(--cream);font-family:inherit;font-size:.9rem;resize:vertical;"></textarea>
-          <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;margin-top:.9rem;" onclick="addDiary()">Хадгалах</button>
+          <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;margin-top:.9rem;" onclick="addDiary()">Нийтлэх</button>
+          <p style="font-size:.72rem;color:var(--sub);margin:.6rem 0 0;">Нийтэлбэл, доорх нийтийн хэсэгт таны нэрээ нуусан <span id="my-handle-note">хэрэглэгчийн</span> нэрээр харагдаж, бусад хэрэглэгч сэтгэгдэл үлдээж, дэмжиж чадна. Таны хувийн тэмдэглэлийн түүхэнд ч бас хадгалагдана.</p>
         </div>
         <div class="section-card">
-          <div class="section-head"><h3>Миний тэмдэглэл</h3></div>
+          <div class="section-head"><h3>💬 Нийтийн хуваалцсан сэтгэгдэл</h3></div>
+          <div id="feed-list-full"></div>
+        </div>
+        <div class="section-card">
+          <div class="section-head"><h3>Миний тэмдэглэлийн түүх (зөвхөн танд харагдана)</h3></div>
           <div id="diary-list"></div>
         </div>
       </div>
@@ -664,15 +668,6 @@
             <div class="test-title">Өнгө ялгах чадвар</div>
             <div class="test-blurb">6 плат — 3 минут</div>
           </div>
-        </div>
-      </div>
-
-      <!-- ================= FEED (community) ================= -->
-      <div id="view-feed" class="view">
-        <div class="page-head"><h2>Сэтгэгдлээ хуваалцах</h2><p>Нэрээ нуусан орон зайд мэдрэмжээ хуваалцаж, дэмжлэг үзүүлээрэй.</p></div>
-        <div class="section-card">
-          <div id="feed-list-full"></div>
-          <div class="composer"><input type="text" id="post-input" placeholder="Мэдрэмжээ нэрээ нуулцан бичих..."><button onclick="addPost()">Илгээх</button></div>
         </div>
       </div>
 
@@ -1653,10 +1648,20 @@ async function addDiary() {
   textEl.value = '';
   document.querySelectorAll('.emo-btn').forEach(x=>x.classList.remove('selected'));
   selectedDiaryEmo = null;
+
+  // 1) Хувийн тэмдэглэл (зөвхөн танд харагдана, аналитикт ашиглагдана)
   const { error } = await sb.from('mood_entries').insert({ user_id: currentUser.id, mood: emoObj.key, note: text });
   if (error) { showToast('Хадгалахад алдаа гарлаа: ' + error.message, 'error'); return; }
-  showToast('Тэмдэглэл хадгалагдлаа', 'success');
+
+  // 2) Нийтийн санал (Facebook маягийн feed рүү, нэрээ нуусан тогтмол хэрэглэгчийн нэрээр)
+  const { error: postErr } = await sb.from('posts').insert({
+    user_id: currentUser.id, anon_handle: currentUser.handle, text: `${emoObj.e} ${text}`, likes: 0
+  });
+  if (postErr) console.error('post insert error:', postErr);
+
+  showToast('Тэмдэглэл хадгалагдаж, нийтлэгдлээ', 'success');
   loadDiary();
+  loadPosts();
   loadWeekMood();
   updateStreakBadge();
 }
@@ -2337,8 +2342,10 @@ async function scoreModal(key) {
   `;
 }
 
-/* ================= FEED (Supabase-тэй холбогдсон) ================= */
+/* ================= FEED (Facebook маягийн нийтийн пост + сэтгэгдэл, Supabase-тэй холбогдсон) ================= */
 let feedState = [];
+let COMMENTS_BY_POST = {};
+let openCommentPosts = new Set();
 
 function timeAgo(ts) {
   const s = Math.floor((Date.now() - new Date(ts).getTime())/1000);
@@ -2350,41 +2357,121 @@ function timeAgo(ts) {
   // 7 хоногоос хуучин бол Улаанбаатарын цагаар тодорхой огноо харуулна
   return formatUbFull(ts);
 }
-function postHTML(p,i){ return `
+
+function commentHTML(c) {
+  const isMine = currentUser?.id && c.user_id === currentUser.id;
+  return `<div class="comment-row" style="display:flex;gap:.5rem;padding:.5rem 0;border-top:1px solid var(--line);">
+    <div class="post-avatar" style="width:26px;height:26px;font-size:.8rem;flex-shrink:0;">🪖</div>
+    <div style="flex:1;min-width:0;">
+      <div style="font-size:.78rem;font-weight:700;">${c.anon_handle}<span style="font-weight:400;color:var(--sub);margin-left:.5rem;">${timeAgo(c.created_at)}</span></div>
+      <div style="font-size:.85rem;word-break:break-word;">${c.text}</div>
+    </div>
+    ${isMine ? `<button onclick="deleteComment('${c.id}','${c.post_id}')" title="Устгах" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>` : ''}
+  </div>`;
+}
+
+function postHTML(p) {
+  const isMine = currentUser?.id && p.user_id === currentUser.id;
+  const comments = COMMENTS_BY_POST[p.id] || [];
+  const isOpen = openCommentPosts.has(p.id);
+  return `
+  <div class="post" id="post-${p.id}">
+    <div class="post-head"><div class="post-avatar">🪖</div><div><div class="post-name">${p.anon_handle}</div><div class="post-time">${timeAgo(p.created_at)}</div></div>
+      ${isMine ? `<button onclick="deletePost('${p.id}')" title="Устгах" style="margin-left:auto;background:none;border:none;color:var(--sub);cursor:pointer;">🗑</button>` : ''}
+    </div>
+    <p class="post-text">${p.text}</p>
+    <div class="post-actions">
+      <div class="post-action" onclick="toggleLike('${p.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>${p.likes}</div>
+      <div class="post-action" onclick="toggleComments('${p.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5A8.5 8.5 0 1 1 21 11.5z"/></svg>${comments.length}</div>
+      <button class="support-btn" onclick="toggleLike('${p.id}')">ДЭМЖИХ</button>
+    </div>
+    <div class="comment-section" id="comments-${p.id}" style="display:${isOpen?'block':'none'};margin-top:.6rem;">
+      <div id="comment-list-${p.id}">${comments.map(commentHTML).join('') || '<div style="color:var(--sub);font-size:.8rem;padding:.4rem 0;">Одоогоор сэтгэгдэл алга. Эхнийхийг үлдээгээрэй!</div>'}</div>
+      <div style="display:flex;gap:.5rem;margin-top:.6rem;">
+        <input type="text" id="comment-input-${p.id}" placeholder="Сэтгэгдэл бичих..." onkeydown="if(event.key==='Enter'){addComment('${p.id}');}" style="flex:1;border:1px solid var(--line);border-radius:10px;padding:.5rem .8rem;font-family:inherit;font-size:.85rem;background:#fff;color:var(--cream);">
+        <button class="connect-btn" style="width:auto;padding:.5rem 1rem;font-size:.85rem;" onclick="addComment('${p.id}')">Илгээх</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function postPreviewHTML(p) {
+  return `
   <div class="post">
     <div class="post-head"><div class="post-avatar">🪖</div><div><div class="post-name">${p.anon_handle}</div><div class="post-time">${timeAgo(p.created_at)}</div></div></div>
     <p class="post-text">${p.text}</p>
     <div class="post-actions">
-      <div class="post-action" onclick="toggleLike('${p.id}', ${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>${p.likes}</div>
-      <div class="post-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5A8.5 8.5 0 1 1 21 11.5z"/></svg>0</div>
-      <button class="support-btn" onclick="toggleLike('${p.id}', ${i})">ДЭМЖИХ</button>
+      <div class="post-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>${p.likes}</div>
+      <div class="post-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5A8.5 8.5 0 1 1 21 11.5z"/></svg>${(COMMENTS_BY_POST[p.id]||[]).length}</div>
     </div>
-  </div>`; }
-function renderFeed(){
-  const html = feedState.map(postHTML).join('') || '<div style="color:var(--sub);text-align:center;padding:2rem 0;">Одоогоор бичлэг байхгүй байна. Эхнийхийг та бичээрэй!</div>';
-  document.getElementById('feed-list-full').innerHTML = html;
-  document.getElementById('feed-preview').innerHTML = feedState.slice(0,2).map(postHTML).join('');
+  </div>`;
 }
+
+function renderFeed(){
+  const html = feedState.map(p=>postHTML(p)).join('') || '<div style="color:var(--sub);text-align:center;padding:2rem 0;">Одоогоор бичлэг байхгүй байна. Эхнийхийг та бичээрэй!</div>';
+  const fullEl = document.getElementById('feed-list-full');
+  if (fullEl) fullEl.innerHTML = html;
+  const previewEl = document.getElementById('feed-preview');
+  if (previewEl) previewEl.innerHTML = feedState.slice(0,2).map(postPreviewHTML).join('') || '<div style="color:var(--sub);font-size:.85rem;">Одоогоор бичлэг байхгүй байна.</div>';
+}
+
 async function loadPosts() {
   const { data, error } = await sb.from('posts').select('*').order('created_at', { ascending:false }).limit(50);
-  if (error) { console.error(error); return; }
-  feedState = data;
+  if (error) { console.error('loadPosts error:', error); return; }
+  feedState = data || [];
+  const postIds = feedState.map(p => p.id);
+  if (postIds.length) {
+    const { data: comments, error: cErr } = await sb.from('comments').select('*').in('post_id', postIds).order('created_at', { ascending:true });
+    if (!cErr) {
+      COMMENTS_BY_POST = {};
+      (comments||[]).forEach(c => { (COMMENTS_BY_POST[c.post_id] ||= []).push(c); });
+    } else {
+      console.error('loadComments error:', cErr);
+    }
+  }
   renderFeed();
 }
-async function toggleLike(id, i) {
-  const newLikes = feedState[i].likes + 1;
-  feedState[i].likes = newLikes;
+
+function toggleComments(postId) {
+  if (openCommentPosts.has(postId)) openCommentPosts.delete(postId);
+  else openCommentPosts.add(postId);
+  renderFeed();
+}
+
+async function addComment(postId) {
+  const input = document.getElementById('comment-input-' + postId);
+  const text = input.value.trim();
+  if (!text) return;
+  if (!currentUser?.id) { showToast('Холболт хараахан бэлэн болоогүй байна.', 'warn'); return; }
+  input.value = '';
+  const { error } = await sb.from('comments').insert({ post_id: postId, user_id: currentUser.id, anon_handle: currentUser.handle, text });
+  if (error) { showToast('Сэтгэгдэл илгээхэд алдаа гарлаа: ' + error.message, 'error'); return; }
+  openCommentPosts.add(postId);
+  loadPosts();
+}
+
+async function deleteComment(commentId, postId) {
+  if (!confirm('Энэ сэтгэгдлийг устгах уу?')) return;
+  const { error } = await sb.from('comments').delete().eq('id', commentId);
+  if (error) { showToast('Устгахад алдаа гарлаа: ' + error.message, 'error'); return; }
+  openCommentPosts.add(postId);
+  loadPosts();
+}
+
+async function deletePost(postId) {
+  if (!confirm('Энэ нийтлэлийг устгах уу? Дагалдах сэтгэгдлүүд ч мөн устна.')) return;
+  const { error } = await sb.from('posts').delete().eq('id', postId);
+  if (error) { showToast('Устгахад алдаа гарлаа: ' + error.message, 'error'); return; }
+  loadPosts();
+}
+
+async function toggleLike(id) {
+  const post = feedState.find(p => p.id === id);
+  if (!post) return;
+  const newLikes = post.likes + 1;
+  post.likes = newLikes;
   renderFeed();
   await sb.from('posts').update({ likes: newLikes }).eq('id', id);
-}
-async function addPost(){
-  const input=document.getElementById('post-input');
-  const text=input.value.trim();
-  if(!text) return;
-  input.value='';
-  const { error } = await sb.from('posts').insert({ anon_handle: randomHandle(), text, likes: 0 });
-  if (error) { showToast('Илгээхэд алдаа гарлаа: ' + error.message, 'error'); return; }
-  loadPosts();
 }
 
 /* ================= PROS (Supabase-тэй холбогдсон) ================= */

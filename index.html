@@ -1311,7 +1311,7 @@ async function loadProfilePage() {
 
   const [{ count: testCount }, { count: diaryCount }] = await Promise.all([
     sb.from('test_results').select('id', { count: 'exact', head: true }).eq('user_id', currentUser.id),
-    sb.from('mood_entries').select('id', { count: 'exact', head: true }).eq('user_id', currentUser.id),
+    sb.from('mood_entries').select('id', { count: 'exact', head: true }).eq('user_id', currentUser.id).neq('note', 'Нүүр хуудасны хурдан бүртгэл'),
   ]);
   document.getElementById('profile-stat-tests').textContent = testCount ?? 0;
   document.getElementById('profile-stat-diary').textContent = diaryCount ?? 0;
@@ -1898,10 +1898,14 @@ async function loadDiary() {
   if (!currentUser?.id) { renderDiaryList(); return; }
   const { data, error } = await sb.from('mood_entries').select('*').eq('user_id', currentUser.id).order('created_at', { ascending:false }).limit(30);
   if (error) { console.error('loadDiary error:', error); return; }
-  diaryEntries = data.map(d => {
-    const emoObj = DIARY_EMOS.find(m=>m.key===d.mood) || { e:'💬', l:d.mood };
-    return { emo: emoObj.e, label: emoObj.l, text: d.note, date: formatUbFull(d.created_at) };
-  });
+  // Нүүр хуудасны хурдан (7 хоногийн зурагт зориулсан) бүртгэлийг энд харуулахгүй —
+  // тэдгээр нь зөвхөн долоо хоногийн графикт л ашиглагдана, дэлгэрэнгүй тэмдэглэлийн түүхэд ордоггүй
+  diaryEntries = data
+    .filter(d => d.note !== 'Нүүр хуудасны хурдан бүртгэл')
+    .map(d => {
+      const emoObj = DIARY_EMOS.find(m=>m.key===d.mood) || { e:'💬', l:d.mood };
+      return { emo: emoObj.e, label: emoObj.l, text: d.note, date: formatUbFull(d.created_at) };
+    });
   renderDiaryList();
 }
 
@@ -3742,21 +3746,24 @@ async function loadCompositionStats() {
   const branchEl = document.getElementById('branch-stats');
   const roleEl = document.getElementById('role-stats');
   if (!branchEl) return;
-  const { data, error } = await sb.from('users').select('branch, personnel_type');
-  if (error) { branchEl.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Дүн татахад алдаа гарлаа.</div>'; return; }
-  const total = (data && data.length) || 1;
-  const branchCounts = {}; const roleCounts = {};
-  (data || []).forEach(u => {
-    if (u.branch) branchCounts[u.branch] = (branchCounts[u.branch]||0)+1;
-    if (u.personnel_type) roleCounts[u.personnel_type] = (roleCounts[u.personnel_type]||0)+1;
-  });
-  const renderBars = (counts, labels) => Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([k,c]) => {
+  const [{ data: branchData, error: bErr }, { data: roleData, error: rErr }] = await Promise.all([
+    sb.rpc('get_branch_composition'),
+    sb.rpc('get_role_composition'),
+  ]);
+  if (bErr || rErr) { branchEl.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Дүн татахад алдаа гарлаа.</div>'; console.error(bErr || rErr); return; }
+
+  const branchCounts = {}; (branchData || []).forEach(r => { branchCounts[r.branch] = Number(r.cnt); });
+  const roleCounts = {}; (roleData || []).forEach(r => { roleCounts[r.personnel_type] = Number(r.cnt); });
+  const branchTotal = Object.values(branchCounts).reduce((s,c)=>s+c,0) || 1;
+  const roleTotal = Object.values(roleCounts).reduce((s,c)=>s+c,0) || 1;
+
+  const renderBars = (counts, labels, total) => Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([k,c]) => {
     const pct = Math.round(c/total*100);
     return `<div class="unit-row"><div class="unit-name">${labels[k]||k}</div><div class="unit-track"><div class="unit-fill" style="width:${pct}%;"></div></div><div class="unit-pct">${c}</div></div>`;
   }).join('') || '<div style="color:var(--sub);font-size:.85rem;">Одоогоор өгөгдөл алга.</div>';
 
-  branchEl.innerHTML = '<p style="font-weight:800;font-size:.85rem;margin-bottom:.6rem;">Цэргийн төрлөөр</p>' + renderBars(branchCounts, BRANCH_LABELS);
-  roleEl.innerHTML = '<p style="font-weight:800;font-size:.85rem;margin-bottom:.6rem;">Албан хаагчийн төрлөөр</p>' + renderBars(roleCounts, ROLE_LABELS);
+  branchEl.innerHTML = '<p style="font-weight:800;font-size:.85rem;margin-bottom:.6rem;">Цэргийн төрлөөр</p>' + renderBars(branchCounts, BRANCH_LABELS, branchTotal);
+  roleEl.innerHTML = '<p style="font-weight:800;font-size:.85rem;margin-bottom:.6rem;">Албан хаагчийн төрлөөр</p>' + renderBars(roleCounts, ROLE_LABELS, roleTotal);
 }
 
 /* ================= INIT: эхлээд хэрэглэгч бэлдээд, дараа нь бүх мэдээллийг ачаална ================= */

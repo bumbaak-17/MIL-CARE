@@ -208,6 +208,18 @@
   .support-btn{margin-left:auto;background:linear-gradient(135deg,var(--gold-soft),#fff);color:var(--gold-deep,#A9793A);
     border:1px solid var(--gold);border-radius:100px;padding:.4rem 1rem;font-size:.72rem;font-weight:800;letter-spacing:.03em;cursor:pointer;transition:transform .15s;}
   .support-btn:hover{transform:scale(1.04);}
+  .reaction-wrap{position:relative;margin-left:auto;}
+  .reaction-summary{display:flex;align-items:center;gap:.3rem;font-size:.78rem;color:var(--sub);font-weight:700;}
+  .reaction-summary .r-stack{display:flex;}
+  .reaction-summary .r-stack span{font-size:.95rem;margin-left:-.35rem;background:var(--panel);border-radius:50%;box-shadow:0 0 0 2px var(--panel);}
+  .reaction-summary .r-stack span:first-child{margin-left:0;}
+  .reaction-popup{position:absolute;bottom:calc(100% + 8px);right:0;background:var(--panel);border:1px solid var(--line);
+    border-radius:100px;padding:.4rem .5rem;display:none;gap:.25rem;box-shadow:0 8px 20px rgba(20,30,60,.16);z-index:60;white-space:nowrap;}
+  .reaction-popup.open{display:flex;animation:popupIn .18s cubic-bezier(.34,1.56,.64,1);}
+  @keyframes popupIn{0%{opacity:0;transform:translateY(6px) scale(.85);}100%{opacity:1;transform:translateY(0) scale(1);}}
+  .reaction-popup .r-emo{font-size:1.35rem;cursor:pointer;padding:.15rem .3rem;border-radius:50%;transition:transform .15s;line-height:1;}
+  .reaction-popup .r-emo:hover{transform:scale(1.35) translateY(-4px);}
+  .reaction-popup .r-emo.mine{background:var(--gold-soft);}
   .composer{display:flex;gap:.6rem;margin-top:1rem;}
   .composer input{flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:100px;
     padding:.6rem 1rem;color:var(--cream);font-family:inherit;font-size:.85rem;}
@@ -2634,10 +2646,12 @@ function postHTML(p) {
       ${isMine ? `<button onclick="deletePost('${p.id}')" title="Устгах" style="margin-left:auto;background:none;border:none;color:var(--sub);cursor:pointer;">🗑</button>` : ''}
     </div>
     <p class="post-text">${body}</p>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:.3rem 0;">
+      ${reactionSummaryHTML(p.id)}
+      <div class="post-action" onclick="toggleComments('${p.id}')" style="cursor:pointer;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5A8.5 8.5 0 1 1 21 11.5z"/></svg>${comments.length} сэтгэгдэл</div>
+    </div>
     <div class="post-actions">
-      <div class="post-action" onclick="toggleLike('${p.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>${p.likes}</div>
-      <div class="post-action" onclick="toggleComments('${p.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5A8.5 8.5 0 1 1 21 11.5z"/></svg>${comments.length}</div>
-      <button class="support-btn" onclick="toggleLike('${p.id}')">ДЭМЖИХ</button>
+      ${reactionTriggerHTML(p.id)}
     </div>
     <div class="comment-section" id="comments-${p.id}" style="display:${isOpen?'block':'none'};margin-top:.6rem;">
       <div id="comment-list-${p.id}">${comments.map(commentHTML).join('') || '<div style="color:var(--sub);font-size:.8rem;padding:.4rem 0;">Одоогоор сэтгэгдэл алга. Эхнийхийг үлдээгээрэй!</div>'}</div>
@@ -2651,13 +2665,14 @@ function postHTML(p) {
 
 function postPreviewHTML(p) {
   const { emo, body } = splitPostText(p.text);
+  const comments = COMMENTS_BY_POST[p.id] || [];
   return `
   <div class="post">
     <div class="post-head"><div class="post-avatar">🪖${emo ? `<span class="post-mood-badge">${emo}</span>` : ''}</div><div><div class="post-name">${p.anon_handle}</div><div class="post-time">${timeAgo(p.created_at)}</div></div></div>
     <p class="post-text">${body}</p>
-    <div class="post-actions">
-      <div class="post-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>${p.likes}</div>
-      <div class="post-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5A8.5 8.5 0 1 1 21 11.5z"/></svg>${(COMMENTS_BY_POST[p.id]||[]).length}</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      ${reactionSummaryHTML(p.id)}
+      <div style="color:var(--sub);font-size:.78rem;font-weight:700;">${comments.length} сэтгэгдэл</div>
     </div>
   </div>`;
 }
@@ -2675,6 +2690,7 @@ async function loadPosts() {
   if (error) { console.error('loadPosts error:', error); return; }
   feedState = data || [];
   const postIds = feedState.map(p => p.id);
+  await loadReactions(postIds);
   if (postIds.length) {
     const { data: comments, error: cErr } = await sb.from('comments').select('*').in('post_id', postIds).order('created_at', { ascending:true });
     if (!cErr) {
@@ -2720,14 +2736,95 @@ async function deletePost(postId) {
   loadPosts();
 }
 
-async function toggleLike(id) {
-  const post = feedState.find(p => p.id === id);
-  if (!post) return;
-  const newLikes = post.likes + 1;
-  post.likes = newLikes;
-  renderFeed();
-  await sb.from('posts').update({ likes: newLikes }).eq('id', id);
+/* ================= УРВАЛ (Like/Love/Care/Sad — Facebook маягийн) ================= */
+const REACTIONS = [
+  { key:'like', emo:'👍', label:'Лайк' },
+  { key:'love', emo:'❤️', label:'Love' },
+  { key:'care', emo:'🤗', label:'Care' },
+  { key:'sad',  emo:'😢', label:'Sad' },
+];
+const REACTION_MAP = Object.fromEntries(REACTIONS.map(r => [r.key, r]));
+
+let reactionsByPost = {}; // { postId: { like:n, love:n, care:n, sad:n, total:n } }
+let myReactionByPost = {}; // { postId: 'like'|'love'|'care'|'sad' }
+
+function emptyCounts() { return { like:0, love:0, care:0, sad:0, total:0 }; }
+
+async function loadReactions(postIds) {
+  reactionsByPost = {}; myReactionByPost = {};
+  if (!postIds.length) return;
+  const { data, error } = await sb.from('post_likes').select('post_id, user_id, reaction').in('post_id', postIds);
+  if (error) { console.error('loadReactions error:', error); return; }
+  (data || []).forEach(row => {
+    const c = (reactionsByPost[row.post_id] ||= emptyCounts());
+    const key = REACTION_MAP[row.reaction] ? row.reaction : 'like';
+    c[key] = (c[key] || 0) + 1; c.total++;
+    if (currentUser?.id && row.user_id === currentUser.id) myReactionByPost[row.post_id] = key;
+  });
 }
+
+async function setReaction(postId, key) {
+  closeAllReactionPopups();
+  if (!currentUser?.id) return;
+  const post = feedState.find(p => p.id === postId);
+  if (!post) return;
+  const prev = myReactionByPost[postId];
+  const counts = (reactionsByPost[postId] ||= emptyCounts());
+
+  if (prev === key) {
+    // Ижил урвалыг дахин дарвал цуцална
+    counts[key] = Math.max(0, counts[key] - 1); counts.total = Math.max(0, counts.total - 1);
+    delete myReactionByPost[postId];
+    post.likes = counts.total;
+    renderFeed();
+    await sb.from('post_likes').delete().eq('post_id', postId).eq('user_id', currentUser.id);
+  } else {
+    if (prev) { counts[prev] = Math.max(0, counts[prev] - 1); } else { counts.total++; }
+    counts[key] = (counts[key] || 0) + 1;
+    myReactionByPost[postId] = key;
+    post.likes = counts.total;
+    renderFeed();
+    const { error } = await sb.from('post_likes').upsert(
+      { post_id: postId, user_id: currentUser.id, anon_handle: currentUser.handle, reaction: key },
+      { onConflict: 'post_id,user_id' }
+    );
+    if (error) console.error('post_likes upsert error:', error);
+  }
+  await sb.from('posts').update({ likes: counts.total }).eq('id', postId);
+}
+
+function toggleReactionPopup(postId, ev) {
+  ev.stopPropagation();
+  const popup = document.getElementById('reaction-popup-' + postId);
+  if (!popup) return;
+  const willOpen = !popup.classList.contains('open');
+  closeAllReactionPopups();
+  if (willOpen) popup.classList.add('open');
+}
+function closeAllReactionPopups() {
+  document.querySelectorAll('.reaction-popup.open').forEach(p => p.classList.remove('open'));
+}
+document.addEventListener('click', closeAllReactionPopups);
+
+function reactionSummaryHTML(postId) {
+  const c = reactionsByPost[postId] || emptyCounts();
+  if (!c.total) return `<span style="color:var(--sub);font-size:.8rem;">Одоогоор дэмжлэг алга</span>`;
+  const top = REACTIONS.filter(r => c[r.key] > 0).sort((a,b) => c[b.key]-c[a.key]).slice(0,3);
+  return `<div class="reaction-summary"><span class="r-stack">${top.map(r=>`<span>${r.emo}</span>`).join('')}</span>${c.total}</div>`;
+}
+
+function reactionTriggerHTML(postId) {
+  const mine = myReactionByPost[postId];
+  const r = mine ? REACTION_MAP[mine] : null;
+  return `
+  <div class="reaction-wrap">
+    <button class="support-btn" style="${r ? 'color:var(--red);border-color:var(--red);' : ''}" onclick="toggleReactionPopup('${postId}', event)">${r ? `${r.emo} ДЭМЖСЭН` : '👍 ДЭМЖИХ'}</button>
+    <div class="reaction-popup" id="reaction-popup-${postId}" onclick="event.stopPropagation();">
+      ${REACTIONS.map(r => `<span class="r-emo ${mine===r.key?'mine':''}" title="${r.label}" onclick="setReaction('${postId}','${r.key}')">${r.emo}</span>`).join('')}
+    </div>
+  </div>`;
+}
+
 
 /* ================= PROS (Supabase-тэй холбогдсон) ================= */
 let PROS = [];
@@ -2785,14 +2882,7 @@ function renderUserChatBadge() {
     navBadge.textContent = userUnreadReplyCount;
     navBadge.style.display = userUnreadReplyCount > 0 ? 'inline-block' : 'none';
   }
-  // Хонх дээр: мэргэжилтний session биш л бол хэрэглэгчийн хариултын тоог харуулна
-  if (!myProId) {
-    const bellDot = document.querySelector('.bell .dot');
-    if (bellDot) {
-      bellDot.textContent = userUnreadReplyCount;
-      bellDot.style.display = userUnreadReplyCount > 0 ? 'block' : 'none';
-    }
-  }
+  refreshBellBadge();
 }
 
 function subscribeUserGlobalChat() {
@@ -2806,6 +2896,33 @@ function subscribeUserGlobalChat() {
         showToast('💬 Мэргэжилтнээс шинэ хариу ирлээ! "Сэтгэл зүйч" хэсгээс харна уу.', 'info', 6000);
       }
     })
+    .subscribe();
+}
+
+/* ================= БОДИТ ЦАГИЙН МЭДЭГДЭЛ: өөрийн нийтлэлд ирсэн сэтгэгдэл/дэмжлэг ================= */
+let myContentChannel = null;
+function subscribeMyContentRealtime() {
+  if (!currentUser?.id) return;
+  if (myContentChannel) { sb.removeChannel(myContentChannel); myContentChannel = null; }
+  const onReaction = (payload) => {
+    if (payload.new.user_id === currentUser.id) return;
+    const post = feedState.find(p => p.id === payload.new.post_id);
+    if (!post || post.user_id !== currentUser.id) return;
+    refreshBellBadge();
+    loadPosts();
+    const r = REACTION_MAP[payload.new.reaction] || REACTION_MAP.like;
+    showToast(`${r.emo} ${payload.new.anon_handle} таны нийтлэлд ${r.label} өгсөн!`, 'info', 5000);
+  };
+  myContentChannel = sb.channel('my-content-' + currentUser.id)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'comments' }, (payload) => {
+      if (payload.new.user_id === currentUser.id) return; // өөрийн сэтгэгдэл бол алгасна
+      const post = feedState.find(p => p.id === payload.new.post_id);
+      if (!post || post.user_id !== currentUser.id) return; // миний нийтлэл биш бол алгасна
+      refreshBellBadge();
+      showToast(`💬 ${payload.new.anon_handle} таны нийтлэлд сэтгэгдэл бичлээ!`, 'info', 5000);
+    })
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'post_likes' }, onReaction)
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'post_likes' }, onReaction)
     .subscribe();
 }
 
@@ -2842,11 +2959,7 @@ function renderProNotificationBadge() {
     navBadge.textContent = proUnreadCount;
     navBadge.style.display = proUnreadCount > 0 ? 'inline-block' : 'none';
   }
-  const bellDot = document.querySelector('.bell .dot');
-  if (bellDot && myProId) { // зөвхөн мэргэжилтэн session дээр л хонхыг бодит тоогоор дарж бичнэ
-    bellDot.textContent = proUnreadCount;
-    bellDot.style.display = proUnreadCount > 0 ? 'block' : 'none';
-  }
+  refreshBellBadge();
 }
 
 function subscribeProGlobalRealtime() {
@@ -2867,16 +2980,26 @@ function subscribeProGlobalRealtime() {
 async function refreshBellBadge() {
   const bellDot = document.querySelector('.bell .dot');
   if (!bellDot || !currentUser?.id) return;
-  let count = 0;
+  let count = userUnreadReplyCount; // мэргэжилтнээс ирсэн хариу (бүгдэд адил)
+
+  // Бүх хэрэглэгч (сэтгэл зүйч, админ хамаарна): өөрийн нийтлэлд ирсэн сүүлийн 3 хоногийн сэтгэгдэл/дэмжлэг
+  const since3d = new Date(Date.now() - 3*86400000).toISOString();
+  const { data: myPosts } = await sb.from('posts').select('id').eq('user_id', currentUser.id);
+  const myPostIds = (myPosts || []).map(p => p.id);
+  if (myPostIds.length) {
+    const { data: cmts } = await sb.from('comments').select('id').in('post_id', myPostIds).neq('user_id', currentUser.id).gte('created_at', since3d);
+    const { data: likes } = await sb.from('post_likes').select('id').in('post_id', myPostIds).neq('user_id', currentUser.id).gte('created_at', since3d);
+    count += (cmts ? cmts.length : 0) + (likes ? likes.length : 0);
+  }
+
   if (myProId) {
     const { data: alerts } = await sb.from('risk_alerts').select('id').eq('acknowledged', false);
-    count = (alerts ? alerts.length : 0) + proUnreadCount;
+    count += (alerts ? alerts.length : 0) + proUnreadCount;
   } else if (isAdmin) {
     const { data: alerts } = await sb.from('risk_alerts').select('id').eq('acknowledged', false);
-    count = alerts ? alerts.length : 0;
-  } else {
-    count = userUnreadReplyCount;
+    count += alerts ? alerts.length : 0;
   }
+
   bellDot.textContent = count;
   bellDot.style.display = count > 0 ? 'block' : 'none';
 }
@@ -2911,8 +3034,61 @@ async function loadNotifItems() {
 
   let items = [];
 
+  // ===== 1) БҮХ ХЭРЭГЛЭГЧ (сэтгэл зүйч, админ хамаарна): өөрийн нийтлэлд ирсэн сэтгэгдэл, дэмжлэг =====
+  const { data: myPosts } = await sb.from('posts').select('id, text').eq('user_id', currentUser.id);
+  const myPostIds = (myPosts || []).map(p => p.id);
+  const myPostText = {}; (myPosts || []).forEach(p => { myPostText[p.id] = p.text; });
+
+  if (myPostIds.length) {
+    const { data: cmts } = await sb.from('comments').select('*').in('post_id', myPostIds).neq('user_id', currentUser.id).order('created_at', { ascending:false }).limit(6);
+    (cmts || []).forEach(c => items.push({
+      icon: '💬',
+      title: `${c.anon_handle} таны нийтлэлд сэтгэгдэл бичлээ`,
+      sub: c.text,
+      time: timeAgo(c.created_at),
+      ts: new Date(c.created_at).getTime(),
+      onclick: `toggleNotifDropdown(); goto('diary'); setTimeout(()=>{const el=document.getElementById('post-${c.post_id}'); if(el){el.scrollIntoView({behavior:'smooth',block:'center'}); if(!openCommentPosts.has('${c.post_id}')){toggleComments('${c.post_id}');}}}, 300);`,
+    }));
+
+    const { data: likes } = await sb.from('post_likes').select('*').in('post_id', myPostIds).neq('user_id', currentUser.id).order('created_at', { ascending:false }).limit(6);
+    (likes || []).forEach(l => {
+      const r = REACTION_MAP[l.reaction] || REACTION_MAP.like;
+      items.push({
+        icon: r.emo,
+        title: `${l.anon_handle} таны нийтлэлд ${r.label} өгсөн`,
+        sub: splitPostText(myPostText[l.post_id] || '').body,
+        time: timeAgo(l.created_at),
+        ts: new Date(l.created_at).getTime(),
+        onclick: `toggleNotifDropdown(); goto('diary'); setTimeout(()=>{const el=document.getElementById('post-${l.post_id}'); if(el) el.scrollIntoView({behavior:'smooth',block:'center'});}, 300);`,
+      });
+    });
+  }
+
+  // ===== 2) БҮХ ХЭРЭГЛЭГЧ: "Сэтгэл зүйч" хэсгээр мэргэжилтэнтэй хийсэн чатын шинэ хариу =====
+  {
+    const { data: msgs } = await sb.from('chat_messages').select('professional_id, sender, body, created_at')
+      .eq('user_id', currentUser.id).order('created_at', { ascending: true });
+    const lastByThread = {};
+    (msgs || []).forEach(m => { lastByThread[m.professional_id] = m; });
+    const entries = Object.entries(lastByThread).filter(([,m]) => m.sender !== 'user');
+    if (entries.length) {
+      const proList = (typeof PROS !== 'undefined' && PROS && PROS.length) ? PROS : (await sb.from('professionals').select('id, name')).data || [];
+      for (const [proId, m] of entries) {
+        const pro = proList.find(p => String(p.id) === String(proId));
+        items.push({
+          icon: '👩‍⚕️',
+          title: pro ? `${pro.name} хариулав` : 'Мэргэжилтнээс хариу ирлээ',
+          sub: m.body,
+          time: timeAgo(m.created_at),
+          ts: new Date(m.created_at).getTime(),
+          onclick: `toggleNotifDropdown(); goto('pros'); setTimeout(()=>openChat('${proId}', '${(pro?.name||'').replace(/'/g,"")}'), 200);`,
+        });
+      }
+    }
+  }
+
+  // ===== 3) НЭМЭЛТ: сэтгэл зүйчид зориулсан тусгай мэдэгдэл =====
   if (myProId) {
-    // Мэргэжилтэн: эрсдэлийн дохио + хариулаагүй шинэ хүсэлтүүд
     const { data: alerts } = await sb.from('risk_alerts').select('*').eq('acknowledged', false).order('created_at', { ascending:false }).limit(6);
     (alerts || []).forEach(a => items.push({
       icon: a.severity === 'critical' ? '🔴' : '🟠',
@@ -2923,20 +3099,22 @@ async function loadNotifItems() {
       onclick: `toggleNotifDropdown(); goto('proportal');`,
     }));
 
-    const { data: msgs } = await sb.from('chat_messages').select('user_id, sender, body, created_at')
+    const { data: proMsgs } = await sb.from('chat_messages').select('user_id, sender, body, created_at')
       .eq('professional_id', myProId).order('created_at', { ascending: true });
-    const lastByThread = {};
-    (msgs || []).forEach(m => { lastByThread[m.user_id] = m; });
-    Object.entries(lastByThread).filter(([,m]) => m.sender === 'user').forEach(([uid, m]) => items.push({
-      icon: '💬',
+    const lastByThread2 = {};
+    (proMsgs || []).forEach(m => { lastByThread2[m.user_id] = m; });
+    Object.entries(lastByThread2).filter(([,m]) => m.sender === 'user').forEach(([uid, m]) => items.push({
+      icon: '🆕',
       title: 'Шинэ зөвлөгөөний хүсэлт',
       sub: `#${uid.slice(0,8)}… — ${m.body}`,
       time: timeAgo(m.created_at),
       ts: new Date(m.created_at).getTime(),
       onclick: `toggleNotifDropdown(); goto('proportal'); setTimeout(()=>openProChat('${uid}'), 200);`,
     }));
-  } else if (isAdmin) {
-    // Админ: бүх хариулаагүй эрсдэлийн дохио
+  }
+
+  // ===== 4) НЭМЭЛТ: админд зориулсан тусгай мэдэгдэл =====
+  if (isAdmin && !myProId) {
     const { data: alerts } = await sb.from('risk_alerts').select('*').eq('acknowledged', false).order('created_at', { ascending:false }).limit(8);
     (alerts || []).forEach(a => items.push({
       icon: a.severity === 'critical' ? '🔴' : '🟠',
@@ -2946,25 +3124,6 @@ async function loadNotifItems() {
       ts: new Date(a.created_at).getTime(),
       onclick: `toggleNotifDropdown(); goto('admin');`,
     }));
-  } else {
-    // Энгийн хэрэглэгч: мэргэжилтнээс ирсэн шинэ хариу
-    const { data: msgs } = await sb.from('chat_messages').select('professional_id, sender, body, created_at')
-      .eq('user_id', currentUser.id).order('created_at', { ascending: true });
-    const lastByThread = {};
-    (msgs || []).forEach(m => { lastByThread[m.professional_id] = m; });
-    const entries = Object.entries(lastByThread).filter(([,m]) => m.sender !== 'user');
-    const proList = (typeof PROS !== 'undefined' && PROS && PROS.length) ? PROS : (await sb.from('professionals').select('id, name')).data || [];
-    for (const [proId, m] of entries) {
-      const pro = proList.find(p => String(p.id) === String(proId));
-      items.push({
-        icon: '💬',
-        title: pro ? `${pro.name} хариулав` : 'Мэргэжилтнээс хариу ирлээ',
-        sub: m.body,
-        time: timeAgo(m.created_at),
-        ts: new Date(m.created_at).getTime(),
-        onclick: `toggleNotifDropdown(); goto('pros'); setTimeout(()=>openChat('${proId}', '${(pro?.name||'').replace(/'/g,"")}'), 200);`,
-      });
-    }
   }
 
   items.sort((a,b) => b.ts - a.ts);
@@ -3608,6 +3767,8 @@ async function init() {
   initProfessionalNotifications(); // тухайн session мэргэжилтэнтэй холбогдсон эсэхийг чимээгүй шалгаад, шинэ зурвасын мэдэгдлийг эхлүүлнэ
   refreshUserUnreadReplies();
   subscribeUserGlobalChat();
+  refreshBellBadge();
+  subscribeMyContentRealtime();
 
 
   // Хөгжүүлэлт/турших зорилгоор: ?onboarding=1 бүхий URL-аар орвол,

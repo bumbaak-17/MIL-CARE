@@ -710,22 +710,21 @@
         <div class="page-head"><h2>Анхаарал шалгах тест</h2><p>Ажиглах чадвар, анхаарал, өнгө ялгах чадвараа шалгаарай.</p></div>
         <div class="attention-grid">
           <div class="section-card">
+            <p style="font-size:.85rem;color:var(--sub);margin:0 0 1.1rem;">Насанд хүрсэн хүний анхаарал хэр сарнидгийг хэмжих 24 асуулттай стандарт тест (Др. Голдберг).</p>
+            <div class="test-card" onclick="openAttentionScaleTest()">
+              <span class="test-emo">🧠</span>
+              <div class="test-title">Анхаарал сарнилтын түвшин тогтоох тест</div>
+              <div class="test-blurb">24 асуулт — 10 минут</div>
+            </div>
+          </div>
+
+          <div class="section-card">
             <div class="section-head"><h3>🎥 Лого олох видео</h3></div>
             <p style="font-size:.85rem;color:var(--sub);margin:0 0 1rem;">Видеог үзээд, ажиглах чадвараа шалгаарай — аль лого жинхэнэ болохыг олж чадах уу?</p>
             <video controls preload="metadata" style="width:100%;border-radius:12px;display:block;background:#000;">
               <source src="attention-test.mp4" type="video/mp4">
               Таны хөтөч видео тоглуулахыг дэмждэггүй байна.
             </video>
-          </div>
-
-          <div class="section-card">
-            <div class="section-head"><h3>🧠 Анхаарлын сарнилтын түвшин</h3></div>
-            <p style="font-size:.85rem;color:var(--sub);margin:0 0 1.1rem;">Насанд хүрсэн хүний анхаарал хэр сарнидгийг хэмжих 24 асуулттай стандарт тест (Др. Голдберг).</p>
-            <div class="test-card" onclick="openAttentionScaleTest()">
-              <span class="test-emo">🧠</span>
-              <div class="test-title">Анхаарлын сарнилтын тест</div>
-              <div class="test-blurb">24 асуулт — 10 минут</div>
-            </div>
           </div>
         </div>
 
@@ -2199,7 +2198,7 @@ function evaluateSymptoms() {
 
 /* ================= Санал болгосон тестүүдийг нэг дор бөглөж, нэгдсэн дүн гаргах ================= */
 const LINK_TEST_INFO = {
-  attention: { title:'Анхаарлын сарнилтын тест', emo:'🧠', gotoView:'attention', fn:'openAttentionScaleTest' },
+  attention: { title:'Анхаарал сарнилтын түвшин тогтоох тест', emo:'🧠', gotoView:'attention', fn:'openAttentionScaleTest' },
   memory: { title:'Санах ой, анхаарлыг хөгжүүлэх дасгал', emo:'🧩', gotoView:'memory' },
 };
 function startCombinedTests(keys, hasRisk) {
@@ -2466,7 +2465,7 @@ const OPTS6 = ['Хэзээ ч үгүй','Бага','Бага зэрэг','Дун
 function openAttentionScaleTest() {
   document.getElementById('modal-overlay').classList.add('open');
   document.getElementById('modal-box').innerHTML = `
-    <h3>🧠 Анхаарлын сарнилтын тест</h3>
+    <h3>🧠 Анхаарал сарнилтын түвшин тогтоох тест</h3>
     <p class="msub">Насанд хүрсэн хүний анхаарал хэр сарнидгийг хэмжих стандарт тест. Асуулт бүрд өөрт хамгийн тохирох хариултыг сонгоно уу.</p>
     <div id="mq-wrap">${ATTENTION_SCALE_QS.map((q,i)=>`
       <div class="q-block"><div class="q-text">${i+1}. ${q}</div>
@@ -2498,7 +2497,7 @@ async function scoreAttentionScaleTest() {
   }
 
   document.getElementById('modal-box').innerHTML = `
-    <h3>Анхаарлын сарнилтын тест — Үр дүн</h3>
+    <h3>Анхаарал сарнилтын түвшин тогтоох тест — Үр дүн</h3>
     <div class="result-level">${total} / ${max} оноо (${pct}%) — ${level}</div>
     <div class="bar-row"><div class="bar-track"><div class="bar-fill" style="width:${pct}%;"></div></div></div>
     <div class="result-block"><b>Тайлбар:</b> ${interpretation}</div>

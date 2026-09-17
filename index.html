@@ -231,16 +231,6 @@
   .diary-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;align-items:start;}
   .diary-col-right .section-card{max-height:calc(100vh - 220px);overflow-y:auto;}
   .attention-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:1.4rem;align-items:start;}
-  .sonjoo-grid{display:grid;gap:.6rem;margin:1rem 0;justify-content:center;}
-  .sonjoo-cell{cursor:pointer;transition:transform .15s ease;}
-  .sonjoo-cell:hover{transform:scale(1.1);}
-  .sonjoo-cell.wrong-shake{animation:sonjooShake .4s;}
-  @keyframes sonjooShake{0%,100%{transform:translateX(0);}25%{transform:translateX(-5px);}75%{transform:translateX(5px);}}
-  .sonjoo-shape-circle{border-radius:50%;}
-  .sonjoo-shape-square{border-radius:4px;}
-  .sonjoo-shape-triangle{clip-path:polygon(50% 0%, 0% 100%, 100% 100%);}
-  .sonjoo-shape-diamond{clip-path:polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);}
-  .sonjoo-stats{display:flex;gap:1.5rem;align-items:center;justify-content:center;margin-bottom:.5rem;font-size:.85rem;font-weight:700;color:var(--sub);}
   .color-swatch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:.6rem;margin:1rem 0 .4rem;max-width:520px;}
   .color-swatch{width:100%;aspect-ratio:1;border-radius:50%;cursor:pointer;transition:transform .15s ease;box-shadow:0 1px 3px rgba(20,30,60,.2);}
   .color-swatch:hover{transform:scale(1.15);}
@@ -722,23 +712,8 @@
       </div>
 
       <div id="view-sonjoo" class="view">
-        <div class="page-head"><h2>Сонжоо</h2><p>Бусдаас ялгаатай дүрсийг олж дараарай — ажиглах, төвлөрөх чадвараа хөгжүүлээрэй.</p></div>
+        <div class="page-head"><h2>Сонжоо</h2><p>Өөрийгөө болон бусдыг илүү сайн ойлгоход тусалдаг сонирхолтой зурган таавар, дүгнэлтүүд.</p></div>
         <div class="section-card">
-          <div class="sonjoo-stats">
-            <span>Тойрог: <span id="sonjoo-round-lbl">0/8</span></span>
-            <span>Оноо: <span id="sonjoo-score-lbl">0</span></span>
-            <span>Дундаж хугацаа: <span id="sonjoo-time-lbl">—</span></span>
-          </div>
-          <div id="sonjoo-grid" class="sonjoo-grid"></div>
-          <div id="sonjoo-result" style="text-align:center;"></div>
-          <div style="text-align:center;">
-            <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" onclick="startSonjoo()">🔄 Тоглоом эхлүүлэх / дахин эхлэх</button>
-          </div>
-        </div>
-
-        <div class="section-card" style="margin-top:1.4rem;">
-          <div class="section-head"><h3>🎨 Зурган таавар</h3></div>
-          <p style="font-size:.85rem;color:var(--sub);margin:0 0 1rem;">Өөрийгөө болон бусдыг илүү сайн ойлгоход тусалдаг сонирхолтой зурган таавар, дүгнэлтүүд.</p>
           <div id="sonjoo-quiz-list"></div>
         </div>
       </div>
@@ -1400,7 +1375,7 @@ function goto(view, pushState) {
   window.scrollTo({top:0, behavior:'smooth'});
   if (view === 'profile') loadProfilePage();
   if (view === 'memory') { renderMemLifeExList(); }
-  if (view === 'sonjoo') { sonjooActive = false; sonjooRound = 0; document.getElementById('sonjoo-grid').innerHTML=''; document.getElementById('sonjoo-result').innerHTML=''; document.getElementById('sonjoo-round-lbl').textContent = `0/${SONJOO_TOTAL_ROUNDS}`; document.getElementById('sonjoo-score-lbl').textContent = '0'; document.getElementById('sonjoo-time-lbl').textContent = '—'; renderSonjooQuizzes(); }
+  if (view === 'sonjoo') { renderSonjooQuizzes(); }
   if (view === 'group-exercise') { renderGroupExercises(); }
   if (view === 'projective') { renderProjectiveMethods(); }
   if (view === 'analytics') { loadAnalyticsSummary(); loadMonthlyAnalysis(); }
@@ -2539,102 +2514,6 @@ function showColorMeaning(idx) {
   el.style.display = 'block';
   el.innerHTML = `<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;"><span style="width:22px;height:22px;border-radius:50%;background:${c.hex};border:1px solid #ccc;display:inline-block;"></span><strong>${c.name}</strong></div><p style="margin:0;font-size:.88rem;line-height:1.6;">${c.text}</p>`;
   el.scrollIntoView({ behavior:'smooth', block:'nearest' });
-}
-
-/* ================= СОНЖОО: ялгаатай дүрсийг олох анхаарлын тоглоом ================= */
-const SONJOO_COLORS = ['#2851C4','#A9793A','#C0392B','#27AE60','#8E44AD','#E67E22','#16A085','#2C3E50'];
-const SONJOO_SHAPES = ['circle','square','triangle','diamond'];
-const SONJOO_TOTAL_ROUNDS = 8;
-let sonjooRound = 0;
-let sonjooScore = 0;
-let sonjooOddIndex = -1;
-let sonjooOddIsColor = false;
-let sonjooRoundTimes = [];
-let sonjooRoundStart = 0;
-let sonjooActive = false;
-
-function sonjooGridSizeForRound(r) {
-  // Тойрог ахих тусам торны хэмжээ, улмаар хэцүү болно (3x3 -> 6x6)
-  const sizes = [9, 12, 16, 20, 25, 30, 36, 42];
-  return sizes[Math.min(r, sizes.length - 1)];
-}
-
-function startSonjoo() {
-  sonjooRound = 0;
-  sonjooScore = 0;
-  sonjooRoundTimes = [];
-  sonjooActive = true;
-  document.getElementById('sonjoo-result').innerHTML = '';
-  renderSonjooRound();
-}
-
-function renderSonjooRound() {
-  if (sonjooRound >= SONJOO_TOTAL_ROUNDS) { finishSonjoo(); return; }
-  const grid = document.getElementById('sonjoo-grid');
-  const total = sonjooGridSizeForRound(sonjooRound);
-  const cols = Math.ceil(Math.sqrt(total));
-  grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-
-  const color = SONJOO_COLORS[Math.floor(Math.random() * SONJOO_COLORS.length)];
-  let baseShape, oddShape;
-  if (Math.random() < 0.5) {
-    // Дүрс ялгаатай (өнгө адилхан)
-    const shapes = [...SONJOO_SHAPES].sort(() => Math.random() - 0.5);
-    baseShape = shapes[0]; oddShape = shapes[1];
-    sonjooOddIsColor = false;
-  } else {
-    baseShape = SONJOO_SHAPES[Math.floor(Math.random() * SONJOO_SHAPES.length)];
-    oddShape = baseShape;
-    sonjooOddIsColor = true;
-  }
-  sonjooOddIndex = Math.floor(Math.random() * total);
-
-  let oddColor = color;
-  if (sonjooOddIsColor) {
-    const others = SONJOO_COLORS.filter(c => c !== color);
-    oddColor = others[Math.floor(Math.random() * others.length)];
-  }
-
-  const cellSize = total <= 12 ? 48 : total <= 20 ? 40 : total <= 30 ? 34 : 28;
-  let html = '';
-  for (let i = 0; i < total; i++) {
-    const isOdd = i === sonjooOddIndex;
-    const shape = isOdd ? oddShape : baseShape;
-    const c = isOdd ? oddColor : color;
-    html += `<div class="sonjoo-cell sonjoo-shape-${shape}" style="width:${cellSize}px;height:${cellSize}px;background:${c};" onclick="checkSonjoo(${i})"></div>`;
-  }
-  grid.innerHTML = html;
-  document.getElementById('sonjoo-round-lbl').textContent = `${sonjooRound + 1}/${SONJOO_TOTAL_ROUNDS}`;
-  document.getElementById('sonjoo-score-lbl').textContent = sonjooScore;
-  sonjooRoundStart = Date.now();
-}
-
-function checkSonjoo(idx) {
-  if (!sonjooActive) return;
-  const elapsed = (Date.now() - sonjooRoundStart) / 1000;
-  if (idx === sonjooOddIndex) {
-    sonjooScore++;
-    sonjooRoundTimes.push(elapsed);
-    showToast(`✅ Зөв! (${elapsed.toFixed(1)}с)`, 'success', 1200);
-    sonjooRound++;
-    setTimeout(renderSonjooRound, 500);
-  } else {
-    const cells = document.querySelectorAll('.sonjoo-cell');
-    if (cells[idx]) { cells[idx].classList.add('wrong-shake'); setTimeout(() => cells[idx].classList.remove('wrong-shake'), 400); }
-    showToast('❌ Дахин оролдоно уу', 'error', 1200);
-  }
-}
-
-function finishSonjoo() {
-  sonjooActive = false;
-  const avg = sonjooRoundTimes.length ? (sonjooRoundTimes.reduce((a,b)=>a+b,0) / sonjooRoundTimes.length) : 0;
-  document.getElementById('sonjoo-grid').innerHTML = '';
-  document.getElementById('sonjoo-time-lbl').textContent = avg ? avg.toFixed(1) + 'с' : '—';
-  document.getElementById('sonjoo-result').innerHTML = `
-    <div style="padding:1.2rem;background:var(--panel-2);border-radius:14px;margin:1rem 0;">
-      <div style="font-size:1.4rem;font-weight:800;color:var(--gold);">🎉 Дуусгалаа!</div>
-      <div style="font-size:.9rem;color:var(--sub);margin-top:.4rem;">Оноо: ${sonjooScore}/${SONJOO_TOTAL_ROUNDS} · Дундаж хугацаа: ${avg.toFixed(1)} секунд</div>
-    </div>`;
 }
 
 function openAttentionScaleTest() {

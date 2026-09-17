@@ -463,6 +463,11 @@
   /* ---------- Дараалсан өдрийн streak ---------- */
   .streak-badge{display:inline-flex;align-items:center;gap:.35rem;background:var(--brass-soft);
     color:var(--brass);font-weight:800;font-size:.78rem;padding:.3rem .7rem;border-radius:100px;}
+  .iq-cl-cat h4{margin:1.2rem 0 .6rem;font-size:.95rem;color:var(--navy);}
+  .iq-cl-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.5rem 0;border-bottom:1px solid var(--line);}
+  .iq-cl-q{font-size:.86rem;flex:1;}
+  .iq-cl-opts{display:flex;gap:1rem;flex-shrink:0;font-size:.85rem;white-space:nowrap;}
+  .iq-cl-opts label{cursor:pointer;display:flex;align-items:center;gap:.3rem;}
 </style>
 </head>
 <body>
@@ -681,6 +686,19 @@
       <div id="view-tests" class="view">
         <div class="page-head"><h2>Сэтгэл зүйн тестүүд</h2><p>Олон улсын стандартад нийцсэн богино тестүүд. </p></div>
         <div class="test-grid" id="test-grid-full"></div>
+      </div>
+
+      <!-- ================= ОЮУН УХААНЫ ЧАДАМЖИЙГ ТОДОРХОЙЛОХ ТЕСТ (тусдаа хуудас) ================= -->
+      <div id="view-iqtest" class="view">
+        <div class="page-head"><h2>Оюун ухааны чадамжийг тодорхойлох тест</h2><p>Хүмүүс хоорондын харилцаа, боловсрол мэдлэг, дотоод соёл, бие бялдрын чадамжийг үнэлэх 39 асуулттай тест.</p></div>
+        <button class="modal-close" style="margin-bottom:1.2rem;" onclick="goto('tests')">← Тестүүд рүү буцах</button>
+
+        <div class="section-card">
+          <p style="font-size:.85rem;color:var(--sub);margin:0 0 1rem;">Асуулт бүрийг сайтар уншиж, өөрт тохирох хариултыг сонгоно уу.</p>
+          <div id="iq-checklist-form"></div>
+          <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;margin-top:1rem;" onclick="scoreIqChecklist()">Дүн харах</button>
+          <div id="iq-checklist-result" style="display:none;margin-top:1rem;padding:1rem;background:var(--panel-2);border-radius:12px;"></div>
+        </div>
       </div>
 
       <!-- ================= АНХААРАЛ ШАЛГАХ ТЕСТ (тусдаа хуудас) ================= -->
@@ -1375,6 +1393,7 @@ function goto(view, pushState) {
   window.scrollTo({top:0, behavior:'smooth'});
   if (view === 'profile') loadProfilePage();
   if (view === 'memory') { renderMemLifeExList(); }
+  if (view === 'iqtest') { renderIqChecklist(); }
   if (view === 'sonjoo') { renderSonjooQuizzes(); }
   if (view === 'group-exercise') { renderGroupExercises(); }
   if (view === 'projective') { renderProjectiveMethods(); }
@@ -2109,6 +2128,7 @@ const TESTS = {
 
   satisfaction: { title:'Сэтгэл ханамж тодорхойлох', emo:'❤️', dur:'12 минут', blurb:'Амьдралын ерөнхий сэтгэл ханамжийг үнэлнэ.', qs:['Амьдралдаа ерөнхийдөө сэтгэл хангалуун','Ажил-амьдралын тэнцвэртээ сэтгэл хангалуун','Ойр дотны хүмүүстэйгээ дэмжлэгтэй харилцаатай'] },
   memory_attention: { title:'Ой санамж, анхаарал хөгжүүлэх тест', emo:'🧠', dur:'5-10 минут', blurb:'Зурган дасгалуудаар богино хугацааны ой санамж, анхаарлын төвлөрлийг шалгана.', custom:'memory' },
+  iq: { title:'Оюун ухааны чадамжийг тодорхойлох тест', emo:'🧩', dur:'10 минут', blurb:'Хүмүүс хоорондын харилцаа, боловсрол мэдлэг, дотоод соёл, бие бялдрын чадамжийг үнэлэх 39 асуулттай тест.', custom:'iq' },
 };
 const OPTS = ['Огт үгүй','Ховор','Заримдаа','Байнга'];
 
@@ -2350,6 +2370,47 @@ async function scoreCombinedTests() {
     <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="closeModal(); goto('pros');">Мэргэжилтэнтэй холбогдох</button></div>
   `;
   document.getElementById('modal-box').innerHTML = html;
+}
+
+
+/* ================= ОЮУН УХААНЫ ЧАДАМЖИЙГ ТОДОРХОЙЛОХ ТЕСТ ================= */
+const IQ_CHECKLIST = [{"cat": "Хүмүүс хоорондын харилцааны чадамж", "qs": ["Хөршүүд буюу ажил дээр хүмүүс надаас зөвлөгөө авдаг", "Агаарын теннис, гар бөмбөг, сагсан бөмбөг зэрэг баг болж тоглодог спортод илүү дуртай", "Аль нэг асуудалтай тулгарахад өөрөө шийдвэрлэхийн оронд өөр хүнээс туслалцаа авахыг эрхэмлэдэг", "Би наад зах нь гурван дотнын найзтай", "Ганцаар тоглодог тоглоомын оронд бусад хүмүүстэй хамтран багаар тоглож цагаа өнгөрөөх дуртай", "Чадаж мэддэгээ бусад хүмүүс, хувь хүнд заах дуртай", "Би өөрийгөө удирдагч гэж үздэг", "Олон хүмүүс дунд байх нь миний хувьд илүү таатай байдаг", "Өөрийн ажил, хамт олонтой холбогдсон олон нийтийн ажилд оролцох дуртай", "Үдэш орой гэртээ ганцаараа байснаас сонирхолтой хүмүүстэй хамт цэнгэн өнгөрүүлэх дуртай"]}, {"cat": "Ерөнхий боловсрол мэдлэгийн чадамж", "qs": ["Миний хувьд ном чухал", "Миний гадаад хэлний мэдлэг боломжийн", "Телевизийн нэвтрүүлгүүдээс мэдээ мэдээллийг нь илүү сонирхон үздэг", "Би компьютерын хэрэглээний 1-2 программ дээр чөлөөтэй ажиллаж чаддаг", "Одоогоор ямар нэгэн хэл судалж эхлээгүй байгаа", "Өөрийн ярианд уншсан, сонссон зүйлээсээ ишлэлд татах нь олон байдаг", "Шинжлэх ухааны нээлт дэвшлийг би ихэд сонирхдог", "Надад шинэ орчин нөхцөлд дасан зохицоход нэлээд хугацаа шаардагддаг", "Би олны өмнө гарч мэдээлэл хийхдээ сандраад байдаггүй", "Бусдын логик, дэс дараагүй яриаг тэвчээртэй сонсох надад төвөгтэй"]}, {"cat": "Хүний дотоод соёл, өөрийгөө удирдах чадамж", "qs": ["Би үе үе амьдралын чухал асуудлыг ганцаараа тунгаан бодож бясалган цагаа өнгөрөөдөг", "Өөрийн тухай улам сайн мэдэж авахын тулд зөвлөгөө өгөх, сэтгэлээр өөдрөг явах тухай семинарт сууж байсан", "Бэрхшээлийг тэвчээртэй давж чаддаг", "Өөрийн тусгай хоббитой", "Тогтмол санаж явдаг, өөрийн амьдралын зорилготой", "7 хоногийн сүүлээр олон хүнтэй амралтын газар очихоос илүү ганцаараа ой модонд өнгөрөөхийг хүсдэг", "Өөрийгөө сэтгэлийн тэнхээтэй, өөрийн гэсэн бодолтой хүн гэж үздэг", "Өөрийн дотоод амьдралын үйл явдлуудаа мартахгүйн тулд өдрийн тэмдэглэл хөтөлдөг", "Би хувиараа ажил эрхэлдэг буюу өөрийн гэсэн бизнес эрхлэх тухай нэлээд сайн бодож байсан"]}, {"cat": "Бие бялдрын чадамж", "qs": ["Биеийн тамирын буюу биеийн хөдөлгөөний аль нэг төрлөөр тогтмол хичээллэдэг", "Удаан хугацаагаар хөдөлгөөнгүй суух нь хэцүү байдаг", "Оёх, нэхэх, сийлэх, мужааны ажил хийх, эсвэл уран барилгын загвар хийж гараа ажиллуулах дуртай", "Удаан хугацаагаар алхах, зөөлөн гүйх буюу биеийн бусад хөдөлгөөн хийж байхад хамгийн сайхан санаанууд толгойд орж ирдэг", "Чөлөөт цагаа гэрээс гадуур өнгөрөөх дуртай", "Бусадтай харилцахдаа гараа хөдөлгөх буюу бусад дохио зангаа биеэр үзүүлэх аргыг олонтоо хэрэглэдэг", "Юмсыг танин мэдэхийн тулд гараар барьж үзэх хэрэгтэй байдаг", "Жолоогүй хурдан давхих, бусад бие бялдрын авхаалж самбаа шаардсан үйлдлүүдэд дуртай", "Өөрийн хөдөлгөөнийг эвсэл сайтай гэж үздэг", "Шинэ ур чадварын тухай унших, эсвэл дүрс бичлэгээр үзэхээс илүү биеэр туршиж үзэх дуртай"]}];
+
+function renderIqChecklist() {
+  const el = document.getElementById('iq-checklist-form');
+  if (!el) return;
+  let qIdx = 0;
+  el.innerHTML = IQ_CHECKLIST.map(cat => {
+    const rows = cat.qs.map(q => {
+      const idx = qIdx++;
+      return `<div class="iq-cl-row">
+        <div class="iq-cl-q">${q}</div>
+        <div class="iq-cl-opts">
+          <label><input type="radio" name="iqcl${idx}" value="1"> Тийм</label>
+          <label><input type="radio" name="iqcl${idx}" value="0"> Үгүй</label>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="iq-cl-cat"><h4>${cat.cat}</h4>${rows}</div>`;
+  }).join('');
+}
+
+function scoreIqChecklist() {
+  const totalQs = IQ_CHECKLIST.reduce((s,c)=>s+c.qs.length,0);
+  let sum = 0, answered = 0;
+  for (let i=0;i<totalQs;i++) {
+    const sel = document.querySelector(`input[name="iqcl${i}"]:checked`);
+    if (sel) { answered++; sum += parseInt(sel.value,10); }
+  }
+  if (answered < totalQs) { showToast('Бүх асуултад хариулна уу.', 'warn'); return; }
+  let level;
+  if (sum <= 20) level = 'бага';
+  else if (sum <= 35) level = 'дунд';
+  else level = 'их';
+  const resEl = document.getElementById('iq-checklist-result');
+  resEl.style.display = 'block';
+  resEl.innerHTML = `<div style="font-size:1.3rem;font-weight:800;color:var(--gold);">Таны оноо: ${sum}</div><div style="font-size:.9rem;color:var(--sub);margin-top:.3rem;">Оюун ухааны чадамж: <strong>${level}</strong></div>`;
+  resEl.scrollIntoView({ behavior:'smooth', block:'center' });
 }
 
 function renderTestCard(key, t) {
@@ -2618,6 +2679,7 @@ async function renderIshiharaResult() {
 function openModal(key) {
   const t = TESTS[key];
   if (t.custom === 'memory') { openMemoryTestModal(); return; }
+  if (t.custom === 'iq') { closeModal(); goto('iqtest'); return; }
   const box = document.getElementById('modal-box');
   box.innerHTML = `
     <h3>${t.emo} ${t.title}</h3>

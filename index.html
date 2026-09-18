@@ -2023,20 +2023,20 @@ async function loadOrders() {
         <div style="font-weight:700;font-size:.92rem;">${d.title}</div>
         <div style="font-size:.78rem;color:var(--sub);">${timeAgo(d.created_at)}${d.file_size ? ' · ' + (Math.round(d.file_size/1024)) + ' KB' : ''}</div>
       </div>
+      <button class="modal-close" style="width:auto;padding:.5rem 1rem;font-size:.85rem;flex-shrink:0;" onclick="viewOrderDoc('${d.storage_path}')">Харах</button>
       <button class="connect-btn" style="width:auto;padding:.5rem 1rem;font-size:.85rem;flex-shrink:0;" onclick="downloadOrderDoc('${d.storage_path}','${(d.title||'document').replace(/'/g,"")}')">Татах</button>
     </div>
   `).join('');
 }
-async function downloadOrderDoc(storagePath, title) {
+async function viewOrderDoc(storagePath) {
   const { data, error } = await sb.storage.from(DOCS_BUCKET).createSignedUrl(storagePath, 300);
+  if (error) { showToast('Нээхэд алдаа гарлаа: ' + error.message, 'error'); return; }
+  window.open(data.signedUrl, '_blank');
+}
+async function downloadOrderDoc(storagePath, title) {
+  const { data, error } = await sb.storage.from(DOCS_BUCKET).createSignedUrl(storagePath, 300, { download: title + '.pdf' });
   if (error) { showToast('Татахад алдаа гарлаа: ' + error.message, 'error'); return; }
-  const a = document.createElement('a');
-  a.href = data.signedUrl;
-  a.download = title + '.pdf';
-  a.target = '_blank';
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
+  window.location.href = data.signedUrl;
 }
 
 /* ================= АДМИН: Тушаал, баримт бичиг удирдах (байршуулах/устгах) ================= */

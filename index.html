@@ -865,10 +865,12 @@
         <div id="admin-panel" style="display:none;">
           <div class="admin-grid" id="admin-grid"></div>
           <div class="section-card" id="admin-registered-users-section" style="display:none;">
+            <button class="modal-close" style="margin-bottom:1rem;" onclick="hideAdminUsersView()">← Буцах</button>
             <div class="section-head"><h3>📧 Хэрэглэгч (зөвхөн админ)</h3></div>
             <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Имэйл/нууц үгээр бүртгүүлсэн хэрэглэгчдийн жагсаалт.</p>
             <div id="registered-users-list"></div>
           </div>
+          <div id="admin-other-sections">
           <div class="section-card">
             <div class="section-head collapsible" onclick="toggleAdminSection('branch-comp')"><h3>🎖️ Алба хаагчдын бүрэлдэхүүн</h3><span class="collapse-arrow" id="branch-comp-arrow">▾</span></div>
             <div class="collapsible-body" id="branch-comp-body">
@@ -969,6 +971,7 @@
             <div class="section-head"><h3>Бодит нэрсийн жагсаалт (зөвхөн админ)</h3></div>
             <div id="identity-list"></div>
             <div class="privacy-note">Энэ жагсаалт зөвхөн баталгаажсан админд харагдана. Ердийн алба хаагч, мэргэжилтэн бусдын бодит нэрийг хэзээ ч харахгүй.</div>
+          </div>
           </div>
           <button class="btn-secondary-link" style="background:none;border:1px solid var(--line);color:var(--sub);border-radius:10px;padding:.5rem 1.1rem;font-size:.82rem;cursor:pointer;" onclick="adminLogout()">Админ горимоос гарах</button>
         </div>
@@ -3733,7 +3736,7 @@ const ADMIN_ITEMS = [
 ];
 document.getElementById('admin-grid').innerHTML = ADMIN_ITEMS.map(a => `
   <div class="admin-card" onclick="${
-    a.label === 'Хэрэглэгч' ? "document.getElementById('admin-registered-users-section').style.display = document.getElementById('admin-registered-users-section').style.display==='none' ? 'block' : 'none'; document.getElementById('admin-registered-users-section').scrollIntoView({behavior:'smooth'})" :
+    a.label === 'Хэрэглэгч' ? "showAdminUsersView()" :
     a.label === 'Мэргэжилтэн' ? "document.getElementById('admin-professionals-section').scrollIntoView({behavior:'smooth'})" :
     a.label === 'Цэргийн төрөл харах' ? "adminPreviewOnboarding()" :
     `showToast('${a.label} — demo хувилбарт зөвхөн харагдацтай, production дээр бүрэн удирдах боломжтой.', 'info')`
@@ -3760,6 +3763,18 @@ function toggleAdminSection(id) {
   const willOpen = !body.classList.contains('open');
   body.classList.toggle('open', willOpen);
   if (arrow) arrow.textContent = willOpen ? '▴' : '▾';
+}
+
+function showAdminUsersView() {
+  document.getElementById('admin-grid').style.display = 'none';
+  document.getElementById('admin-other-sections').style.display = 'none';
+  document.getElementById('admin-registered-users-section').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function hideAdminUsersView() {
+  document.getElementById('admin-registered-users-section').style.display = 'none';
+  document.getElementById('admin-grid').style.display = '';
+  document.getElementById('admin-other-sections').style.display = '';
 }
 
 /* ================= АДМИН: Бүх сэтгэгдлийг удирдах (харах/устгах) ================= */

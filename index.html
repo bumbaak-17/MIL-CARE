@@ -870,6 +870,12 @@
             <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Имэйл/нууц үгээр бүртгүүлсэн хэрэглэгчдийн жагсаалт.</p>
             <div id="registered-users-list"></div>
           </div>
+          <div class="section-card" id="admin-posts-section" style="display:none;">
+            <button class="modal-close" style="margin-bottom:1rem;" onclick="hideAdminPostsView()">← Буцах</button>
+            <div class="section-head"><h3>💬 Пост (зөвхөн админ)</h3></div>
+            <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Хэрэглэгчдийн бичсэн бүх сэтгэгдлийн жагсаалт. Зохисгүй агуулгыг эндээс устгаж болно. Жирийн хэрэглэгч зөвхөн өөрийн сэтгэгдлээ устгах эрхтэй.</p>
+            <div id="admin-comments-list"></div>
+          </div>
           <div id="admin-other-sections">
           <div class="section-card">
             <div class="section-head collapsible" onclick="toggleAdminSection('branch-comp')"><h3>🎖️ Алба хаагчдын бүрэлдэхүүн</h3><span class="collapse-arrow" id="branch-comp-arrow">▾</span></div>
@@ -901,13 +907,6 @@
               <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" onclick="uploadAdminDocument()">Байршуулах</button>
               <div id="doc-upload-msg" style="font-size:.82rem;margin-top:.7rem;"></div>
               <div id="admin-documents-list" style="margin-top:1.1rem;"></div>
-            </div>
-          </div>
-          <div class="section-card">
-            <div class="section-head collapsible" onclick="toggleAdminSection('comments-mod')"><h3>🗑️ Сэтгэгдэл удирдах (зөвхөн админ)</h3><span class="collapse-arrow" id="comments-mod-arrow">▾</span></div>
-            <div class="collapsible-body" id="comments-mod-body">
-              <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Хэрэглэгчдийн бичсэн бүх сэтгэгдлийн жагсаалт. Зохисгүй агуулгыг эндээс устгаж болно. Жирийн хэрэглэгч зөвхөн өөрийн сэтгэгдлээ устгах эрхтэй.</p>
-              <div id="admin-comments-list"></div>
             </div>
           </div>
           <div class="section-card" id="admin-professionals-section">
@@ -3737,6 +3736,7 @@ const ADMIN_ITEMS = [
 document.getElementById('admin-grid').innerHTML = ADMIN_ITEMS.map(a => `
   <div class="admin-card" onclick="${
     a.label === 'Хэрэглэгч' ? "showAdminUsersView()" :
+    a.label === 'Пост' ? "showAdminPostsView()" :
     a.label === 'Мэргэжилтэн' ? "document.getElementById('admin-professionals-section').scrollIntoView({behavior:'smooth'})" :
     a.label === 'Цэргийн төрөл харах' ? "adminPreviewOnboarding()" :
     `showToast('${a.label} — demo хувилбарт зөвхөн харагдацтай, production дээр бүрэн удирдах боломжтой.', 'info')`
@@ -3768,11 +3768,24 @@ function toggleAdminSection(id) {
 function showAdminUsersView() {
   document.getElementById('admin-grid').style.display = 'none';
   document.getElementById('admin-other-sections').style.display = 'none';
+  document.getElementById('admin-posts-section').style.display = 'none';
   document.getElementById('admin-registered-users-section').style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 function hideAdminUsersView() {
   document.getElementById('admin-registered-users-section').style.display = 'none';
+  document.getElementById('admin-grid').style.display = '';
+  document.getElementById('admin-other-sections').style.display = '';
+}
+function showAdminPostsView() {
+  document.getElementById('admin-grid').style.display = 'none';
+  document.getElementById('admin-other-sections').style.display = 'none';
+  document.getElementById('admin-registered-users-section').style.display = 'none';
+  document.getElementById('admin-posts-section').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function hideAdminPostsView() {
+  document.getElementById('admin-posts-section').style.display = 'none';
   document.getElementById('admin-grid').style.display = '';
   document.getElementById('admin-other-sections').style.display = '';
 }

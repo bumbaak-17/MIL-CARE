@@ -12,10 +12,10 @@
     /* Дизайны токен: гүн, итгэлтэй "signal navy" үндсэн өнгө, хүрлийн акцент,
        монгол кирилл (Өө/Үү-г оролцуулаад) бүрэн дэмждэг Inter фонт */
     --bg:#F5F7FA; --panel:#FFFFFF; --panel-2:#EEF2F8; --panel-3:#E2E9F4;
-    --gold:#2851C4; --gold-deep:#1A3B8F; --gold-soft:rgba(40,81,196,.09);
+    --gold:#0A677A; --gold-deep:#063F4A; --gold-soft:rgba(10,103,122,.09);
     --cream:#151E33; --sub:#5C6A82; --line:#DDE3ED;
     --red:#AE3A32; --red-soft:rgba(174,58,50,.09);
-    --blue:#2851C4; --blue-soft:rgba(40,81,196,.09);
+    --blue:#0A677A; --blue-soft:rgba(10,103,122,.09);
     --brass:#A9793A; --brass-soft:rgba(169,121,58,.12);
   }
   *{box-sizing:border-box;}
@@ -38,7 +38,7 @@
   .navgroup-label{font-size:.62rem;font-weight:800;color:var(--sub);letter-spacing:.08em;
     margin:.9rem .8rem .3rem;}
   .navitem{display:flex;align-items:center;gap:.65rem;padding:.56rem .8rem;border-radius:8px;
-    font-size:.83rem;font-weight:700;color:var(--sub);cursor:pointer;margin-bottom:.1rem;user-select:none;}
+    font-size:.83rem;font-weight:700;color:var(--cream);cursor:pointer;margin-bottom:.1rem;user-select:none;}
   .navitem svg{width:16px;height:16px;flex-shrink:0;}
   .navitem:hover{background:var(--panel-2);}
   .navitem.active{background:var(--gold-soft);color:var(--gold);}
@@ -189,7 +189,7 @@
   .post:last-child{margin-bottom:0;}
   .post-head{display:flex;align-items:center;gap:.7rem;margin-bottom:.6rem;}
   .post-avatar{width:38px;height:38px;border-radius:50%;position:relative;flex-shrink:0;
-    background:linear-gradient(135deg,var(--navy,#1E3A66),var(--gold-deep,#A9793A));
+    background:linear-gradient(135deg,var(--navy,#063F4A),var(--gold-deep,#A9793A));
     display:flex;align-items:center;justify-content:center;font-size:.95rem;color:#fff;box-shadow:0 2px 6px rgba(20,30,60,.18);}
   .post-mood-badge{position:absolute;bottom:-3px;right:-3px;width:19px;height:19px;border-radius:50%;
     background:var(--panel);border:2px solid var(--panel);display:flex;align-items:center;justify-content:center;font-size:.68rem;box-shadow:0 1px 3px rgba(20,30,60,.2);}
@@ -305,10 +305,10 @@
   .result-list{margin:.4rem 0 0;padding-left:1.1rem;font-size:.83rem;line-height:1.6;}
   .disclaimer-note{font-size:.72rem;color:var(--sub);margin-top:.9rem;line-height:1.5;}
   .mem-tab-btn{cursor:pointer;}
-  .mem-tab-btn.active{background:var(--navy,#1E3A66);color:#fff;border-color:var(--navy,#1E3A66);}
+  .mem-tab-btn.active{background:var(--navy,#063F4A);color:#fff;border-color:var(--navy,#063F4A);}
   .ge-item{border:1px solid var(--line);border-radius:12px;margin-bottom:.8rem;overflow:hidden;background:#fff;}
   .ge-head{display:flex;align-items:center;gap:.7rem;padding:.9rem 1.1rem;cursor:pointer;user-select:none;}
-  .ge-num{background:var(--navy,#1E3A66);color:#fff;font-weight:800;font-size:.78rem;border-radius:50%;width:28px;height:28px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+  .ge-num{background:var(--navy,#063F4A);color:#fff;font-weight:800;font-size:.78rem;border-radius:50%;width:28px;height:28px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
   .ge-title{font-weight:700;font-size:.95rem;flex:1;}
   .ge-arrow{color:var(--sub);font-size:.85rem;flex-shrink:0;}
   .ge-body{display:none;padding:0 1.1rem 1.1rem 3.6rem;font-size:.88rem;line-height:1.65;color:#333;}
@@ -562,7 +562,7 @@
       <button class="hamburger" id="hamburger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
       <div class="tagline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 6v6c0 5 3.5 8.5 9 10 5.5-1.5 9-5 9-10V6z"/></svg>Сэтгэл зүйгээ хамгаалах нь өөрийгөө хамгаалах нэг хэлбэр.</div>
       <div class="topbar-right">
-        <div id="ub-clock" style="font-size:.78rem;color:var(--sub);font-weight:700;white-space:nowrap;"></div>
+        <div id="ub-clock" style="font-size:.78rem;color:var(--cream);font-weight:700;white-space:nowrap;"></div>
         <div class="bell" id="bell-btn" onclick="toggleNotifDropdown()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
           <span class="dot" style="display:none;">0</span>

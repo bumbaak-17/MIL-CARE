@@ -39,7 +39,7 @@
     margin:.9rem .8rem .3rem;}
   .navitem{display:flex;align-items:center;gap:.65rem;padding:.56rem .8rem;border-radius:8px;
     font-size:.83rem;font-weight:700;color:var(--cream);cursor:pointer;margin-bottom:.1rem;user-select:none;}
-  .navitem svg{width:16px;height:16px;flex-shrink:0;}
+  .navitem svg{width:16px;height:16px;flex-shrink:0;color:var(--gold);}
   .navitem:hover{background:var(--panel-2);}
   .navitem.active{background:var(--gold-soft);color:var(--gold);}
 
@@ -776,21 +776,21 @@
           </div>
 
           <div class="section-card">
-            <div class="section-head"><h3>🎥 Лого олох видео</h3></div>
-            <p style="font-size:.85rem;color:var(--sub);margin:0 0 1rem;">Видеог үзээд, ажиглах чадвараа шалгаарай — аль лого жинхэнэ болохыг олж чадах уу?</p>
-            <video controls preload="metadata" style="width:100%;border-radius:12px;display:block;background:#000;">
-              <source src="attention-test.mp4" type="video/mp4">
-              Таны хөтөч видео тоглуулахыг дэмждэггүй байна.
-            </video>
-          </div>
-
-          <div class="section-card">
             <p style="font-size:.85rem;color:var(--sub);margin:0 0 1.1rem;">Ishihara-загварын dot-plate ашиглан улаан-ногоон өнгө ялгах чадварыг шалгана.</p>
             <div class="test-card" onclick="openColorTest()">
               <span class="test-emo">🎨</span>
               <div class="test-title">Өнгө ялгах чадвар</div>
               <div class="test-blurb">6 плат — 3 минут</div>
             </div>
+          </div>
+
+          <div class="section-card">
+            <div class="section-head"><h3>🎥 Лого олох видео</h3></div>
+            <p style="font-size:.85rem;color:var(--sub);margin:0 0 1rem;">Видеог үзээд, ажиглах чадвараа шалгаарай — аль лого жинхэнэ болохыг олж чадах уу?</p>
+            <video controls preload="metadata" style="width:100%;border-radius:12px;display:block;background:#000;">
+              <source src="attention-test.mp4" type="video/mp4">
+              Таны хөтөч видео тоглуулахыг дэмждэггүй байна.
+            </video>
           </div>
         </div>
       </div>
@@ -2702,7 +2702,7 @@ function renderSonjooQuizzes() {
   el.innerHTML = SONJOO_QUIZZES.map(q => `
     <div class="ge-item">
       <div class="ge-head" onclick="toggleSonjooQuiz('${q.key}')">
-        <div class="ge-title">${q.title}</div>
+        <div class="ge-title">${q.key === 'colors' ? '🎨' : '🚪'} ${q.title}</div>
         <div class="ge-arrow" id="sq-arrow-${q.key}">▼</div>
       </div>
       <div class="ge-body" id="sq-body-${q.key}">${q.html}</div>

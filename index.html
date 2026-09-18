@@ -726,6 +726,11 @@
             <div class="quick-title">Тушаал</div>
             <div class="quick-sub" id="orders-count-sub">Албан ёсны баримт бичиг</div>
           </div>
+          <div class="quick-card" onclick="goto('guides')">
+            <div class="quick-icon">📘</div>
+            <div class="quick-title">Гарын авлага</div>
+            <div class="quick-sub" id="guides-count-sub">Заавар, гарын авлага</div>
+          </div>
         </div>
       </div>
 
@@ -741,6 +746,12 @@
         <div id="orders-list"></div>
       </div>
 
+      <div id="view-guides" class="view">
+        <div class="page-head"><h2>Гарын авлага</h2><p>Ажлын явцад ашиглах гарын авлага, зөвлөмжийн PDF баримт бичгүүд. Зөвхөн админ, бүртгэлтэй сэтгэл зүйчдэд харагдана.</p></div>
+        <button class="modal-close" style="margin-bottom:1.2rem;" onclick="goto('psy-corner')">← Сэтгэл зүйчдийн булан руу буцах</button>
+        <div id="guides-list"></div>
+      </div>
+
       <div id="view-projective" class="view">
         <div class="page-head"><h2>Хувь хүнийг тодорхойлох проектив аргууд</h2><p>Зан чанар, сэтгэл зүйн байдлыг зураг, дүрслэлээр дамжуулан судлах сонирхолтой аргууд.</p></div>
         <div id="projective-list"></div>
@@ -751,15 +762,6 @@
 
         <div class="section-card">
           <div id="sonjoo-quiz-list"></div>
-        </div>
-
-        <div class="section-card" style="margin-top:1.4rem;">
-          <p style="font-size:.85rem;color:var(--sub);margin:0 0 1.1rem;">Ishihara-загварын dot-plate ашиглан улаан-ногоон өнгө ялгах чадварыг шалгана.</p>
-          <div class="test-card" onclick="openColorTest()" style="max-width:320px;">
-            <span class="test-emo">🎨</span>
-            <div class="test-title">Өнгө ялгах чадвар</div>
-            <div class="test-blurb">6 плат — 3 минут</div>
-          </div>
         </div>
       </div>
 
@@ -783,6 +785,15 @@
               <source src="attention-test.mp4" type="video/mp4">
               Таны хөтөч видео тоглуулахыг дэмждэггүй байна.
             </video>
+          </div>
+
+          <div class="section-card">
+            <p style="font-size:.85rem;color:var(--sub);margin:0 0 1.1rem;">Ishihara-загварын dot-plate ашиглан улаан-ногоон өнгө ялгах чадварыг шалгана.</p>
+            <div class="test-card" onclick="openColorTest()">
+              <span class="test-emo">🎨</span>
+              <div class="test-title">Өнгө ялгах чадвар</div>
+              <div class="test-blurb">6 плат — 3 минут</div>
+            </div>
           </div>
         </div>
       </div>
@@ -884,6 +895,10 @@
               <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Энд байршуулсан PDF баримт бичгүүд Сэтгэл зүйчдийн булангийн "Тушаал" хэсэгт админ болон бүртгэлтэй сэтгэл зүйчдэд харагдана.</p>
               <div class="filter-bar" style="margin-bottom:.7rem;">
                 <input type="text" id="doc-upload-title" placeholder="Баримт бичгийн нэр (жишээ: Сэтгэл зүйн хангалтыг зохион байгуулах заавар)" style="flex:1;min-width:220px;border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
+                <select id="doc-upload-category" style="border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
+                  <option value="tushaal">Тушаал</option>
+                  <option value="guide">Гарын авлага</option>
+                </select>
                 <input type="file" id="doc-upload-file" accept="application/pdf" style="border:1px solid var(--line);border-radius:12px;padding:.5rem .6rem;font-family:inherit;font-size:.85rem;background:#fff;color:var(--cream);">
               </div>
               <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" onclick="uploadAdminDocument()">Байршуулах</button>
@@ -1421,7 +1436,7 @@ async function loadIdentityList() {
 document.getElementById('hamburger').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
 
 function goto(view, pushState) {
-  if ((view === 'psy-corner' || view === 'group-exercise' || view === 'orders') && !(isAdmin || myProId)) {
+  if ((view === 'psy-corner' || view === 'group-exercise' || view === 'orders' || view === 'guides') && !(isAdmin || myProId)) {
     showToast('Энэ хэсэг зөвхөн админ болон бүртгэлтэй сэтгэл зүйчдэд нээлттэй.', 'error');
     view = 'home';
   }
@@ -1436,7 +1451,8 @@ function goto(view, pushState) {
   if (view === 'iqtest') { renderIqChecklist(); }
   if (view === 'sonjoo') { renderSonjooQuizzes(); }
   if (view === 'group-exercise') { renderGroupExercises(); }
-  if (view === 'orders') { loadOrders(); }
+  if (view === 'orders') { loadOrders('tushaal', 'orders-list', 'orders-count-sub'); }
+  if (view === 'guides') { loadOrders('guide', 'guides-list', 'guides-count-sub'); }
   if (view === 'projective') { renderProjectiveMethods(); }
   if (view === 'analytics') { loadAnalyticsSummary(); loadMonthlyAnalysis(); }
   if (view === 'org') { loadOrgStats(); loadUnitStress(); }
@@ -2007,18 +2023,21 @@ const PROJECTIVE_METHODS = [{"num": 1, "title": "ЗАН ЧАНАРЫН ОНЦЛ�
 
 /* ================= ТУШААЛ: сэтгэл зүйчдийн буланд байршуулсан PDF баримт бичгүүд ================= */
 const DOCS_BUCKET = 'psy-documents';
-async function loadOrders() {
-  const el = document.getElementById('orders-list');
+async function loadOrders(category, elId, subElId) {
+  category = category || 'tushaal';
+  elId = elId || 'orders-list';
+  subElId = subElId || 'orders-count-sub';
+  const el = document.getElementById(elId);
   if (!el) return;
   el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div>';
-  const { data, error } = await sb.from('psy_documents').select('*').order('created_at', { ascending:false });
+  const { data, error } = await sb.from('psy_documents').select('*').eq('category', category).order('created_at', { ascending:false });
   if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Жагсаалт татахад алдаа гарлаа: ' + error.message + '</div>'; console.error('loadOrders error:', error); return; }
-  const subEl = document.getElementById('orders-count-sub');
+  const subEl = document.getElementById(subElId);
   if (subEl) subEl.textContent = (data?.length || 0) + ' баримт бичиг';
   if (!data || data.length===0) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;padding:.6rem 0;">Одоогоор баримт бичиг байршуулаагүй байна.</div>'; return; }
   el.innerHTML = data.map(d => `
     <div class="section-card" style="display:flex;align-items:center;gap:.8rem;margin-bottom:.8rem;">
-      <div style="font-size:1.6rem;flex-shrink:0;">📄</div>
+      <div style="font-size:1.6rem;flex-shrink:0;">${category === 'guide' ? '📘' : '📄'}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-weight:700;font-size:.92rem;">${d.title}</div>
         <div style="font-size:.78rem;color:var(--sub);">${timeAgo(d.created_at)}${d.file_size ? ' · ' + (Math.round(d.file_size/1024)) + ' KB' : ''}</div>
@@ -2049,10 +2068,10 @@ async function loadAdminDocuments() {
   if (!data || data.length===0) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор баримт бичиг байршуулаагүй байна.</div>'; return; }
   el.innerHTML = data.map(d => `
     <div class="comment-row" style="display:flex;gap:.5rem;padding:.6rem 0;border-top:1px solid var(--line);align-items:center;">
-      <div style="font-size:1.3rem;flex-shrink:0;">📄</div>
+      <div style="font-size:1.3rem;flex-shrink:0;">${d.category === 'guide' ? '📘' : '📄'}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-size:.85rem;font-weight:700;">${d.title}</div>
-        <div style="font-size:.78rem;color:var(--sub);">${timeAgo(d.created_at)}</div>
+        <div style="font-size:.78rem;color:var(--sub);">${d.category === 'guide' ? 'Гарын авлага' : 'Тушаал'} · ${timeAgo(d.created_at)}</div>
       </div>
       <button onclick="adminDeleteDocument('${d.id}','${d.storage_path}')" title="Устгах" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>
     </div>
@@ -2061,9 +2080,11 @@ async function loadAdminDocuments() {
 async function uploadAdminDocument() {
   const fileInput = document.getElementById('doc-upload-file');
   const titleInput = document.getElementById('doc-upload-title');
+  const categoryInput = document.getElementById('doc-upload-category');
   const msg = document.getElementById('doc-upload-msg');
   const file = fileInput.files[0];
   const title = titleInput.value.trim();
+  const category = categoryInput.value;
   if (!file) { msg.style.color = 'var(--red)'; msg.textContent = 'PDF файл сонгоно уу.'; return; }
   if (file.type !== 'application/pdf') { msg.style.color = 'var(--red)'; msg.textContent = 'Зөвхөн PDF файл байршуулах боломжтой.'; return; }
   if (!title) { msg.style.color = 'var(--red)'; msg.textContent = 'Баримт бичгийн нэрийг оруулна уу.'; return; }
@@ -2072,7 +2093,7 @@ async function uploadAdminDocument() {
   const storagePath = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${fileExt}`;
   const { error: upErr } = await sb.storage.from(DOCS_BUCKET).upload(storagePath, file, { contentType: 'application/pdf' });
   if (upErr) { msg.style.color = 'var(--red)'; msg.textContent = 'Байршуулахад алдаа гарлаа: ' + upErr.message; return; }
-  const { error: insErr } = await sb.from('psy_documents').insert({ title, storage_path: storagePath, file_size: file.size, uploaded_by: currentUser?.id });
+  const { error: insErr } = await sb.from('psy_documents').insert({ title, category, storage_path: storagePath, file_size: file.size, uploaded_by: currentUser?.id });
   if (insErr) { msg.style.color = 'var(--red)'; msg.textContent = 'Мэдээлэл хадгалахад алдаа гарлаа: ' + insErr.message; return; }
   msg.style.color = 'var(--gold)'; msg.textContent = 'Амжилттай байршууллаа!';
   showToast('Баримт бичиг байршууллаа.', 'success');

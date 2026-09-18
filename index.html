@@ -139,19 +139,26 @@
   /* ---------- QUICK ACTIONS ---------- */
   .quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.9rem;margin-bottom:1.4rem;}
   /* ---------- Зоригжуулах ишлэл ---------- */
-  .quote-card{display:flex;gap:1.1rem;align-items:center;background:var(--panel);border:1px solid var(--line);
-    border-radius:14px;padding:1.2rem 1.4rem;margin-bottom:1.4rem;position:relative;z-index:2;}
-  .quote-card-wrap{position:relative;padding-bottom:34px;}
+  @property --border-angle{syntax:'<angle>';inherits:false;initial-value:0deg;}
+  .quote-card-wrap{position:relative;padding:3px;margin-bottom:1.4rem;border-radius:20px;
+    background:conic-gradient(from var(--border-angle), transparent 0%, #7EE3EF 6%, var(--gold) 16%, #063F4A 26%, transparent 40%, transparent 100%);
+    animation:quoteBorderSpin 4.5s linear infinite;
+    box-shadow:0 10px 32px rgba(10,103,122,.22), 0 2px 8px rgba(10,103,122,.12);}
+  @keyframes quoteBorderSpin{to{--border-angle:360deg;}}
+  .quote-card{display:flex;gap:1.1rem;align-items:center;background:var(--panel);
+    border-radius:18px;padding:1.3rem 1.5rem;position:relative;z-index:2;overflow:hidden;}
+  .quote-card::after{content:'';position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(140% 100% at 0% 0%, var(--gold-soft), transparent 60%);}
   .quote-mascot-wrap{position:absolute;right:1.6rem;bottom:-4px;height:58px;z-index:1;pointer-events:none;display:inline-block;opacity:.95;}
   .quote-mascot-wrap2{position:absolute;right:3.6rem;bottom:-4px;height:50px;z-index:0;pointer-events:none;display:inline-block;opacity:.88;}
   .quote-mascot-wrap2 .quote-mascot2{position:static;height:100%;width:auto;display:block;filter:brightness(.9);}
   .quote-mascot-wrap .quote-mascot{position:static;height:100%;width:auto;display:block;}
   .quote-seal{width:52px;height:52px;flex-shrink:0;border-radius:50%;
-    background:radial-gradient(circle at 35% 30%, #C9A876, var(--brass) 75%);
-    display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px var(--brass-soft);}
+    background:radial-gradient(circle at 35% 30%, #7EE3EF, var(--gold) 75%);
+    display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px var(--gold-soft);position:relative;z-index:1;}
   .quote-seal svg{width:26px;height:26px;}
-  .quote-text{font-size:.98rem;font-style:italic;color:var(--cream);line-height:1.5;margin:0 0 .3rem;}
-  .quote-by{font-size:.78rem;color:var(--brass);font-weight:700;}
+  .quote-text{font-size:.98rem;font-style:italic;color:var(--cream);line-height:1.5;margin:0 0 .3rem;position:relative;z-index:1;}
+  .quote-by{font-size:.78rem;color:var(--gold);font-weight:700;position:relative;z-index:1;}
   .quote-by span{color:var(--sub);font-weight:500;}
   .quick-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;
     padding:1.1rem 1.2rem;cursor:pointer;display:flex;flex-direction:column;gap:.55rem;}
@@ -1707,7 +1714,7 @@ function renderQuoteCard() {
   if (!el) return;
   const q = MOTIVATION_QUOTES[currentQuoteSlot() % MOTIVATION_QUOTES.length];
   el.innerHTML = `
-    <div class="quote-seal"><svg viewBox="0 0 24 24" fill="#FFFFFF"><path d="M12 2l2.6 6.2 6.7.5-5.1 4.4 1.6 6.6L12 16.3 6.2 19.7l1.6-6.6-5.1-4.4 6.7-.5z"/></svg></div>
+    <div class="quote-seal"><svg viewBox="0 0 24 24" fill="#FFFFFF"><path d="M12 21s-6.7-4.35-9.3-8.1C.86 10.2 1.4 6.6 4.2 5.1c2.3-1.25 5-0.5 6.3 1.5.4.6 1.2 1.5 1.5 2 .3-.5 1.1-1.4 1.5-2 1.3-2 4-2.75 6.3-1.5 2.8 1.5 3.34 5.1 1.5 7.8C18.7 16.65 12 21 12 21z"/></svg></div>
     <div>
       <p class="quote-text">«${q.text}»</p>
       ${q.name ? `<div class="quote-by">${q.name} <span>· ${q.era}</span></div>` : ''}

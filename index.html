@@ -2068,7 +2068,8 @@ async function uploadAdminDocument() {
   if (file.type !== 'application/pdf') { msg.style.color = 'var(--red)'; msg.textContent = 'Зөвхөн PDF файл байршуулах боломжтой.'; return; }
   if (!title) { msg.style.color = 'var(--red)'; msg.textContent = 'Баримт бичгийн нэрийг оруулна уу.'; return; }
   msg.style.color = 'var(--sub)'; msg.textContent = 'Байршуулж байна...';
-  const storagePath = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9а-яА-Яөүёэ.\-]/g, '_')}`;
+  const fileExt = (file.name.split('.').pop() || 'pdf').toLowerCase().replace(/[^a-z0-9]/g, '') || 'pdf';
+  const storagePath = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${fileExt}`;
   const { error: upErr } = await sb.storage.from(DOCS_BUCKET).upload(storagePath, file, { contentType: 'application/pdf' });
   if (upErr) { msg.style.color = 'var(--red)'; msg.textContent = 'Байршуулахад алдаа гарлаа: ' + upErr.message; return; }
   const { error: insErr } = await sb.from('psy_documents').insert({ title, storage_path: storagePath, file_size: file.size, uploaded_by: currentUser?.id });

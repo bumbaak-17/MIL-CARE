@@ -867,6 +867,13 @@
               <div id="admin-chat-threads"></div>
             </div>
           </div>
+          <div class="section-card">
+            <div class="section-head collapsible" onclick="toggleAdminSection('comments-mod')"><h3>🗑️ Сэтгэгдэл удирдах (зөвхөн админ)</h3><span class="collapse-arrow" id="comments-mod-arrow">▾</span></div>
+            <div class="collapsible-body" id="comments-mod-body">
+              <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Хэрэглэгчдийн бичсэн бүх сэтгэгдлийн жагсаалт. Зохисгүй агуулгыг эндээс устгаж болно. Жирийн хэрэглэгч зөвхөн өөрийн сэтгэгдлээ устгах эрхтэй.</p>
+              <div id="admin-comments-list"></div>
+            </div>
+          </div>
           <div class="section-card" id="admin-professionals-section">
             <div class="section-head collapsible" onclick="toggleAdminSection('pro-manage')"><h3>👩‍⚕️ Сэтгэл зүйн мэргэжилтнүүдийг бүртгэх</h3><span class="collapse-arrow" id="pro-manage-arrow">▾</span></div>
             <div class="collapsible-body" id="pro-manage-body">
@@ -3630,6 +3637,34 @@ function toggleAdminSection(id) {
   if (arrow) arrow.textContent = willOpen ? '▴' : '▾';
 }
 
+/* ================= АДМИН: Бүх сэтгэгдлийг удирдах (харах/устгах) ================= */
+async function loadAdminComments() {
+  const el = document.getElementById('admin-comments-list');
+  if (!el) return;
+  el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div>';
+  const { data, error } = await sb.from('comments').select('*').order('created_at', { ascending:false }).limit(200);
+  if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Жагсаалт татахад алдаа гарлаа.</div>'; console.error('loadAdminComments error:', error); return; }
+  if (!data || data.length===0) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор сэтгэгдэл алга.</div>'; return; }
+  el.innerHTML = data.map(c => `
+    <div class="comment-row" style="display:flex;gap:.5rem;padding:.6rem 0;border-top:1px solid var(--line);align-items:flex-start;">
+      <div class="post-avatar" style="width:26px;height:26px;font-size:.75rem;flex-shrink:0;">🪖</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:.78rem;font-weight:700;">${c.anon_handle}<span style="font-weight:400;color:var(--sub);margin-left:.5rem;">${timeAgo(c.created_at)}</span></div>
+        <div style="font-size:.85rem;word-break:break-word;">${c.text}</div>
+      </div>
+      <button onclick="adminDeleteComment('${c.id}')" title="Устгах" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>
+    </div>
+  `).join('');
+}
+async function adminDeleteComment(commentId) {
+  if (!confirm('Энэ сэтгэгдлийг устгах уу?')) return;
+  const { error } = await sb.from('comments').delete().eq('id', commentId);
+  if (error) { showToast('Устгахад алдаа гарлаа: ' + error.message, 'error'); return; }
+  showToast('Сэтгэгдэл устгагдлаа.', 'success');
+  loadAdminComments();
+  loadPosts(); // нийтийн хуваалцсан сэтгэгдлийн жагсаалтыг мөн шинэчилнэ
+}
+
 /* ================= АДМИН: Мэргэжилтнүүдийг удирдах (нэмэх/засах/устгах) ================= */
 async function loadAdminProfessionals() {
   const el = document.getElementById('admin-pro-list');
@@ -3925,6 +3960,7 @@ async function init() {
     loadCompositionStats();
     loadRegisteredUsers();
     loadAdminChatThreads();
+    loadAdminComments();
     loadAdminProfessionals();
     loadAdminRiskAlerts();
     refreshBellBadge();

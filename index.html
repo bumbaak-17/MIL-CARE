@@ -2364,6 +2364,7 @@ const TESTS = {
   iq: { title:'Оюун ухааны чадамжийг тодорхойлох тест', emo:'🧩', dur:'10 минут', blurb:'Хүмүүс хоорондын харилцаа, боловсрол мэдлэг, дотоод соёл, бие бялдрын чадамжийг үнэлэх 39 асуулттай тест.', custom:'iq' },
   stress_symptoms: { title:'Стрессийн шинжүүдийг илрүүлэх тест', emo:'⚡', dur:'5 минут', blurb:'19 асуултад тийм/үгүй хариулснаар, стресстэй холбоотой боломжит хэдэн шинж тэмдгийн магадлалыг зэрэг харуулна.', custom:'stress_symptoms' },
   insomnia_test: { title:'Нойргүйдлийг илрүүлэх тест', emo:'🌙', dur:'4 минут', blurb:'17 асуултад тийм/үгүй хариулснаар, нойрны эмгэгийн боломжит хэдэн хэлбэрийн магадлалыг зэрэг харуулна.', custom:'insomnia' },
+  gender_role: { title:'Бие хүний сэтгэлзүйн хүйсийг тодорхойлох тест', emo:'⚧️', dur:'8 минут', blurb:'60 шинж чанарын үгэнд хариулснаар, эрэгтэйлэг/эмэгтэйлэг/андрогин сэтгэлзүйн хэв шинжийг тодорхойлно.', custom:'gender_role' },
 
   jung_extraversion: { title:'Зан төлөвийн хэв шинжийг тодорхойлох тест (К.Юнг)', emo:'🔄', dur:'6 минут',
     blurb:'К.Юнгийн аргачлалаар экстраверт, интроверт, амвоверт хэв шинжийг тодорхойлно.',
@@ -3255,6 +3256,7 @@ function openModal(key) {
   if (t.custom === 'iq') { closeModal(); goto('iqtest'); return; }
   if (t.custom === 'stress_symptoms') { openStressSymptomsTest(); return; }
   if (t.custom === 'insomnia') { openInsomniaTest(); return; }
+  if (t.custom === 'gender_role') { openGenderRoleTest(); return; }
   const box = document.getElementById('modal-box');
   box.innerHTML = `
     <h3>${t.emo} ${t.title}</h3>
@@ -3471,6 +3473,91 @@ async function scoreInsomniaTest() {
     'Таны хариултаас харахад дараах боломжит нойрны эмгэгийн магадлал (%) илэрч байна. Магадлал өндөр байх тусам холбогдох шинж илүү тод илэрч байгааг илтгэнэ — энэ бол эмнэлгийн онош биш, зөвхөн эрт анхаарал татах чиглүүлэг.',
     results, false
   );
+}
+
+const GENDER_ROLE_QS = [
+  'Өөртөө итгэлтэй','Бууж өгч чаддаг','Тусч','Өөрийн үзэл бодлоо хамгаалдаг','Амьдралын баяр баясгаланг мэдэрч чаддаг',
+  'Дүнсгэр','Хараат бус','Ичимхий','Үнэнч шударга, ухамсартай','Спортод сонирхолтой, эрүүл чийрэг',
+  'Цайлган','Уран сайхны мэдрэмжтэй','Идэвхтэй','Магтаалд дуртай','Азтай',
+  'Хурц зан чанартай','Аливаа зүйлд үнэнч, тууштай','Тааварлашгүй','Хүчтэй','Эмэгтэйлэг',
+  'Найдвартай','Дүн шинжилгээ хийдэг','Өрөвдөж энэрч чаддаг','Хартай','Удирдах чадвартай',
+  'Хүмүүсийг халамжлагч','Шулуун шударга','Эрсдэл гаргаж чадах','Бусдыг ойлгодог','Нууцлаг',
+  'Хурдан шийдвэр гаргадаг','Өрөвч','Чин үнэнч','Зөвхөн өөртөө л итгэдэг','Хүнийг тайвшруулж чаддаг',
+  'Бардам','Захирангуй','Сул дуутай','Сэтгэл татам','Эршүүд',
+  'Халуун дотно, эелдэг','Чухал','Өөрийн гэсэн байр суурьтай','Уян зөөлөн','Нөхөрсөг',
+  'Түрэмгий','Итгэмтгий','Бүтээлч бус','Бусдыг удирдан чиглүүлэх хандлагатай','Хүүхэд шиг',
+  'Юманд амархан дасан зохицдог','Хувиа бодсон','Хэрүүл маргаанд дургүй','Зохион байгуулалт муутай','Тэмцэгч',
+  'Хүүхдэд хайртай','Эв дүйтэй','Нэр хүндэд дуртай','Тайван','Хуучинсаг',
+];
+const GENDER_MASCULINE_ITEMS = [1,4,7,10,13,16,19,22,25,28,31,34,37,40,43,46,49,52,55,58];
+const GENDER_FEMININE_ITEMS = [2,5,8,11,14,17,20,23,26,29,32,35,38,41,44,47,50,53,56,59];
+
+function openGenderRoleTest() {
+  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('modal-box').innerHTML = `
+    <h3>⚧️ Бие хүний сэтгэлзүйн хүйсийг тодорхойлох тест</h3>
+    <p class="msub">60 үг/шинж чанар — тус бүрийг өөрт хэр тохирохыг Тийм/Үгүй гэж хариулна уу.</p>
+    <div id="mq-wrap">${renderYesNoQuestions(GENDER_ROLE_QS, 'gnq')}</div>
+    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="scoreGenderRoleTest()">Дүн харах</button></div>
+  `;
+}
+
+async function scoreGenderRoleTest() {
+  const answers = readYesNoAnswers(GENDER_ROLE_QS, 'gnq');
+  if (!answers) { showToast('Бүх асуултад хариулна уу.', 'warn'); return; }
+
+  const masculineCount = GENDER_MASCULINE_ITEMS.reduce((s,qNum)=> s + (answers[qNum-1]===1?1:0), 0);
+  const feminineCount = GENDER_FEMININE_ITEMS.reduce((s,qNum)=> s + (answers[qNum-1]===1?1:0), 0);
+  const Em = feminineCount / 20;
+  const Er = masculineCount / 20;
+  const genderIndex = (Em - Er) / 2.322;
+
+  let resultLabel, resultDesc;
+  if (genderIndex < -2.025) {
+    resultLabel = 'Эрэгтэйлэг шинж чанарын тод илрэл';
+    resultDesc = 'Уламжлалт ёсоор эрэгтэйлэг чанарт тусгаар, өөртөө итгэлтэй, давамгай, түрэмгий, аз туршсан, бие даасан байдал зэрэг онцлог шинжүүд ордог.';
+  } else if (genderIndex < -1) {
+    resultLabel = 'Эрэгтэйлэг хэв шинж';
+    resultDesc = 'Уламжлалт ёсоор эрэгтэйлэг чанарт тусгаар, өөртөө итгэлтэй, давамгай, түрэмгий, аз туршсан, бие даасан байдал зэрэг онцлог шинжүүд ордог.';
+  } else if (genderIndex <= 1) {
+    resultLabel = 'Андрогин хэв шинж';
+    resultDesc = 'Бие хүнд эрэгтэйлэг, эмэгтэйлэг чанарууд тэгш хэмжээтэй байж, харилцан зохицож, бие биенээ нөхдөг. Энэ нь аливаа зүйлд амархан дасан зохицох боломж олгодог гэж тооцогддог.';
+  } else if (genderIndex <= 2.025) {
+    resultLabel = 'Эмэгтэйлэг хэв шинж';
+    resultDesc = 'Эмэгтэйлэг чанарт уламжлалт хандлагаар хүлцэнгүй, уян зөөлөн, мэдрэмтгий, ичимхий, бусдыг энэрэн хайрлах, ойлгох гэх мэт хувийн онцлогууд багтдаг.';
+  } else {
+    resultLabel = 'Эмэгтэйлэг шинж чанарын тод илрэл';
+    resultDesc = 'Эмэгтэйлэг чанарт уламжлалт хандлагаар хүлцэнгүй, уян зөөлөн, мэдрэмтгий, ичимхий, бусдыг энэрэн хайрлах, ойлгох гэх мэт хувийн онцлогууд багтдаг.';
+  }
+
+  if (currentUser?.id) {
+    const { error } = await sb.from('test_results').insert({ user_id: currentUser.id, test_key:'gender_role', score: Math.round(genderIndex*1000)/1000, max_score: null, level: resultLabel });
+    if (error) console.error('test_results save error:', error);
+    loadMonthlyAnalysis();
+  }
+
+  document.getElementById('modal-box').innerHTML = `
+    <h3>Бие хүний сэтгэлзүйн хүйсийг тодорхойлох тест — Үр дүн</h3>
+    <div class="result-level">${resultLabel}</div>
+    <div style="display:flex;gap:1rem;margin:1rem 0;flex-wrap:wrap;">
+      <div style="flex:1;min-width:140px;background:var(--panel-2);border-radius:12px;padding:.9rem;text-align:center;">
+        <div style="font-size:.78rem;color:var(--sub);">Эмэгтэйлэг (Эм)</div>
+        <div style="font-size:1.3rem;font-weight:800;color:var(--gold);">${Em.toFixed(2)}</div>
+        <div style="font-size:.72rem;color:var(--sub);">${feminineCount}/20 тохирсон</div>
+      </div>
+      <div style="flex:1;min-width:140px;background:var(--panel-2);border-radius:12px;padding:.9rem;text-align:center;">
+        <div style="font-size:.78rem;color:var(--sub);">Эрэгтэйлэг (Эр)</div>
+        <div style="font-size:1.3rem;font-weight:800;color:var(--gold);">${Er.toFixed(2)}</div>
+        <div style="font-size:.72rem;color:var(--sub);">${masculineCount}/20 тохирсон</div>
+      </div>
+      <div style="flex:1;min-width:140px;background:var(--panel-2);border-radius:12px;padding:.9rem;text-align:center;">
+        <div style="font-size:.78rem;color:var(--sub);">Хүйсийн индекс</div>
+        <div style="font-size:1.3rem;font-weight:800;color:var(--gold);">${genderIndex.toFixed(3)}</div>
+      </div>
+    </div>
+    <div class="result-block"><b>Тайлбар:</b> ${resultDesc}</div>
+    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button></div>
+  `;
 }
 
 /* ================= FEED (Facebook маягийн нийтийн пост + сэтгэгдэл, Supabase-тэй холбогдсон) ================= */

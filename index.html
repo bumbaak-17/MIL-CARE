@@ -553,6 +553,9 @@
       <li class="navitem" data-view="proportal" id="proportal-navitem" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 6v6c0 5 3.5 8.5 9 10 5.5-1.5 9-5 9-10V6z"/></svg>Хэрэглэгчидтэй холбогдох хэсэг<span id="proportal-nav-badge" class="nav-badge" style="display:none;">0</span></li>
       <li class="navitem" data-view="psy-corner" id="psy-corner-navitem" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><path d="M12 2 3 6v6c0 5 3.5 8.5 9 10 5.5-1.5 9-5 9-10V6z"/></svg>Сэтгэл зүйчдийн булан</li>
 
+      <div class="navgroup-label">ХҮНИЙ НӨӨЦ</div>
+      <li class="navitem" data-view="hr-portal" id="hr-portal-navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Хүний нөөц</li>
+
       <div class="navgroup-label">ХЭРЭГЛЭГЧ</div>
       <li class="navitem" data-view="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>Миний профайл</li>
     </ul>
@@ -748,6 +751,11 @@
         <div class="page-head"><h2>Тушаал</h2><p>Сэтгэл зүйн хангалттай холбоотой албан ёсны тушаал, заавар, журмын PDF баримт бичгүүд. Зөвхөн админ, бүртгэлтэй сэтгэл зүйчдэд харагдана.</p></div>
         <button class="modal-close" style="margin-bottom:1.2rem;" onclick="goto('psy-corner')">← Сэтгэл зүйчдийн булан руу буцах</button>
         <div id="orders-list"></div>
+      </div>
+
+      <div id="view-hr-portal" class="view">
+        <div class="page-head"><h2>👔 Хүний нөөц</h2><p id="hr-portal-subtitle">Ажилд орох, цэргийн албанд татагдах, энхийг дэмжих ажиллагаанд явах гэх мэт үед бөглөдөг хүний нөөцийн чиглэлийн тестүүд.</p></div>
+        <div id="hr-portal-content"></div>
       </div>
 
       <div id="view-guides" class="view">
@@ -969,6 +977,22 @@
               </div>
               <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" onclick="linkProfessionalAccount()">Холбох</button>
               <div id="pro-link-msg" style="font-size:.82rem;margin-top:.7rem;"></div>
+            </div>
+          </div>
+          <div class="section-card">
+            <div class="section-head collapsible" onclick="toggleAdminSection('hr-reg')"><h3>👔 Хүний нөөцийн мэргэжилтэн бүртгэх</h3><span class="collapse-arrow" id="hr-reg-arrow">▾</span></div>
+            <div class="collapsible-body" id="hr-reg-body">
+              <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">
+                Анги, байгууллагын хүний нөөцийн мэргэжилтнийг эндээс бүртгэнэ. Тэрээр эхлээд өөрөө сайтад имэйл/нууц үгээрээ бүртгүүлсэн байх ёстой (жирийн хэрэглэгчийн адилаар), дараа нь та энд нэр, ангийг нь бичээд, бүртгүүлсэн имэйлээр нь холбоно. Холбогдсоны дараа тэрээр "Хүний нөөц" хэсэгт орж, хүний нөөцийн тестүүдийг бөглөсөн хүмүүсийн жагсаалтыг харах боломжтой болно.
+              </p>
+              <div class="filter-bar" style="margin-bottom:.7rem;">
+                <input type="text" id="hr-name" placeholder="Овог нэр (жишээ: Б.Түвшинбаяр)" style="border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
+                <input type="text" id="hr-unit" placeholder="Анги, байгууллага (жишээ: 084 анги)" style="border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
+                <input type="email" id="hr-email" placeholder="Бүртгүүлсэн имэйл" style="border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
+              </div>
+              <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" onclick="addAndLinkHrSpecialist()">Бүртгэж холбох</button>
+              <div id="hr-reg-msg" style="font-size:.82rem;margin-top:.7rem;"></div>
+              <div id="admin-hr-list" style="margin-top:1.1rem;"></div>
             </div>
           </div>
           <div class="section-card">
@@ -1439,6 +1463,49 @@ async function loadIdentityList() {
   `).join('');
 }
 
+/* ================= ХҮНИЙ НӨӨЦ: хэрэглэгчид тест өгөх, ХН мэргэжилтэн/админ үр дүн харах ================= */
+async function loadHrResults() {
+  const subtitle = document.getElementById('hr-portal-subtitle');
+  const content = document.getElementById('hr-portal-content');
+  if (!content) return;
+
+  if (isAdmin || myHrId) {
+    // ХН мэргэжилтэн / админ горим: бөглөсөн хүмүүсийн дэлгэрэнгүй жагсаалт
+    subtitle.textContent = 'Хүний нөөцийн чиглэлийн тестүүдийг бөглөсөн хүмүүсийн жагсаалт, дэлгэрэнгүй үр дүн.';
+    content.innerHTML = `
+      <div class="section-card">
+        <p style="font-size:.85rem;color:var(--sub);margin:0;">Хүний нөөцийн чиглэлийн тестүүд (авьяс, чадварчлага, удирдлагын чадвар гэх мэт) одоогоор боловсруулагдаж байгаа тул жагсаалт хоосон байна. Тестүүд идэвхжсэний дараа энд бөглөсөн хүмүүсийн дэлгэрэнгүй үр дүн автоматаар харагдана.</p>
+      </div>
+      <div class="section-card">
+        <div class="section-head"><h3>📋 Тест бөглөсөн хүмүүсийн жагсаалт</h3></div>
+        <div id="hr-results-list"></div>
+      </div>
+    `;
+    const el = document.getElementById('hr-results-list');
+    el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div>';
+    const { data, error } = await sb.from('test_results').select('*, users(anon_handle, branch, personnel_type)')
+      .like('test_key', 'hr_%').order('created_at', { ascending:false }).limit(500);
+    if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Жагсаалт татахад алдаа гарлаа: ' + error.message + '</div>'; console.error('loadHrResults error:', error); return; }
+    if (!data || data.length===0) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор хүний нөөцийн чиглэлийн тест өгсөн хүн алга.</div>'; return; }
+    const byUser = {};
+    data.forEach(r => { (byUser[r.user_id] ||= { user: r.users, results: [] }).results.push(r); });
+    el.innerHTML = Object.values(byUser).map(u => `
+      <div class="comment-row" style="display:flex;flex-direction:column;gap:.3rem;padding:.7rem 0;border-top:1px solid var(--line);">
+        <div style="font-weight:700;font-size:.88rem;">${u.user?.anon_handle || '—'} <span style="font-weight:400;color:var(--sub);font-size:.78rem;">${u.user?.branch || ''} ${u.user?.personnel_type ? '· '+u.user.personnel_type : ''}</span></div>
+        ${u.results.map(r => `<div style="font-size:.82rem;color:var(--sub);padding-left:.5rem;">• ${r.test_key} — ${r.score}/${r.max_score} (${r.level || ''}) · ${timeAgo(r.created_at)}</div>`).join('')}
+      </div>
+    `).join('');
+  } else {
+    // Энгийн хэрэглэгчийн горим: бөглөх боломжтой тестүүдийн жагсаалт
+    subtitle.textContent = 'Ажилд орох, цэргийн албанд татагдах, энхийг дэмжих ажиллагаанд явах гэх мэт үед бөглөдөг хүний нөөцийн чиглэлийн тестүүд. Таны хариултыг зөвхөн эрх бүхий хүний нөөцийн мэргэжилтэн, админ л харна.';
+    content.innerHTML = `
+      <div class="section-card">
+        <p style="font-size:.85rem;color:var(--sub);margin:0;">Хүний нөөцийн чиглэлийн тестүүд одоогоор боловсруулагдаж байна. Тестүүд идэвхжмэгц энд гарч ирж, шууд эндээс бөглөх боломжтой болно.</p>
+      </div>
+    `;
+  }
+}
+
 /* ================= NAV ROUTING ================= */
 document.getElementById('hamburger').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
 
@@ -1460,6 +1527,7 @@ function goto(view, pushState) {
   if (view === 'group-exercise') { renderGroupExercises(); }
   if (view === 'orders') { loadOrders('tushaal', 'orders-list', 'orders-count-sub'); }
   if (view === 'guides') { loadOrders('guide', 'guides-list', 'guides-count-sub'); }
+  if (view === 'hr-portal') { loadHrResults(); }
   if (view === 'projective') { renderProjectiveMethods(); }
   if (view === 'analytics') { loadAnalyticsSummary(); loadMonthlyAnalysis(); }
   if (view === 'org') { loadOrgStats(); loadUnitStress(); }
@@ -3267,6 +3335,19 @@ async function initProfessionalNotifications() {
   subscribeProGlobalRealtime();
 }
 
+/* ================= ХҮНИЙ НӨӨЦИЙН МЭРГЭЖИЛТНИЙ ИЛРҮҮЛЭЛТ ================= */
+let myHrId = null;
+let myHrName = '';
+let myHrUnit = '';
+
+async function initHrNotifications() {
+  const { data, error } = await sb.rpc('get_my_hr_profile');
+  if (error || !data || !data.length) return; // энэ хэрэглэгч хүний нөөцийн мэргэжилтэн биш
+  myHrId = data[0].id;
+  myHrName = data[0].name;
+  myHrUnit = data[0].unit;
+}
+
 async function refreshProUnreadCount() {
   if (!myProId) return;
   const { data, error } = await sb.from('chat_messages').select('user_id, sender, created_at')
@@ -4002,6 +4083,52 @@ async function linkProfessionalAccount() {
   loadAdminProfessionals();
 }
 
+/* ================= АДМИН: Хүний нөөцийн мэргэжилтэн бүртгэх/холбох ================= */
+async function addAndLinkHrSpecialist() {
+  const name = document.getElementById('hr-name').value.trim();
+  const unit = document.getElementById('hr-unit').value.trim();
+  const email = document.getElementById('hr-email').value.trim();
+  const msg = document.getElementById('hr-reg-msg');
+  if (!name || !email) { msg.style.color = 'var(--red)'; msg.textContent = 'Нэр, имэйл хоёуланг оруулна уу.'; return; }
+  msg.style.color = 'var(--sub)'; msg.textContent = 'Бүртгэж байна...';
+  const { data: inserted, error: insErr } = await sb.from('hr_specialists').insert({ name, unit }).select().single();
+  if (insErr) { msg.style.color = 'var(--red)'; msg.textContent = 'Бүртгэхэд алдаа гарлаа: ' + insErr.message; return; }
+  const { error: linkErr } = await sb.rpc('link_hr_specialist_account', { hr_id: inserted.id, hr_email: email });
+  if (linkErr) { msg.style.color = 'var(--red)'; msg.textContent = 'Бүртгэгдсэн ч холбоход алдаа гарлаа: ' + linkErr.message; return; }
+  msg.style.color = 'var(--gold)';
+  msg.textContent = 'Амжилттай бүртгэж холболоо! Тэрээр өөрийн имэйлээрээ нэвтэрч, "Хүний нөөц" хэсэгт орох боломжтой боллоо.';
+  showToast('Хүний нөөцийн мэргэжилтэн бүртгэгдлээ.', 'success');
+  document.getElementById('hr-name').value = '';
+  document.getElementById('hr-unit').value = '';
+  document.getElementById('hr-email').value = '';
+  loadAdminHrList();
+}
+
+async function loadAdminHrList() {
+  const el = document.getElementById('admin-hr-list');
+  if (!el) return;
+  const { data, error } = await sb.from('hr_specialists').select('*').order('created_at', { ascending:false });
+  if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Жагсаалт татахад алдаа гарлаа.</div>'; return; }
+  if (!data || !data.length) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор бүртгэсэн хүний нөөцийн мэргэжилтэн алга.</div>'; return; }
+  el.innerHTML = data.map(h => `
+    <div class="comment-row" style="display:flex;gap:.5rem;padding:.5rem 0;border-top:1px solid var(--line);align-items:center;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:.85rem;font-weight:700;">${h.name} <span style="font-weight:400;color:var(--sub);">${h.unit || ''}</span></div>
+        ${h.auth_user_id ? '<span style="color:var(--gold);font-size:.72rem;font-weight:800;">✓ Нэвтрэх эрхтэй</span>' : '<span style="color:var(--sub);font-size:.72rem;">· Нэвтрэх эрхгүй</span>'}
+      </div>
+      <button onclick="adminDeleteHrSpecialist('${h.id}')" title="Устгах" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>
+    </div>
+  `).join('');
+}
+
+async function adminDeleteHrSpecialist(id) {
+  if (!confirm('Энэ хүний нөөцийн мэргэжилтнийг устгах уу?')) return;
+  const { error } = await sb.from('hr_specialists').delete().eq('id', id);
+  if (error) { showToast('Устгахад алдаа гарлаа: ' + error.message, 'error'); return; }
+  showToast('Устгагдлаа.', 'success');
+  loadAdminHrList();
+}
+
 async function saveProfessional() {
   const editId = document.getElementById('pro-edit-id').value;
   const msg = document.getElementById('pro-form-msg');
@@ -4235,6 +4362,7 @@ async function init() {
   applyUserToTopbar();
   await checkAdminStatus();
   initProfessionalNotifications(); // тухайн session мэргэжилтэнтэй холбогдсон эсэхийг чимээгүй шалгаад, шинэ зурвасын мэдэгдлийг эхлүүлнэ
+  initHrNotifications(); // тухайн session хүний нөөцийн мэргэжилтэнтэй холбогдсон эсэхийг чимээгүй шалгана
   refreshUserUnreadReplies();
   subscribeUserGlobalChat();
   refreshBellBadge();
@@ -4255,6 +4383,7 @@ async function init() {
     loadAdminChatThreads();
     loadAdminPosts();
     loadAdminComments();
+    loadAdminHrList();
     loadAdminDocuments();
     loadAdminProfessionals();
     loadAdminRiskAlerts();

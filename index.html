@@ -3191,6 +3191,9 @@ function subscribeUserGlobalChat() {
         playNotificationSound();
         showToast('🎥 Мэргэжилтэн онлайн зөвлөгөөг зөвшөөрлөө! Дуудлагад нэгдэх боломжтой боллоо.', 'success', 8000);
         renderUserOnlineConsultButton();
+      } else if (row.status === 'none') {
+        showToast('Мэргэжилтэн онлайн зөвлөгөөний зөвшөөрлийг цуцаллаа.', 'info', 6000);
+        renderUserOnlineConsultButton();
       }
     })
     .subscribe();
@@ -3590,7 +3593,8 @@ async function renderProOnlineConsultButton() {
   if (session?.status === 'approved' && session.video_room) {
     el.innerHTML = `
       <div style="text-align:center;color:var(--gold);font-size:.85rem;font-weight:700;margin-bottom:.5rem;">🟢 Онлайн зөвлөгөө зөвшөөрөгдсөн</div>
-      <a href="${session.video_room}" target="_blank" style="display:block;text-align:center;text-decoration:none;background:var(--gold);color:#fff;border-radius:12px;padding:.75rem;font-size:.92rem;font-weight:700;">🎥 Дуудлагад нэгдэх</a>`;
+      <a href="${session.video_room}" target="_blank" style="display:block;text-align:center;text-decoration:none;background:var(--gold);color:#fff;border-radius:12px;padding:.75rem;font-size:.92rem;font-weight:700;margin-bottom:.5rem;">🎥 Дуудлагад нэгдэх</a>
+      <button onclick="proRevokeOnlineConsult('${currentProChatUserId}','${myProId}')" style="width:100%;background:none;border:1px solid var(--red,#c0392b);color:var(--red,#c0392b);border-radius:12px;padding:.6rem;font-size:.85rem;cursor:pointer;">Зөвшөөрлийг цуцлах</button>`;
   } else {
     el.innerHTML = `<button onclick="proApproveOnlineConsult('${currentProChatUserId}','${myProId}')" style="width:100%;background:var(--gold);color:#fff;border:none;border-radius:12px;padding:.75rem;font-size:.92rem;font-weight:700;cursor:pointer;">🎥 Онлайн зөвлөгөөг зөвшөөрөх</button>`;
   }
@@ -3762,6 +3766,16 @@ async function proApproveOnlineConsult(userId, proId) {
   }, { onConflict: 'user_id,professional_id' });
   if (error) { showToast('Зөвшөөрөхөд алдаа гарлаа: ' + error.message, 'error'); return; }
   showToast('Онлайн зөвлөгөөг зөвшөөрлөө! Хэрэглэгчийн тал идэвхжлээ.', 'success');
+  renderProOnlineConsultButton();
+}
+
+async function proRevokeOnlineConsult(userId, proId) {
+  if (!confirm('Онлайн зөвлөгөөний зөвшөөрлийг цуцлах уу? Хэрэглэгчийн талын товч дахин идэвхгүй болно.')) return;
+  const { error } = await sb.from('video_sessions').update({
+    status: 'none', video_room: null, updated_at: new Date().toISOString()
+  }).eq('user_id', userId).eq('professional_id', proId);
+  if (error) { showToast('Цуцлахад алдаа гарлаа: ' + error.message, 'error'); return; }
+  showToast('Онлайн зөвлөгөөг цуцаллаа.', 'info');
   renderProOnlineConsultButton();
 }
 

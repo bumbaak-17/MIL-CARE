@@ -2052,7 +2052,7 @@ async function loadOrders(category, elId, subElId) {
       <div style="font-size:1.6rem;flex-shrink:0;">${category === 'guide' ? '📘' : '📄'}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-weight:700;font-size:.92rem;">${d.title}</div>
-        <div style="font-size:.78rem;color:var(--sub);">${timeAgo(d.created_at)}${d.file_size ? ' · ' + (Math.round(d.file_size/1024)) + ' KB' : ''}</div>
+        <div style="font-size:.78rem;color:var(--sub);">${d.file_size ? (Math.round(d.file_size/1024)) + ' KB' : ''}</div>
       </div>
       <button class="modal-close" style="width:auto;padding:.5rem 1rem;font-size:.85rem;flex-shrink:0;" onclick="viewOrderDoc('${d.storage_path}')">Харах</button>
       <button class="connect-btn" style="width:auto;padding:.5rem 1rem;font-size:.85rem;flex-shrink:0;" onclick="downloadOrderDoc('${d.storage_path}','${(d.title||'document').replace(/'/g,"")}')">Татах</button>
@@ -2085,9 +2085,20 @@ async function loadAdminDocuments() {
         <div style="font-size:.85rem;font-weight:700;">${d.title}</div>
         <div style="font-size:.78rem;color:var(--sub);">${d.category === 'guide' ? 'Гарын авлага' : 'Тушаал'} · ${timeAgo(d.created_at)}</div>
       </div>
+      <button onclick="editDocumentTitle('${d.id}', '${(d.title||'').replace(/'/g,"\\'")}')" title="Засах" style="background:none;border:none;color:var(--gold);cursor:pointer;font-size:.85rem;flex-shrink:0;">✏️</button>
       <button onclick="adminDeleteDocument('${d.id}','${d.storage_path}')" title="Устгах" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>
     </div>
   `).join('');
+}
+async function editDocumentTitle(docId, currentTitle) {
+  const newTitle = prompt('Баримт бичгийн шинэ нэрийг оруулна уу:', currentTitle);
+  if (newTitle === null) return;
+  const trimmed = newTitle.trim();
+  if (!trimmed) { showToast('Нэр хоосон байж болохгүй.', 'error'); return; }
+  const { error } = await sb.from('psy_documents').update({ title: trimmed }).eq('id', docId);
+  if (error) { showToast('Нэр өөрчлөхөд алдаа гарлаа: ' + error.message, 'error'); return; }
+  showToast('Нэр амжилттай өөрчлөгдлөө.', 'success');
+  loadAdminDocuments();
 }
 async function uploadAdminDocument() {
   const fileInput = document.getElementById('doc-upload-file');

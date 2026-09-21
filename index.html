@@ -894,39 +894,10 @@
             <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Пост бүрийн доор бичигдсэн хариу сэтгэгдлүүд.</p>
             <div id="admin-comments-list"></div>
           </div>
-          <div id="admin-other-sections">
-          <div class="section-card">
-            <div class="section-head collapsible" onclick="toggleAdminSection('branch-comp')"><h3>🎖️ Алба хаагчдын бүрэлдэхүүн</h3><span class="collapse-arrow" id="branch-comp-arrow">▾</span></div>
-            <div class="collapsible-body" id="branch-comp-body">
-              <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Цэргийн төрөл, албан хаагчийн төрлөөр нэгтгэсэн тоо. Хувь хүнийг тодорхойлохгүй.</p>
-              <div id="branch-stats"></div>
-              <div id="role-stats" style="margin-top:1.1rem;"></div>
-            </div>
-          </div>
-          <div class="section-card">
-            <div class="section-head collapsible" onclick="toggleAdminSection('pro-chat')"><h3>💬 Мэргэжилтний чат (зөвхөн админ)</h3><span class="collapse-arrow" id="pro-chat-arrow">▾</span></div>
-            <div class="collapsible-body" id="pro-chat-body">
-              <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Хэрэглэгчдийн мэргэжилтэнтэй чатласан мессежүүд. Мэргэжилтний нэрийн өмнөөс хариулах боломжтой.</p>
-              <div id="admin-chat-threads"></div>
-            </div>
-          </div>
-          <div class="section-card">
-            <div class="section-head collapsible" onclick="toggleAdminSection('docs-mod')"><h3>📄 Тушаал, баримт бичиг удирдах</h3><span class="collapse-arrow" id="docs-mod-arrow">▾</span></div>
-            <div class="collapsible-body" id="docs-mod-body">
-              <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Энд байршуулсан PDF баримт бичгүүд Сэтгэл зүйчдийн булангийн "Тушаал" хэсэгт админ болон бүртгэлтэй сэтгэл зүйчдэд харагдана.</p>
-              <div class="filter-bar" style="margin-bottom:.7rem;">
-                <input type="text" id="doc-upload-title" placeholder="Баримт бичгийн нэр (жишээ: Сэтгэл зүйн хангалтыг зохион байгуулах заавар)" style="flex:1;min-width:220px;border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
-                <select id="doc-upload-category" style="border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
-                  <option value="tushaal">Тушаал</option>
-                  <option value="guide">Гарын авлага</option>
-                </select>
-                <input type="file" id="doc-upload-file" accept="application/pdf" style="border:1px solid var(--line);border-radius:12px;padding:.5rem .6rem;font-family:inherit;font-size:.85rem;background:#fff;color:var(--cream);">
-              </div>
-              <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" onclick="uploadAdminDocument()">Байршуулах</button>
-              <div id="doc-upload-msg" style="font-size:.82rem;margin-top:.7rem;"></div>
-              <div id="admin-documents-list" style="margin-top:1.1rem;"></div>
-            </div>
-          </div>
+          <div class="section-card" id="admin-professionals-panel" style="display:none;">
+            <button class="modal-close" style="margin-bottom:1rem;" onclick="hideAdminProfessionalsView()">← Буцах</button>
+            <div class="section-head"><h3>👩‍⚕️ Мэргэжилтэн (зөвхөн админ)</h3></div>
+            <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Сэтгэл зүйн мэргэжилтэн, хүний нөөцийн мэргэжилтний бүртгэл, нэвтрэх эрхийг эндээс удирдана.</p>
           <div class="section-card" id="admin-professionals-section">
             <div class="section-head collapsible" onclick="toggleAdminSection('pro-manage')"><h3>👩‍⚕️ Сэтгэл зүйн мэргэжилтнүүдийг бүртгэх</h3><span class="collapse-arrow" id="pro-manage-arrow">▾</span></div>
             <div class="collapsible-body" id="pro-manage-body">
@@ -993,6 +964,40 @@
               <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" onclick="addAndLinkHrSpecialist()">Бүртгэж холбох</button>
               <div id="hr-reg-msg" style="font-size:.82rem;margin-top:.7rem;"></div>
               <div id="admin-hr-list" style="margin-top:1.1rem;"></div>
+            </div>
+          </div>
+          </div>
+          <div id="admin-other-sections">
+          <div class="section-card">
+            <div class="section-head collapsible" onclick="toggleAdminSection('branch-comp')"><h3>🎖️ Алба хаагчдын бүрэлдэхүүн</h3><span class="collapse-arrow" id="branch-comp-arrow">▾</span></div>
+            <div class="collapsible-body" id="branch-comp-body">
+              <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Цэргийн төрөл, албан хаагчийн төрлөөр нэгтгэсэн тоо. Хувь хүнийг тодорхойлохгүй.</p>
+              <div id="branch-stats"></div>
+              <div id="role-stats" style="margin-top:1.1rem;"></div>
+            </div>
+          </div>
+          <div class="section-card">
+            <div class="section-head collapsible" onclick="toggleAdminSection('pro-chat')"><h3>💬 Мэргэжилтний чат (зөвхөн админ)</h3><span class="collapse-arrow" id="pro-chat-arrow">▾</span></div>
+            <div class="collapsible-body" id="pro-chat-body">
+              <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Хэрэглэгчдийн мэргэжилтэнтэй чатласан мессежүүд. Мэргэжилтний нэрийн өмнөөс хариулах боломжтой.</p>
+              <div id="admin-chat-threads"></div>
+            </div>
+          </div>
+          <div class="section-card">
+            <div class="section-head collapsible" onclick="toggleAdminSection('docs-mod')"><h3>📄 Тушаал, баримт бичиг удирдах</h3><span class="collapse-arrow" id="docs-mod-arrow">▾</span></div>
+            <div class="collapsible-body" id="docs-mod-body">
+              <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Энд байршуулсан PDF баримт бичгүүд Сэтгэл зүйчдийн булангийн "Тушаал" хэсэгт админ болон бүртгэлтэй сэтгэл зүйчдэд харагдана.</p>
+              <div class="filter-bar" style="margin-bottom:.7rem;">
+                <input type="text" id="doc-upload-title" placeholder="Баримт бичгийн нэр (жишээ: Сэтгэл зүйн хангалтыг зохион байгуулах заавар)" style="flex:1;min-width:220px;border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
+                <select id="doc-upload-category" style="border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
+                  <option value="tushaal">Тушаал</option>
+                  <option value="guide">Гарын авлага</option>
+                </select>
+                <input type="file" id="doc-upload-file" accept="application/pdf" style="border:1px solid var(--line);border-radius:12px;padding:.5rem .6rem;font-family:inherit;font-size:.85rem;background:#fff;color:var(--cream);">
+              </div>
+              <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" onclick="uploadAdminDocument()">Байршуулах</button>
+              <div id="doc-upload-msg" style="font-size:.82rem;margin-top:.7rem;"></div>
+              <div id="admin-documents-list" style="margin-top:1.1rem;"></div>
             </div>
           </div>
           <div class="section-card">
@@ -3928,7 +3933,7 @@ document.getElementById('admin-grid').innerHTML = ADMIN_ITEMS.map(a => `
   <div class="admin-card" onclick="${
     a.label === 'Хэрэглэгч' ? "showAdminUsersView()" :
     a.label === 'Пост' ? "showAdminPostsView()" :
-    a.label === 'Мэргэжилтэн' ? "document.getElementById('admin-professionals-section').scrollIntoView({behavior:'smooth'})" :
+    a.label === 'Мэргэжилтэн' ? "showAdminProfessionalsView()" :
     a.label === 'Цэргийн төрөл харах' ? "adminPreviewOnboarding()" :
     `showToast('${a.label} — demo хувилбарт зөвхөн харагдацтай, production дээр бүрэн удирдах боломжтой.', 'info')`
   }"><div class="admin-icon">${a.icon}</div><div class="admin-lbl">${a.label}</div></div>
@@ -3960,6 +3965,7 @@ function showAdminUsersView() {
   document.getElementById('admin-grid').style.display = 'none';
   document.getElementById('admin-other-sections').style.display = 'none';
   document.getElementById('admin-posts-section').style.display = 'none';
+  document.getElementById('admin-professionals-panel').style.display = 'none';
   document.getElementById('admin-registered-users-section').style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -3972,11 +3978,25 @@ function showAdminPostsView() {
   document.getElementById('admin-grid').style.display = 'none';
   document.getElementById('admin-other-sections').style.display = 'none';
   document.getElementById('admin-registered-users-section').style.display = 'none';
+  document.getElementById('admin-professionals-panel').style.display = 'none';
   document.getElementById('admin-posts-section').style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 function hideAdminPostsView() {
   document.getElementById('admin-posts-section').style.display = 'none';
+  document.getElementById('admin-grid').style.display = '';
+  document.getElementById('admin-other-sections').style.display = '';
+}
+function showAdminProfessionalsView() {
+  document.getElementById('admin-grid').style.display = 'none';
+  document.getElementById('admin-other-sections').style.display = 'none';
+  document.getElementById('admin-registered-users-section').style.display = 'none';
+  document.getElementById('admin-posts-section').style.display = 'none';
+  document.getElementById('admin-professionals-panel').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function hideAdminProfessionalsView() {
+  document.getElementById('admin-professionals-panel').style.display = 'none';
   document.getElementById('admin-grid').style.display = '';
   document.getElementById('admin-other-sections').style.display = '';
 }

@@ -1005,13 +1005,6 @@
         <!-- Нэвтэрсэн бүртгэлийн мэдээлэл -->
         <div class="section-card" id="auth-section"></div>
 
-        <!-- Миний видео зөвлөгөөний хүсэлтүүд -->
-        <div class="section-card" id="my-video-requests-card" style="display:none;">
-          <div class="section-head"><h3>🎥 Миний видео зөвлөгөөний хүсэлтүүд</h3></div>
-          <p style="font-size:.82rem;color:var(--sub);margin:0 0 1rem;">Мэргэжилтэн зөвшөөрсний дараа видео дуудлагад нэгдэх холбоос эндээс идэвхжинэ.</p>
-          <div id="my-video-requests-list"></div>
-        </div>
-
         <!-- Миний сэтгэл зүйн идэвхтэй байдал -->
         <div class="section-card">
           <div class="section-head"><h3>Миний сэтгэл зүйн идэвхтэй байдал</h3></div>
@@ -1377,7 +1370,6 @@ async function saveClassification() {
 async function loadProfilePage() {
   if (!currentUser?.id) return;
   renderAuthSection();
-  loadMyVideoAppointments();
   const logoutNote = document.getElementById('logout-note');
   if (logoutNote) {
     logoutNote.textContent = currentUser.isAnonymous !== false
@@ -3146,7 +3138,6 @@ function renderPros() {
       </div>
       <div class="pro-actions">
         <button class="txt" onclick="openChat('${p.id}','${p.name}')">💬 Чатаар холбогдох</button>
-        <button class="vid" onclick="bookPro('${p.id}','${p.name}','Видео зөвлөгөө')">Видео зөвлөгөө</button>
       </div>
     </div>`).join('');
 }
@@ -3270,11 +3261,6 @@ function subscribeProGlobalRealtime() {
       if (payload.new.sender === 'user') {
         showToast('💬 Шинэ зөвлөгөөний хүсэлт ирлээ! "Хэрэглэгчидтэй холбогдох хэсэг"-аас хариулаарай.', 'info', 6000);
       }
-    })
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'appointments' }, (payload) => {
-      if (payload.new.professional_id !== myProId || payload.new.category !== 'Видео зөвлөгөө') return;
-      showToast('🎥 Шинэ видео зөвлөгөөний хүсэлт ирлээ! "Хэрэглэгчидтэй холбогдох хэсэг"-ээс зөвшөөрөөрэй.', 'info', 6000);
-      loadProVideoRequests();
     })
     .subscribe();
 }
@@ -3465,12 +3451,7 @@ async function loadProPortal() {
   el.innerHTML = `
     <div class="section-card">
       <div class="section-head"><h3>👋 Тавтай морил, ${myProName}!</h3></div>
-      <p style="font-size:.85rem;color:var(--sub);margin:0;">Танд ирсэн зөвлөгөөний хүсэлтүүд доор жагсаагдана. Нэг мөрийг дарж, хариулаарай.</p>
-    </div>
-    <div class="section-card">
-      <div class="section-head"><h3>🎥 Видео зөвлөгөөний хүсэлт</h3></div>
-      <p style="font-size:.82rem;color:var(--sub);margin:0 0 .8rem;">Хэрэглэгч видео зөвлөгөө хүссэн бол доор гарч ирнэ. Зөвшөөрсний дараа видео дуудлагын холбоос автоматаар үүсэж, хоёр талд идэвхжинэ.</p>
-      <div id="pro-video-requests"></div>
+      <p style="font-size:.85rem;color:var(--sub);margin:0;">Танд ирсэн зөвлөгөөний хүсэлтүүд доор жагсаагдана. Нэг мөрийг дарж, хариулаарай. Хэрэглэгчтэй чатлах явцад "Онлайн зөвлөгөөг зөвшөөрөх" товч дарж, видео дуудлага идэвхжүүлж болно.</p>
     </div>
     <div class="section-card" style="border:2px solid var(--red,#c0392b);">
       <div class="section-head"><h3>🚨 Эрсдэлийн дохио</h3></div>
@@ -3483,7 +3464,6 @@ async function loadProPortal() {
     </div>
   `;
   loadProChatThreads();
-  loadProVideoRequests();
   loadRiskAlertsForPro();
   subscribeRiskAlertsRealtime();
 }
@@ -3565,10 +3545,25 @@ function openProChat(uid) {
       <input type="text" id="pro-chat-input" placeholder="Хариу бичих..." onkeydown="if(event.key==='Enter'){sendProChatMessage();}" style="flex:1;border:1px solid var(--line);border-radius:10px;padding:.6rem .8rem;font-family:inherit;font-size:.9rem;background:#fff;color:var(--cream);">
       <button class="connect-btn" style="width:auto;padding:.6rem 1.1rem;" onclick="sendProChatMessage()">Илгээх</button>
     </div>
+    <div id="pro-online-consult-btn" style="margin-top:.9rem;"></div>
     <div class="modal-actions" style="margin-top:.9rem;"><button class="modal-close" onclick="closeProChat()">Хаах</button></div>
   `;
   loadProChatMessages();
   subscribeProChatRealtime();
+  renderProOnlineConsultButton();
+}
+
+async function renderProOnlineConsultButton() {
+  const el = document.getElementById('pro-online-consult-btn');
+  if (!el || !currentProChatUserId || !myProId) return;
+  const session = await getVideoSessionStatus(currentProChatUserId, myProId);
+  if (session?.status === 'approved' && session.video_room) {
+    el.innerHTML = `
+      <div style="text-align:center;color:var(--gold);font-size:.85rem;font-weight:700;margin-bottom:.5rem;">🟢 Онлайн зөвлөгөө зөвшөөрөгдсөн</div>
+      <a href="${session.video_room}" target="_blank" style="display:block;text-align:center;text-decoration:none;background:var(--gold);color:#fff;border-radius:12px;padding:.75rem;font-size:.92rem;font-weight:700;">🎥 Дуудлагад нэгдэх</a>`;
+  } else {
+    el.innerHTML = `<button onclick="proApproveOnlineConsult('${currentProChatUserId}','${myProId}')" style="width:100%;background:var(--gold);color:#fff;border:none;border-radius:12px;padding:.75rem;font-size:.92rem;font-weight:700;cursor:pointer;">🎥 Онлайн зөвлөгөөг зөвшөөрөх</button>`;
+  }
 }
 
 async function loadProChatMessages() {
@@ -3638,10 +3633,23 @@ function openChat(proId, name) {
       <input type="text" id="chat-input" placeholder="Мессежээ бичих..." onkeydown="if(event.key==='Enter'){sendChatMessage();}" style="flex:1;border:1px solid var(--line);border-radius:10px;padding:.6rem .8rem;font-family:inherit;font-size:.9rem;background:#fff;color:var(--cream);">
       <button class="connect-btn" style="width:auto;padding:.6rem 1.1rem;" onclick="sendChatMessage()">Илгээх</button>
     </div>
+    <div id="chat-online-consult-btn" style="margin-top:.9rem;"></div>
     <div class="modal-actions" style="margin-top:.9rem;"><button class="modal-close" onclick="closeChat()">Хаах</button></div>
   `;
   loadChatMessages();
   subscribeChatRealtime();
+  renderUserOnlineConsultButton();
+}
+
+async function renderUserOnlineConsultButton() {
+  const el = document.getElementById('chat-online-consult-btn');
+  if (!el || !currentUser?.id || !currentChatProId) return;
+  const session = await getVideoSessionStatus(currentUser.id, currentChatProId);
+  if (session?.status === 'approved' && session.video_room) {
+    el.innerHTML = `<a href="${session.video_room}" target="_blank" style="display:block;text-align:center;text-decoration:none;background:var(--gold);color:#fff;border-radius:12px;padding:.75rem;font-size:.92rem;font-weight:700;">🎥 Онлайн зөвлөгөө — Дуудлагад нэгдэх</a>`;
+  } else {
+    el.innerHTML = `<div style="text-align:center;background:var(--panel-2);color:var(--sub);border-radius:12px;padding:.75rem;font-size:.88rem;opacity:.6;cursor:not-allowed;">🎥 Онлайн зөвлөгөө <span style="display:block;font-size:.72rem;margin-top:.2rem;">Мэргэжилтэн зөвшөөрсний дараа идэвхжинэ</span></div>`;
+  }
 }
 
 async function loadChatMessages() {
@@ -3692,6 +3700,12 @@ function subscribeChatRealtime() {
         loadChatMessages();
       }
     })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'video_sessions' }, (payload) => {
+      const row = payload.new;
+      if (row && row.user_id === currentUser.id && row.professional_id === currentChatProId) {
+        renderUserOnlineConsultButton();
+      }
+    })
     .subscribe();
 }
 
@@ -3701,93 +3715,24 @@ function closeChat() {
   refreshUserUnreadReplies();
 }
 
-async function bookPro(proId, name, type) {
-  if (type === 'Видео зөвлөгөө') { await requestVideoConsult(proId, name); return; }
-  const code = 'MC-' + Math.floor(1000+Math.random()*9000);
-  const { error } = await sb.from('appointments').insert({
-    code, professional_id: proId, category: type, message: '', status: 'new'
-  });
-  if (error) { showToast('Захиалахад алдаа гарлаа: ' + error.message, 'error'); return; }
-  showToast(`${type} товлогдлоо: <b>${name}</b><br>Баталгаажуулах код: <b>${code}</b><br><span style="color:var(--sub);font-size:.78rem;">Нэрээ нуусан хэвээр, мэргэжилтэн зөвхөн кодоор таныг мэднэ.</span>`, 'success', 9000);
+/* ================= ОНЛАЙН ЗӨВЛӨГӨӨ: чат доторх идэвхжүүлэх систем ================= */
+function videoRoomFor(userId, proId) {
+  return `https://meet.jit.si/MILCARE-${userId.slice(0,8)}-${proId.slice(0,8)}`;
 }
-
-/* ================= ВИДЕО ЗӨВЛӨГӨӨ: хүсэлт → зөвшөөрөл → дуудлага ================= */
-async function requestVideoConsult(proId, name) {
-  if (!currentUser?.id) { showToast('Эхлээд нэвтэрнэ үү.', 'error'); return; }
-  const code = 'MC-' + Math.floor(1000+Math.random()*9000);
-  const { error } = await sb.from('appointments').insert({
-    code, professional_id: proId, user_id: currentUser.id, category: 'Видео зөвлөгөө', message: '', status: 'pending'
-  });
-  if (error) { showToast('Хүсэлт илгээхэд алдаа гарлаа: ' + error.message, 'error'); return; }
-  showToast(`Видео зөвлөгөөний хүсэлт <b>${name}</b>-д илгээгдлээ.<br><span style="color:var(--sub);font-size:.78rem;">Мэргэжилтэн зөвшөөрсний дараа видео дуудлага идэвхжинэ. Төлөв, холбоосыг "Миний профайл" хэсгээс шалгаарай.</span>`, 'success', 9000);
-  loadMyVideoAppointments();
+async function getVideoSessionStatus(userId, proId) {
+  const { data, error } = await sb.from('video_sessions').select('*')
+    .eq('user_id', userId).eq('professional_id', proId).maybeSingle();
+  if (error) { console.error('getVideoSessionStatus error:', error); return null; }
+  return data;
 }
-
-async function loadMyVideoAppointments() {
-  const card = document.getElementById('my-video-requests-card');
-  const el = document.getElementById('my-video-requests-list');
-  if (!el || !currentUser?.id) return;
-  const { data, error } = await sb.from('appointments').select('*')
-    .eq('user_id', currentUser.id).eq('category', 'Видео зөвлөгөө').order('created_at', { ascending:false });
-  if (error) { console.error('loadMyVideoAppointments error:', error); return; }
-  if (!data || !data.length) { card.style.display = 'none'; return; }
-  card.style.display = 'block';
-  el.innerHTML = data.map(a => {
-    const proName = PROS.find(p => p.id === a.professional_id)?.name || 'Мэргэжилтэн';
-    const statusLabel = a.status === 'approved' ? '🟢 Зөвшөөрсөн' : a.status === 'declined' ? '🔴 Татгалзсан' : '🟡 Хүлээгдэж байна';
-    return `
-    <div class="comment-row" style="display:flex;justify-content:space-between;align-items:center;padding:.7rem 0;border-top:1px solid var(--line);flex-wrap:wrap;gap:.5rem;">
-      <div>
-        <div style="font-weight:700;font-size:.88rem;">${proName}</div>
-        <div style="font-size:.78rem;color:var(--sub);">${a.code} · ${statusLabel}</div>
-      </div>
-      ${a.status === 'approved' && a.video_room ? `<a href="${a.video_room}" target="_blank" class="btn-primary" style="text-decoration:none;background:var(--gold);color:#fff;border-radius:10px;padding:.5rem 1rem;font-size:.82rem;">🎥 Дуудлагад нэгдэх</a>` : ''}
-    </div>`;
-  }).join('');
-}
-
-async function loadProVideoRequests() {
-  const el = document.getElementById('pro-video-requests');
-  if (!el || !myProId) return;
-  el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div>';
-  const { data, error } = await sb.from('appointments').select('*')
-    .eq('professional_id', myProId).eq('category', 'Видео зөвлөгөө').order('created_at', { ascending:false });
-  if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж чадсангүй.</div>'; console.error('loadProVideoRequests error:', error); return; }
-  if (!data || !data.length) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор видео зөвлөгөөний хүсэлт алга.</div>'; return; }
-  el.innerHTML = data.map(a => {
-    const statusLabel = a.status === 'approved' ? '🟢 Зөвшөөрсөн' : a.status === 'declined' ? '🔴 Татгалзсан' : '🟡 Хүлээгдэж байна';
-    return `
-    <div class="comment-row" style="display:flex;justify-content:space-between;align-items:center;padding:.7rem 0;border-top:1px solid var(--line);flex-wrap:wrap;gap:.5rem;">
-      <div>
-        <div style="font-weight:700;font-size:.88rem;">${a.code}</div>
-        <div style="font-size:.78rem;color:var(--sub);">${statusLabel} · ${timeAgo(a.created_at)}</div>
-      </div>
-      <div style="display:flex;gap:.5rem;">
-        ${a.status === 'pending' ? `
-          <button onclick="approveVideoAppointment('${a.id}','${a.code}')" style="background:var(--gold);color:#fff;border:none;border-radius:10px;padding:.45rem .9rem;font-size:.8rem;cursor:pointer;">Зөвшөөрөх</button>
-          <button onclick="declineVideoAppointment('${a.id}')" style="background:none;border:1px solid var(--line);color:var(--sub);border-radius:10px;padding:.45rem .9rem;font-size:.8rem;cursor:pointer;">Татгалзах</button>
-        ` : a.status === 'approved' && a.video_room ? `<a href="${a.video_room}" target="_blank" style="text-decoration:none;background:var(--gold);color:#fff;border-radius:10px;padding:.45rem .9rem;font-size:.8rem;">🎥 Дуудлагад нэгдэх</a>` : ''}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-async function approveVideoAppointment(id, code) {
-  const videoRoom = `https://meet.jit.si/MILCARE-${code}`;
-  const { error } = await sb.from('appointments').update({
-    status: 'approved', video_room: videoRoom, responded_at: new Date().toISOString()
-  }).eq('id', id);
+async function proApproveOnlineConsult(userId, proId) {
+  const videoRoom = videoRoomFor(userId, proId);
+  const { error } = await sb.from('video_sessions').upsert({
+    user_id: userId, professional_id: proId, status: 'approved', video_room: videoRoom, updated_at: new Date().toISOString()
+  }, { onConflict: 'user_id,professional_id' });
   if (error) { showToast('Зөвшөөрөхөд алдаа гарлаа: ' + error.message, 'error'); return; }
-  showToast('Зөвшөөрлөө! Видео дуудлагын холбоос идэвхжлээ.', 'success');
-  loadProVideoRequests();
-}
-
-async function declineVideoAppointment(id) {
-  const { error } = await sb.from('appointments').update({
-    status: 'declined', responded_at: new Date().toISOString()
-  }).eq('id', id);
-  if (error) { showToast('Татгалзахад алдаа гарлаа: ' + error.message, 'error'); return; }
-  loadProVideoRequests();
+  showToast('Онлайн зөвлөгөөг зөвшөөрлөө! Хэрэглэгчийн тал идэвхжлээ.', 'success');
+  renderProOnlineConsultButton();
 }
 
 

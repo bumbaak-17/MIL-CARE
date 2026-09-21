@@ -879,8 +879,11 @@
           </div>
           <div class="section-card" id="admin-posts-section" style="display:none;">
             <button class="modal-close" style="margin-bottom:1rem;" onclick="hideAdminPostsView()">← Буцах</button>
-            <div class="section-head"><h3>💬 Пост (зөвхөн админ)</h3></div>
-            <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Хэрэглэгчдийн бичсэн бүх сэтгэгдлийн жагсаалт. Зохисгүй агуулгыг эндээс устгаж болно. Жирийн хэрэглэгч зөвхөн өөрийн сэтгэгдлээ устгах эрхтэй.</p>
+            <div class="section-head"><h3>📝 Пост (үндсэн зурвас, зөвхөн админ)</h3></div>
+            <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Хэрэглэгчдийн нийтийн feed-д бичсэн бүх зурвас. Зохисгүй агуулгыг эндээс устгаж болно.</p>
+            <div id="admin-posts-list"></div>
+            <div class="section-head" style="margin-top:1.4rem;"><h3>💬 Сэтгэгдэл (пост доторх хариултууд)</h3></div>
+            <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Пост бүрийн доор бичигдсэн хариу сэтгэгдлүүд.</p>
             <div id="admin-comments-list"></div>
           </div>
           <div id="admin-other-sections">
@@ -3898,6 +3901,36 @@ function hideAdminPostsView() {
 }
 
 /* ================= АДМИН: Бүх сэтгэгдлийг удирдах (харах/устгах) ================= */
+/* ================= АДМИН: Постын жагсаалт (харах/устгах) ================= */
+async function loadAdminPosts() {
+  const el = document.getElementById('admin-posts-list');
+  if (!el) return;
+  el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div>';
+  const { data, error } = await sb.from('posts').select('*').order('created_at', { ascending:false }).limit(200);
+  if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Жагсаалт татахад алдаа гарлаа.</div>'; console.error('loadAdminPosts error:', error); return; }
+  if (!data || data.length===0) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор пост алга.</div>'; return; }
+  el.innerHTML = data.map(p => `
+    <div class="comment-row" style="display:flex;gap:.5rem;padding:.6rem 0;border-top:1px solid var(--line);align-items:flex-start;">
+      <div class="post-avatar" style="width:26px;height:26px;font-size:.75rem;flex-shrink:0;">🪖</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:.78rem;font-weight:700;">${p.anon_handle}<span style="font-weight:400;color:var(--sub);margin-left:.5rem;">${timeAgo(p.created_at)}</span></div>
+        <div style="font-size:.85rem;word-break:break-word;">${p.text}</div>
+      </div>
+      <button onclick="adminDeletePost('${p.id}')" title="Устгах" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>
+    </div>
+  `).join('');
+}
+async function adminDeletePost(postId) {
+  if (!confirm('Энэ постыг устгах уу? Постын доорх бүх сэтгэгдэл ч мөн устана.')) return;
+  await sb.from('comments').delete().eq('post_id', postId);
+  const { error } = await sb.from('posts').delete().eq('id', postId);
+  if (error) { showToast('Устгахад алдаа гарлаа: ' + error.message, 'error'); return; }
+  showToast('Пост устгагдлаа.', 'success');
+  loadAdminPosts();
+  loadAdminComments();
+  loadPosts();
+}
+
 async function loadAdminComments() {
   const el = document.getElementById('admin-comments-list');
   if (!el) return;
@@ -4220,6 +4253,7 @@ async function init() {
     loadCompositionStats();
     loadRegisteredUsers();
     loadAdminChatThreads();
+    loadAdminPosts();
     loadAdminComments();
     loadAdminDocuments();
     loadAdminProfessionals();

@@ -3184,7 +3184,37 @@ function subscribeUserGlobalChat() {
         showToast('💬 Мэргэжилтнээс шинэ хариу ирлээ! "Сэтгэл зүйч" хэсгээс харна уу.', 'info', 6000);
       }
     })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'video_sessions' }, (payload) => {
+      const row = payload.new;
+      if (!row || row.user_id !== currentUser.id) return;
+      if (row.status === 'approved') {
+        playNotificationSound();
+        showToast('🎥 Мэргэжилтэн онлайн зөвлөгөөг зөвшөөрлөө! Дуудлагад нэгдэх боломжтой боллоо.', 'success', 8000);
+        renderUserOnlineConsultButton();
+      }
+    })
     .subscribe();
+}
+
+/* ================= ДУУТ МЭДЭГДЭЛ ================= */
+function playNotificationSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const playTone = (freq, startTime, duration) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, startTime);
+      gain.gain.linearRampToValueAtTime(0.18, startTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(startTime); osc.stop(startTime + duration);
+    };
+    const now = ctx.currentTime;
+    playTone(880, now, 0.18);
+    playTone(1175, now + 0.16, 0.22);
+  } catch (e) { console.warn('playNotificationSound error:', e); }
 }
 
 /* ================= БОДИТ ЦАГИЙН МЭДЭГДЭЛ: өөрийн нийтлэлд ирсэн сэтгэгдэл/дэмжлэг ================= */

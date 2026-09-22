@@ -735,6 +735,11 @@
             <div class="quick-title">Гарын авлага</div>
             <div class="quick-sub" id="guides-count-sub">Заавар, гарын авлага</div>
           </div>
+          <div class="quick-card" onclick="goto('military-test')">
+            <div class="quick-icon">🎖️</div>
+            <div class="quick-title">Цэргийн гэрээт, хугацаат алба хаагчдаас авах тест</div>
+            <div class="quick-sub" id="military-test-count-sub">Тестийн материал</div>
+          </div>
         </div>
       </div>
 
@@ -759,6 +764,12 @@
         <div class="page-head"><h2>Гарын авлага</h2><p>Ажлын явцад ашиглах гарын авлага, зөвлөмжийн PDF баримт бичгүүд. Зөвхөн админ, бүртгэлтэй сэтгэл зүйчдэд харагдана.</p></div>
         <button class="modal-close" style="margin-bottom:1.2rem;" onclick="goto('psy-corner')">← Сэтгэл зүйчдийн булан руу буцах</button>
         <div id="guides-list"></div>
+      </div>
+
+      <div id="view-military-test" class="view">
+        <div class="page-head"><h2>Цэргийн гэрээт болон хугацаат цэргийн алба хаагчдаас авах тест</h2><p>Цэргийн гэрээт болон хугацаат цэргийн алба хаагчдад зориулсан тестийн материал, PDF баримт бичгүүд. Зөвхөн админ, бүртгэлтэй сэтгэл зүйчдэд харагдана.</p></div>
+        <button class="modal-close" style="margin-bottom:1.2rem;" onclick="goto('psy-corner')">← Сэтгэл зүйчдийн булан руу буцах</button>
+        <div id="military-test-list"></div>
       </div>
 
       <div id="view-projective" class="view">
@@ -989,6 +1000,7 @@
                 <select id="doc-upload-category" style="border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
                   <option value="tushaal">Тушаал</option>
                   <option value="guide">Гарын авлага</option>
+                  <option value="military_test">Цэргийн алба хаагчдаас авах тест</option>
                 </select>
                 <input type="file" id="doc-upload-file" accept="application/pdf" style="border:1px solid var(--line);border-radius:12px;padding:.5rem .6rem;font-family:inherit;font-size:.85rem;background:#fff;color:var(--cream);">
               </div>
@@ -1512,7 +1524,7 @@ async function loadHrResults() {
 document.getElementById('hamburger').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
 
 function goto(view, pushState) {
-  if ((view === 'psy-corner' || view === 'group-exercise' || view === 'orders' || view === 'guides') && !(isAdmin || myProId)) {
+  if ((view === 'psy-corner' || view === 'group-exercise' || view === 'orders' || view === 'guides' || view === 'military-test') && !(isAdmin || myProId)) {
     showToast('Энэ хэсэг зөвхөн админ болон бүртгэлтэй сэтгэл зүйчдэд нээлттэй.', 'error');
     view = 'home';
   }
@@ -1529,6 +1541,7 @@ function goto(view, pushState) {
   if (view === 'group-exercise') { renderGroupExercises(); }
   if (view === 'orders') { loadOrders('tushaal', 'orders-list', 'orders-count-sub'); }
   if (view === 'guides') { loadOrders('guide', 'guides-list', 'guides-count-sub'); }
+  if (view === 'military-test') { loadOrders('military_test', 'military-test-list', 'military-test-count-sub'); }
   if (view === 'hr-portal') { loadHrResults(); }
   if (view === 'projective') { renderProjectiveMethods(); }
   if (view === 'analytics') { loadAnalyticsSummary(); loadMonthlyAnalysis(); }
@@ -2114,7 +2127,7 @@ async function loadOrders(category, elId, subElId) {
   if (!data || data.length===0) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;padding:.6rem 0;">Одоогоор баримт бичиг байршуулаагүй байна.</div>'; return; }
   el.innerHTML = data.map(d => `
     <div class="section-card" style="display:flex;align-items:center;gap:.8rem;margin-bottom:.8rem;">
-      <div style="font-size:1.6rem;flex-shrink:0;">${category === 'guide' ? '📘' : '📄'}</div>
+      <div style="font-size:1.6rem;flex-shrink:0;">${category === 'guide' ? '📘' : category === 'military_test' ? '🎖️' : '📄'}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-weight:700;font-size:.92rem;">${d.title}</div>
         <div style="font-size:.78rem;color:var(--sub);">${d.file_size ? (Math.round(d.file_size/1024)) + ' KB' : ''}</div>
@@ -2145,10 +2158,10 @@ async function loadAdminDocuments() {
   if (!data || data.length===0) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор баримт бичиг байршуулаагүй байна.</div>'; return; }
   el.innerHTML = data.map(d => `
     <div class="comment-row" style="display:flex;gap:.5rem;padding:.6rem 0;border-top:1px solid var(--line);align-items:center;">
-      <div style="font-size:1.3rem;flex-shrink:0;">${d.category === 'guide' ? '📘' : '📄'}</div>
+      <div style="font-size:1.3rem;flex-shrink:0;">${d.category === 'guide' ? '📘' : d.category === 'military_test' ? '🎖️' : '📄'}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-size:.85rem;font-weight:700;">${d.title}</div>
-        <div style="font-size:.78rem;color:var(--sub);">${d.category === 'guide' ? 'Гарын авлага' : 'Тушаал'} · ${timeAgo(d.created_at)}</div>
+        <div style="font-size:.78rem;color:var(--sub);">${d.category === 'guide' ? 'Гарын авлага' : d.category === 'military_test' ? 'Цэргийн алба хаагчдаас авах тест' : 'Тушаал'} · ${timeAgo(d.created_at)}</div>
       </div>
       <button onclick="editDocumentTitle('${d.id}', '${(d.title||'').replace(/'/g,"\\'")}')" title="Засах" style="background:none;border:none;color:var(--gold);cursor:pointer;font-size:.85rem;flex-shrink:0;">✏️</button>
       <button onclick="adminDeleteDocument('${d.id}','${d.storage_path}')" title="Устгах" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>

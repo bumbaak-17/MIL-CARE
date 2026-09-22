@@ -42,6 +42,16 @@
   .topnav-sos .t1{font-size:.58rem;font-weight:800;color:var(--gold);letter-spacing:.02em;line-height:1;}
   .topnav-sos .t2{font-size:.88rem;font-weight:800;color:var(--gold);line-height:1;}
   .topnav-mobile-toggle{display:none;background:none;border:none;color:var(--cream);cursor:pointer;margin-left:auto;}
+  .topnav-drop{position:relative;}
+  .topnav-drop-btn{display:flex;align-items:center;gap:.35rem;padding:.5rem .7rem;border-radius:8px;font-size:.78rem;font-weight:700;
+    color:var(--cream);cursor:pointer;user-select:none;background:none;border:none;font-family:inherit;white-space:nowrap;}
+  .topnav-drop-btn:hover{background:var(--panel-2);}
+  .topnav-drop-btn svg{width:13px;height:13px;color:var(--gold);transition:transform .15s;}
+  .topnav-drop.open .topnav-drop-btn svg{transform:rotate(180deg);}
+  .topnav-drop-menu{display:none;position:absolute;top:calc(100% + 8px);left:0;min-width:240px;
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 30px rgba(20,30,60,.18);z-index:200;padding:.4rem;}
+  .topnav-drop.open .topnav-drop-menu{display:block;}
+  .topnav-drop-menu .navitem{padding:.6rem .7rem;font-size:.82rem;}
 
   /* ---------- SIDEBAR (зөвхөн админ/мэргэжилтэн/ХН-д зориулсан, Facebook admin маягийн зүүн босоо самбар) ---------- */
   .sidebar{background:var(--panel);border-right:1px solid var(--line);width:210px;flex-shrink:0;
@@ -466,6 +476,7 @@
     .topnav-mobile-toggle{display:block;}
     .topnav-sos{margin-left:.4rem;}
     .topnav-brand b{display:none;}
+    .topnav-drop-menu{position:static;box-shadow:none;border:none;padding:0 0 0 1rem;margin-top:.2rem;}
     .quick-grid, .test-grid, .filter-bar, .org-grid, .admin-grid{grid-template-columns:repeat(2,1fr);}
     .body-grid{grid-template-columns:1fr;}
     .diary-grid{grid-template-columns:1fr;}
@@ -557,16 +568,29 @@
     <ul class="topnav-list" id="topnav-list">
       <li class="navitem" data-view="admin" id="mobile-admin-link" style="display:none;" onclick="document.getElementById('topnav-list').classList.remove('open'); document.getElementById('sidebar').classList.add('open');"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82 2 2 0 1 1-2.83 2.83 1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33 2 2 0 1 1-2.83-2.83A1.65 1.65 0 0 0 4.6 15 1.65 1.65 0 0 0 3 14H2.91a2 2 0 0 1 0-4H3a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82 2 2 0 1 1 2.83-2.83A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33 2 2 0 1 1 2.83 2.83A1.65 1.65 0 0 0 19.4 9c.36.14.63.44.77.83H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Удирдлагын хэсэг (Админ)</li>
       <li class="navitem active" data-view="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Нүүр хуудас</li>
-      <li class="navitem" data-view="diary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>Өнөөдөр би...</li>
       <li class="navitem" data-view="tests"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/></svg>Сэтгэл зүйн тестүүд</li>
-      <li class="navitem" data-view="memory"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 2A3.5 3.5 0 0 0 6 5.5v.55a2.5 2.5 0 0 0-1.96 3.7A2.5 2.5 0 0 0 3 12v1a2.5 2.5 0 0 0 1.5 2.29V17a3 3 0 0 0 3 3v0a2 2 0 0 0 2-2V5.5A3.5 3.5 0 0 0 9.5 2Z"/><path d="M14.5 2A3.5 3.5 0 0 1 18 5.5v.55a2.5 2.5 0 0 1 1.96 3.7A2.5 2.5 0 0 1 21 12v1a2.5 2.5 0 0 1-1.5 2.29V17a3 3 0 0 1-3 3v0a2 2 0 0 1-2-2V5.5A3.5 3.5 0 0 1 14.5 2Z"/></svg>Ой санамж, анхаарал хөгжүүлэх дасгал</li>
-      <li class="navitem" data-view="sonjoo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><circle cx="17.5" cy="6.5" r="3.5"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 17.5h7"/></svg>Сонжоо</li>
-      <li class="navitem" data-view="attention"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>Анхаарал шалгах тест</li>
-      <li class="navitem" data-view="projective"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19c-4-3-8-6-8-10a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 4-4 7-8 10-.5.4-1.5.4-2 0Z"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/></svg>Хувь хүнийг тодорхойлох проектив аргууд</li>
       <li class="navitem" data-view="pros"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>Сэтгэл зүйч<span id="pros-nav-badge" class="nav-badge" style="display:none;">0</span></li>
-      <li class="navitem" data-view="analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>Миний сэтгэл зүй</li>
-      <li class="navitem" data-view="org"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg>Нийт статистик</li>
-      <li class="navitem" data-view="hr-portal" id="hr-portal-navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Хүний нөөц</li>
+
+      <li class="topnav-drop" id="topnav-drop-1">
+        <button type="button" class="topnav-drop-btn" onclick="toggleTopnavDrop(this)">Дасгал, дадлага<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="topnav-drop-menu">
+          <div class="navitem" data-view="diary" onclick="closeTopnavDrops()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>Өнөөдөр би...</div>
+          <div class="navitem" data-view="memory" onclick="closeTopnavDrops()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 2A3.5 3.5 0 0 0 6 5.5v.55a2.5 2.5 0 0 0-1.96 3.7A2.5 2.5 0 0 0 3 12v1a2.5 2.5 0 0 0 1.5 2.29V17a3 3 0 0 0 3 3v0a2 2 0 0 0 2-2V5.5A3.5 3.5 0 0 0 9.5 2Z"/><path d="M14.5 2A3.5 3.5 0 0 1 18 5.5v.55a2.5 2.5 0 0 1 1.96 3.7A2.5 2.5 0 0 1 21 12v1a2.5 2.5 0 0 1-1.5 2.29V17a3 3 0 0 1-3 3v0a2 2 0 0 1-2-2V5.5A3.5 3.5 0 0 1 14.5 2Z"/></svg>Ой санамж, анхаарал хөгжүүлэх дасгал</div>
+          <div class="navitem" data-view="sonjoo" onclick="closeTopnavDrops()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><circle cx="17.5" cy="6.5" r="3.5"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 17.5h7"/></svg>Сонжоо</div>
+          <div class="navitem" data-view="attention" onclick="closeTopnavDrops()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>Анхаарал шалгах тест</div>
+          <div class="navitem" data-view="projective" onclick="closeTopnavDrops()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19c-4-3-8-6-8-10a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 4-4 7-8 10-.5.4-1.5.4-2 0Z"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/></svg>Хувь хүнийг тодорхойлох проектив аргууд</div>
+        </div>
+      </li>
+
+      <li class="topnav-drop" id="topnav-drop-2">
+        <button type="button" class="topnav-drop-btn" onclick="toggleTopnavDrop(this)">Бусад<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="topnav-drop-menu">
+          <div class="navitem" data-view="analytics" onclick="closeTopnavDrops()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>Миний сэтгэл зүй</div>
+          <div class="navitem" data-view="org" onclick="closeTopnavDrops()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg>Нийт статистик</div>
+          <div class="navitem" data-view="hr-portal" id="hr-portal-navitem" onclick="closeTopnavDrops()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Хүний нөөц</div>
+        </div>
+      </li>
+
       <li class="navitem" data-view="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>Миний профайл</li>
     </ul>
     <div class="topnav-sos" onclick="showToast('Яаралтай тусламжийн 103 дугаарт залгаж байна (demo)', 'warn', 4000)">
@@ -1543,6 +1567,18 @@ async function loadHrResults() {
 
 /* ================= NAV ROUTING ================= */
 document.getElementById('hamburger').addEventListener('click', () => document.getElementById('topnav-list').classList.toggle('open'));
+function toggleTopnavDrop(btn) {
+  const drop = btn.closest('.topnav-drop');
+  const willOpen = !drop.classList.contains('open');
+  closeTopnavDrops();
+  if (willOpen) drop.classList.add('open');
+}
+function closeTopnavDrops() {
+  document.querySelectorAll('.topnav-drop.open').forEach(d => d.classList.remove('open'));
+}
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.topnav-drop')) closeTopnavDrops();
+});
 
 function goto(view, pushState) {
   if ((view === 'psy-corner' || view === 'group-exercise' || view === 'orders' || view === 'guides') && !(isAdmin || myProId)) {

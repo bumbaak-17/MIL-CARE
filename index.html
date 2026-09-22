@@ -41,10 +41,24 @@
   .topnav-sos svg{width:16px;height:16px;color:var(--gold);flex-shrink:0;}
   .topnav-sos .t1{font-size:.58rem;font-weight:800;color:var(--gold);letter-spacing:.02em;line-height:1;}
   .topnav-sos .t2{font-size:.88rem;font-weight:800;color:var(--gold);line-height:1;}
-  .topnav-profile-hover{position:relative;margin-left:.3rem;}
-  .topnav-profile-flyout{display:none;position:absolute;top:100%;right:0;padding-top:.4rem;z-index:200;min-width:200px;}
-  .topnav-profile-hover:hover .topnav-profile-flyout{display:block;}
-  .topnav-profile-flyout .topnav-sos{width:100%;box-shadow:0 12px 30px rgba(20,30,60,.18);}
+  /* ---------- ПРОФАЙЛ (Facebook маягийн дугуй avatar + dropdown) ---------- */
+  .topnav-profile{position:relative;margin-left:.5rem;}
+  .topnav-avatar-btn{background:none;border:none;cursor:pointer;padding:.15rem;border-radius:50%;line-height:0;}
+  .topnav-avatar-btn:hover{background:var(--panel-2);}
+  .topnav-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-deep));
+    color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.95rem;flex-shrink:0;}
+  .topnav-avatar.lg{width:46px;height:46px;font-size:1.15rem;}
+  .topnav-profile-dropdown{display:none;position:absolute;top:calc(100% + 10px);right:0;width:260px;
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 30px rgba(20,30,60,.18);z-index:200;padding:.5rem;}
+  .topnav-profile-dropdown.open{display:block;}
+  .tpd-header{display:flex;align-items:center;gap:.7rem;padding:.6rem;border-radius:10px;cursor:pointer;}
+  .tpd-header:hover{background:var(--panel-2);}
+  .tpd-name{font-weight:800;font-size:.9rem;color:var(--cream);}
+  .tpd-sub{font-size:.75rem;color:var(--gold);margin-top:.1rem;}
+  .tpd-divider{height:1px;background:var(--line);margin:.4rem .2rem;}
+  .tpd-item{display:flex;align-items:center;gap:.7rem;padding:.65rem .6rem;border-radius:10px;cursor:pointer;font-size:.85rem;color:var(--cream);}
+  .tpd-item:hover{background:var(--panel-2);}
+  .tpd-item svg{width:18px;height:18px;color:var(--sub);flex-shrink:0;}
   .topnav-mobile-toggle{display:none;background:none;border:none;color:var(--cream);cursor:pointer;margin-left:auto;}
   .topnav-drop{position:relative;}
   .topnav-drop-btn{display:flex;align-items:center;gap:.35rem;padding:.5rem .7rem;border-radius:8px;font-size:.78rem;font-weight:700;
@@ -482,10 +496,8 @@
     .topnav-sos{margin-left:.4rem;}
     .topnav-brand b{display:none;}
     .topnav-drop-menu{position:static;box-shadow:none;border:none;padding:0 0 0 1rem;margin-top:.2rem;}
-    .topnav-profile-hover{margin-left:auto;}
-    .topnav-profile-flyout{display:block !important;position:static;padding-top:0;min-width:0;}
-    .topnav-profile-flyout .topnav-sos{box-shadow:none;padding:.35rem .55rem;}
-    .topnav-profile-flyout .topnav-sos .t1{display:none;}
+    .topnav-profile{margin-left:auto;}
+    .topnav-profile-dropdown{right:-8px;}
     .quick-grid, .test-grid, .pro-grid, .filter-bar, .org-grid, .admin-grid{grid-template-columns:repeat(2,1fr);}
     .body-grid{grid-template-columns:1fr;}
     .diary-grid{grid-template-columns:1fr;}
@@ -575,7 +587,6 @@
       <b>MIL-CARE</b>
     </div>
     <ul class="topnav-list" id="topnav-list">
-      <li class="navitem" data-view="admin" id="mobile-admin-link" style="display:none;" onclick="document.getElementById('topnav-list').classList.remove('open'); document.getElementById('sidebar').classList.add('open');"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82 2 2 0 1 1-2.83 2.83 1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33 2 2 0 1 1-2.83-2.83A1.65 1.65 0 0 0 4.6 15 1.65 1.65 0 0 0 3 14H2.91a2 2 0 0 1 0-4H3a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82 2 2 0 1 1 2.83-2.83A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33 2 2 0 1 1 2.83 2.83A1.65 1.65 0 0 0 19.4 9c.36.14.63.44.77.83H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Удирдлагын хэсэг (Админ)</li>
       <li class="navitem active" data-view="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Нүүр хуудас</li>
       <li class="navitem" data-view="tests"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/></svg>Сэтгэл зүйн тестүүд</li>
       <li class="navitem" data-view="pros"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>Сэтгэл зүйч<span id="pros-nav-badge" class="nav-badge" style="display:none;">0</span></li>
@@ -601,12 +612,22 @@
       </li>
 
     </ul>
-    <div class="topnav-profile-hover" id="topnav-profile-hover">
-      <div class="navitem" data-view="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>Миний профайл</div>
-      <div class="topnav-profile-flyout">
-        <div class="topnav-sos" onclick="showToast('Яаралтай тусламжийн 103 дугаарт залгаж байна (demo)', 'warn', 4000)">
+    <div class="topnav-profile" id="topnav-profile">
+      <button type="button" class="topnav-avatar-btn" onclick="toggleProfileDropdown()"><div class="topnav-avatar" id="topnav-avatar">?</div></button>
+      <div class="topnav-profile-dropdown" id="topnav-profile-dropdown">
+        <div class="tpd-header" onclick="closeProfileDropdown(); goto('profile');">
+          <div class="topnav-avatar lg" id="topnav-avatar-lg">?</div>
+          <div><div class="tpd-name" id="topnav-profile-name">—</div><div class="tpd-sub">Профайл харах</div></div>
+        </div>
+        <div class="tpd-divider"></div>
+        <div class="tpd-item" onclick="closeProfileDropdown(); showToast('Яаралтай тусламжийн 103 дугаарт залгаж байна (demo)', 'warn', 4000)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13 1 .36 1.94.68 2.85a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.23-1.25a2 2 0 0 1 2.11-.45c.91.32 1.85.55 2.85.68A2 2 0 0 1 22 16.92z"/></svg>
-          <div><div class="t1">ЯАРАЛТАЙ ТУСЛАМЖ</div><div class="t2">103</div></div>
+          <span>Яаралтай тусламж <b style="color:var(--gold);">103</b></span>
+        </div>
+        <div class="tpd-divider"></div>
+        <div class="tpd-item" onclick="closeProfileDropdown(); confirmLogout();">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+          <span>Гарах</span>
         </div>
       </div>
     </div>
@@ -1285,7 +1306,26 @@ function applyUserToTopbar() {
   if (nameEl && currentUser) nameEl.textContent = currentUser.handle;
   const profileEl = document.getElementById('profile-handle');
   if (profileEl && currentUser) profileEl.textContent = currentUser.handle;
+  if (currentUser?.handle) {
+    const initial = currentUser.handle.trim().charAt(0).toUpperCase() || '?';
+    const av = document.getElementById('topnav-avatar');
+    const avLg = document.getElementById('topnav-avatar-lg');
+    const nameLg = document.getElementById('topnav-profile-name');
+    if (av) av.textContent = initial;
+    if (avLg) avLg.textContent = initial;
+    if (nameLg) nameLg.textContent = currentUser.handle;
+  }
 }
+function toggleProfileDropdown() {
+  const dd = document.getElementById('topnav-profile-dropdown');
+  dd.classList.toggle('open');
+}
+function closeProfileDropdown() {
+  document.getElementById('topnav-profile-dropdown')?.classList.remove('open');
+}
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.topnav-profile')) closeProfileDropdown();
+});
 
 /* ================= ONBOARDING: цэргийн төрөл, албан хаагчийн төрөл сонгох ================= */
 const BRANCHES = [
@@ -1503,9 +1543,7 @@ async function checkAdminStatus() {
 function updateSidebarVisibility() {
   const show = isAdmin || myProId;
   const sidebar = document.getElementById('sidebar');
-  const mobileLink = document.getElementById('mobile-admin-link');
   if (sidebar) sidebar.style.display = show ? 'flex' : 'none';
-  if (mobileLink) mobileLink.style.display = show ? 'flex' : 'none';
 }
 function updatePsyCornerVisibility() {
   const el = document.getElementById('psy-corner-navitem');

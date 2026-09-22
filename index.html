@@ -1,4 +1,4 @@
-v<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="mn">
 <head>
 <meta charset="UTF-8">
@@ -90,7 +90,7 @@ v<!DOCTYPE html>
   .topbar-right{margin-left:auto;display:flex;align-items:center;gap:1.1rem;}
   .bell{position:relative;color:var(--sub);cursor:pointer;}
   .bell svg{width:20px;height:20px;}
-  .notif-dropdown{display:none;position:absolute;top:calc(100% + 12px);right:-8px;width:340px;max-height:420px;overflow-y:auto;
+  .notif-dropdown{display:none;position:absolute;top:calc(100% + 12px);right:-8px;width:min(460px,92vw);max-height:420px;overflow-y:auto;
     background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 30px rgba(20,30,60,.18);z-index:200;cursor:default;}
   .notif-dropdown.open{display:block;}
   .notif-dropdown-head{padding:.9rem 1.1rem;font-weight:800;font-size:.85rem;border-bottom:1px solid var(--line);color:var(--cream);}
@@ -100,8 +100,8 @@ v<!DOCTYPE html>
   .notif-item .ni-icon{font-size:1.1rem;flex-shrink:0;}
   .notif-item .ni-body{flex:1;min-width:0;}
   .notif-item .ni-title{font-size:.82rem;font-weight:700;margin-bottom:.15rem;}
-  .notif-item .ni-sub{font-size:.76rem;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .notif-item .ni-time{font-size:.7rem;color:var(--sub);flex-shrink:0;}
+  .notif-item .ni-sub{font-size:.76rem;color:var(--sub);white-space:normal;overflow-wrap:break-word;}
+  .notif-item .ni-time{font-size:.7rem;color:var(--sub);flex-shrink:0;white-space:nowrap;}
   .notif-empty{padding:1.6rem 1rem;text-align:center;color:var(--sub);font-size:.82rem;}
   .bell .dot{position:absolute;top:-4px;right:-5px;background:var(--red);color:#fff;font-size:.6rem;
     font-weight:800;border-radius:100px;padding:.05rem .35rem;}
@@ -580,6 +580,7 @@ v<!DOCTYPE html>
       <li class="navitem" data-view="tests"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/></svg>Сэтгэл зүйн тестүүд</li>
       <li class="navitem" data-view="pros"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>Сэтгэл зүйч<span id="pros-nav-badge" class="nav-badge" style="display:none;">0</span></li>
       <li class="navitem" data-view="diary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>Өнөөдөр би...</li>
+      <li class="navitem" data-view="hr-portal" id="hr-portal-navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Хүний нөөц</li>
 
       <li class="topnav-drop" id="topnav-drop-1">
         <button type="button" class="topnav-drop-btn" onclick="toggleTopnavDrop(this)">Дасгал, дадлага<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
@@ -596,7 +597,6 @@ v<!DOCTYPE html>
         <div class="topnav-drop-menu">
           <div class="navitem" data-view="analytics" onclick="closeTopnavDrops()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>Миний сэтгэл зүй</div>
           <div class="navitem" data-view="org" onclick="closeTopnavDrops()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg>Нийт статистик</div>
-          <div class="navitem" data-view="hr-portal" id="hr-portal-navitem" onclick="closeTopnavDrops()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Хүний нөөц</div>
         </div>
       </li>
 

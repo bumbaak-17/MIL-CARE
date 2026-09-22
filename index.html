@@ -2359,7 +2359,9 @@ const TESTS = {
     ],
     cutoffs:[{max:6,label:'Тайван',key:'low'},{max:13,label:'Дунд зэрэг',key:'medium'},{max:21,label:'Өндөр анхаарал шаардлагатай',key:'high'}] },
 
-  satisfaction: { title:'Сэтгэл ханамж тодорхойлох', emo:'❤️', dur:'12 минут', blurb:'Амьдралын ерөнхий сэтгэл ханамжийг үнэлнэ.', qs:['Амьдралдаа ерөнхийдөө сэтгэл хангалуун','Ажил-амьдралын тэнцвэртээ сэтгэл хангалуун','Ойр дотны хүмүүстэйгээ дэмжлэгтэй харилцаатай'] },
+  satisfaction: { title:'Сэтгэл ханамж тодорхойлох', emo:'❤️', dur:'2 минут', blurb:'Амьдралын ерөнхий сэтгэл ханамжийг үнэлнэ.',
+    qs:['Амьдралдаа ерөнхийдөө сэтгэл хангалуун','Ажил-амьдралын тэнцвэртээ сэтгэл хангалуун','Ойр дотны хүмүүстэйгээ дэмжлэгтэй харилцаатай'],
+    cutoffs:[{max:3,label:'Сэтгэл ханамжийн түвшин бага',key:'high'},{max:6,label:'Сэтгэл ханамжийн түвшин дундаж',key:'medium'},{max:9,label:'Сэтгэл ханамжийн түвшин өндөр',key:'low'}] },
   memory_attention: { title:'Ой санамж, анхаарал хөгжүүлэх тест', emo:'🧠', dur:'5-10 минут', blurb:'Зурган дасгалуудаар богино хугацааны ой санамж, анхаарлын төвлөрлийг шалгана.', custom:'memory' },
   iq: { title:'Оюун ухааны чадамжийг тодорхойлох тест', emo:'🧩', dur:'10 минут', blurb:'Хүмүүс хоорондын харилцаа, боловсрол мэдлэг, дотоод соёл, бие бялдрын чадамжийг үнэлэх 39 асуулттай тест.', custom:'iq' },
   stress_symptoms: { title:'Стрессийн шинжүүдийг илрүүлэх тест', emo:'⚡', dur:'5 минут', blurb:'19 асуултад тийм/үгүй хариулснаар, стресстэй холбоотой боломжит хэдэн шинж тэмдгийн магадлалыг зэрэг харуулна.', custom:'stress_symptoms' },
@@ -2367,7 +2369,7 @@ const TESTS = {
   gender_role: { title:'Бие хүний сэтгэлзүйн хүйсийг тодорхойлох тест', emo:'⚧️', dur:'8 минут', blurb:'60 шинж чанарын үгэнд хариулснаар, эрэгтэйлэг/эмэгтэйлэг/андрогин сэтгэлзүйн хэв шинжийг тодорхойлно.', custom:'gender_role' },
   character_traits: { title:'"Хүний зан аранши, мөн чанар"-ыг үнэлэх тест', emo:'🎭', dur:'15 минут', blurb:'105 асуултад хариулснаар, зан төлөвийн 8 чиглэлийн (идэвх, уян хатан байдал, сэтгэл хөдлөл гэх мэт) хөгжлийн түвшинг тус тусад нь харуулна.', custom:'character_traits' },
 
-  jung_extraversion: { title:'Зан төлөвийн хэв шинжийг тодорхойлох тест (К.Юнг)', emo:'🔄', dur:'6 минут',
+  jung_extraversion: { title:'Зан төлөвийн хэв шинжийг тодорхойлох тест (К.Юнг)', emo:'🔄', dur:'6 минут', personality:true,
     blurb:'К.Юнгийн аргачлалаар экстраверт, интроверт, амвоверт хэв шинжийг тодорхойлно.',
     qs:[
       { text:'Та доорх хоёр хувилбарын алийг нь илүүд үзэх вэ?', opts:['А. Цөөн тооны найз нөхөдтэй байх','Б. Олон хүнтэй нөхөрсөг хамт олныг илүүд үзэх'], values:[0,5] },
@@ -2556,7 +2558,7 @@ const TESTS = {
     ],
     cutoffs:[{ max:20, label:'Гар утсанд донтолд байхгүй', key:'low' },{ max:59, label:'Гар утсанд донтолтын түвшин бага зэрэг', key:'low' },{ max:99, label:'Гар утсанд донтолтын түвшин дунд зэрэг', key:'medium' },{ max:140, label:'Гар утсанд донтолтын түвшин өндөр түвшин', key:'high' }] },
 
-  temperament_sangvinik: { title:'Темперамент тодорхойлох тест — Сангвиник', emo:'🌞', dur:'3 минут',
+  temperament_sangvinik: { title:'Темперамент тодорхойлох тест — Сангвиник', emo:'🌞', dur:'3 минут', personality:true,
     blurb:'Таны темперамент сангвиник төрөлд хэр ойр байгааг үнэлнэ.',
     opts:['Үгүй','Тийм'],
     values:[0,10],
@@ -2574,7 +2576,7 @@ const TESTS = {
     ],
     cutoffs:[{ max:69, label:'Сангвиник шинж тод илрээгүй', key:'low' },{ max:100, label:'Сангвиник темперамент', key:'high' }] },
 
-  temperament_holerik: { title:'Темперамент тодорхойлох тест — Холерик', emo:'🔥', dur:'3 минут',
+  temperament_holerik: { title:'Темперамент тодорхойлох тест — Холерик', emo:'🔥', dur:'3 минут', personality:true,
     blurb:'Таны темперамент холерик төрөлд хэр ойр байгааг үнэлнэ.',
     opts:['Үгүй','Тийм'],
     values:[0,10],
@@ -2592,7 +2594,7 @@ const TESTS = {
     ],
     cutoffs:[{ max:69, label:'Холерик шинж тод илрээгүй', key:'low' },{ max:100, label:'Холерик темперамент', key:'high' }] },
 
-  temperament_melanholik_flegmatik: { title:'Темперамент тодорхойлох тест — Меланхолик/Флегматик', emo:'🌧️', dur:'3 минут',
+  temperament_melanholik_flegmatik: { title:'Темперамент тодорхойлох тест — Меланхолик/Флегматик', emo:'🌧️', dur:'3 минут', personality:true,
     blurb:'Таны темперамент меланхолик эсвэл флегматик төрөлд хэр ойр байгааг үнэлнэ.',
     qs:[
       { text:'Амралтынхаа өдрийг та бүхэлд нь цэвэрлэгээ хийж өнжжээ. Хогоо асгахаар гараад ороод иртэл танай хүү гудамжны нохой гэртээ оруулсан байв. Таны бүхэл өдөржин хийсэн ажил хэдхэн минутад алга болсон гэж бодъё. Тэгвэл та', opts:['А. Буйдан дээрээ суугаад хэсэгхэн хүлээнэ. Хэдхэн минутын дараа ертөнцийн төгсгөл болохыг хүлээж байна гэсэн үг юм. Яагаад гэвэл түүний дараа цэвэрлэгээ хийхгүй шүү дээ','Б. Гудамжинд хөөж гаргаад дахиад эхнээс нь цэвэрлэнэ'], values:[0,1] },
@@ -2865,6 +2867,7 @@ const PRACTICAL_ADVICE = {
   gar_utasny_dontolt: ['Өдөрт тодорхой цагт утасгүй байх дадал зуршил (жишээ нь хооллох үед) тогтоогоорой.','Мэдэгдлийн тохиргоогоо цөөрүүлж, зайлшгүй шаардлагатайг л идэвхжүүлээрэй.','Гэр бүл, найз нөхөдтэйгээ утасгүй цагийг илүү их өнгөрөөхийг хичээгээрэй.'],
   mergejliin_setgel_hanamj: ['Ажлын болон амралтын цагаа тодорхой зааглаж, амралтын цагаа хамгаалаарай.','Ажил дээрх хүндрэлтэй сэдвүүдээ удирдлагатайгаа нээлттэй ярилцаарай.','Ажлаас гадуурх сонирхол, амралт зугаагаа тогтмолжуулаарай.'],
   kovalev_survey: ['Өдөр бүр өөрийн давуу талаа тэмдэглэж бичих дадал зуршил болгоорой.','Өөрийгөө бусадтай харьцуулахаа багасгаж, зөвхөн өөрийн ахиц дэвшилд анхаарлаа хандуулаарай.','Итгэмжит хүнтэйгээ өөрийн мэдрэмжийн талаар ярилцаж үзээрэй.'],
+  setgetsiin_eruul_mend: ['Тогтмол дасгал хөдөлгөөн, зөв хооллолт, хангалттай нойрыг эрхэмлээрэй.','Ажил, амралтын тэнцвэрээ хамгаалж, хэт ачаалалд орохгүй байхыг хичээгээрэй.','Биеийн байдлаа тогтмол ажиглаж, шаардлагатай бол эрт эмчид хандаарай.'],
 };
 
 async function scoreCombinedTests() {
@@ -2875,7 +2878,7 @@ async function scoreCombinedTests() {
     const t = TESTS[key];
     if (!t) continue;
     let total = 0, answered = 0;
-    for (let i=0;i<t.qs.length;i++){ const sel=document.querySelector(`input[name="cq_${key}_${i}"]:checked`); if(sel){answered++; total+=parseInt(sel.value,10);} }
+    for (let i=0;i<t.qs.length;i++){ const sel=document.querySelector(`input[name="cq_${key}_${i}"]:checked`); if(sel){answered++; total+=parseFloat(sel.value);} }
     if (answered < t.qs.length) { showToast(`"${t.title}" тестийн бүх асуултад хариулна уу.`, 'warn'); return; }
     if (key === 'phq9' || key === 'gutral_soril') {
       const item9Sel = document.querySelector(`input[name="cq_${key}_8"]:checked`);
@@ -3273,7 +3276,7 @@ function closeModal(){ document.getElementById('modal-overlay').classList.remove
 async function scoreModal(key) {
   const t = TESTS[key];
   let total=0, answered=0;
-  for (let i=0;i<t.qs.length;i++){ const sel=document.querySelector(`input[name="mq${i}"]:checked`); if(sel){answered++; total+=parseInt(sel.value,10);} }
+  for (let i=0;i<t.qs.length;i++){ const sel=document.querySelector(`input[name="mq${i}"]:checked`); if(sel){answered++; total+=parseFloat(sel.value);} }
   if (answered < t.qs.length) { showToast('Бүх асуултад хариулна уу.', 'warn'); return; }
   const max = getTestMax(t);
   const pct = Math.round((total/max)*100);
@@ -3282,14 +3285,14 @@ async function scoreModal(key) {
   const selfHarmTestKeys = { phq9: 8, gutral_soril: 8 };
   const item9Sel = (key in selfHarmTestKeys) ? document.querySelector(`input[name="mq${selfHarmTestKeys[key]}"]:checked`) : null;
   const hasSelfHarmFlag = item9Sel && parseInt(item9Sel.value,10) > 0;
-  const rec = levelKey === 'low'
+  const rec = PRACTICAL_ADVICE[key] || (t.personality ? null : (levelKey === 'low'
     ? ['Одоогийн дадлаа үргэлжлүүлээрэй.', 'Тогтмол амралт, дасгал хөдөлгөөнөө хэвээр байлгаарай.']
     : levelKey === 'medium'
     ? ['Амралт, унтах цагаа тогтмолжуулаарай.', 'Хамт олон, найз нөхөдтэйгээ ярилцах цаг гаргаарай.', 'Шинж тэмдэг үргэлжилвэл мэргэжилтэнтэй холбогдоорой.']
-    : ['Аль болох эрт мэргэжлийн сэтгэл зүйчид хандахыг зөвлөж байна.', 'Итгэмжит хүн, ахлагчдаа мэдэгдээрэй.', 'Шаардлагатай бол "Сэтгэл зүйч" хэсгээр шууд холбогдоорой.'];
+    : ['Аль болох эрт мэргэжлийн сэтгэл зүйчид хандахыг зөвлөж байна.', 'Итгэмжит хүн, ахлагчдаа мэдэгдээрэй.', 'Шаардлагатай бол "Сэтгэл зүйч" хэсгээр шууд холбогдоорой.']));
 
   if (currentUser?.id) {
-    const { error } = await sb.from('test_results').insert({ user_id: currentUser.id, test_key: key, score: total, max_score: max, level: levelKey });
+    const { error } = await sb.from('test_results').insert({ user_id: currentUser.id, test_key: key, score: Math.round(total), max_score: Math.round(max), level: levelKey });
     if (error) console.error('test_results save error:', error);
     loadMonthlyAnalysis();
     if (hasSelfHarmFlag) await sendSelfHarmRiskAlert();
@@ -3303,11 +3306,11 @@ async function scoreModal(key) {
       <div style="margin-top:.7rem;"><button class="connect-btn" style="width:auto;padding:.5rem 1.1rem;font-size:.82rem;" onclick="closeModal(); goto('pros');">Мэргэжилтэнтэй холбогдох</button></div>
     </div>` : ''}
     <div class="result-level">${level}</div>
-    <div class="bar-row"><div class="bar-track"><div class="bar-fill" style="width:${pct}%;"></div></div><div class="bar-pct">${total}/${max} оноо (${pct}%)</div></div>
-    <div class="result-block"><b>Тайлбар:</b> Таны хариултаас харахад ${level.toLowerCase()} түвшний үзүүлэлт байна.</div>
-    <div class="result-block"><b>Зөвлөмж:</b><ul class="result-list">${rec.map(r=>`<li>${r}</li>`).join('')}</ul></div>
+    <div class="bar-row"><div class="bar-track"><div class="bar-fill" style="width:${pct}%;"></div></div><div class="bar-pct">${Math.round(total)}/${Math.round(max)} оноо (${pct}%)</div></div>
+    <div class="result-block"><b>Тайлбар:</b> ${t.personality ? 'Энэ бол таны зан төлөвийн онцлог бөгөөд "засах шаардлагатай асуудал" биш — хүн бүр өөр өөр хэв шинжтэй байдаг.' : `Таны хариултаас харахад ${level.toLowerCase()} түвшний үзүүлэлт байна.`}</div>
+    ${rec ? `<div class="result-block"><b>Зөвлөмж:</b><ul class="result-list">${rec.map(r=>`<li>${r}</li>`).join('')}</ul></div>` : ''}
 
-    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="closeModal(); goto('pros');">Мэргэжилтэнтэй холбогдох</button></div>
+    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button>${t.personality ? '' : `<button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="closeModal(); goto('pros');">Мэргэжилтэнтэй холбогдох</button>`}</div>
   `;
 }
 

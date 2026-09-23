@@ -124,17 +124,18 @@
   .mood-btn.selected{border-color:#D8BC8A;background:rgba(216,188,138,.16);}
   .mood-btn.selected .lbl{color:#EDDBB8;}
 
-  /* ---------- Hero-ийн хулгана дагасан усан долгионы эффект ---------- */
-  .hero-ripple{position:absolute;width:110px;height:110px;border-radius:50%;pointer-events:none;
-    background:radial-gradient(circle, rgba(190,225,255,.55), rgba(190,225,255,.18) 45%, transparent 72%);
-    filter:blur(8px);top:0;left:0;transform:translate(-1000px,-1000px);mix-blend-mode:screen;
-    transition:transform .55s cubic-bezier(.22,.9,.35,1), opacity .35s ease;opacity:0;z-index:1;}
-  .hero-ripple.active{opacity:1;}
-  .hero-ripple2{position:absolute;width:50px;height:50px;border-radius:50%;pointer-events:none;
-    background:radial-gradient(circle, rgba(255,255,255,.6), transparent 70%);
-    filter:blur(3px);top:0;left:0;transform:translate(-1000px,-1000px);mix-blend-mode:screen;
-    transition:transform .28s ease-out, opacity .3s ease;opacity:0;z-index:1;}
-  .hero-ripple2.active{opacity:1;}
+  /* ---------- Бүх сайтад хулгана дагасан усан долгионы эффект ---------- */
+  .water-ripple{position:fixed;top:0;left:0;width:36px;height:36px;border-radius:50%;
+    pointer-events:none;z-index:99999;
+    border:2px solid rgba(120,190,255,.55);
+    background:radial-gradient(circle, rgba(160,215,255,.25), transparent 70%);
+    transform:translate(-1000px,-1000px) scale(.3);
+    opacity:.85;
+    animation:waterRippleExpand 1.1s cubic-bezier(.15,.6,.35,1) forwards;}
+  @keyframes waterRippleExpand{
+    0%{opacity:.8;}
+    100%{transform:translate(var(--wr-x,-1000px),var(--wr-y,-1000px)) scale(2.6);opacity:0;}
+  }
 
   /* ---------- QUICK ACTIONS ---------- */
   .quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.9rem;margin-bottom:1.4rem;}
@@ -587,8 +588,7 @@
       <!-- ================= HOME ================= -->
       <div id="view-home" class="view active">
         <div class="hero">
-          <div class="hero-ripple" id="hero-ripple"></div>
-          <div class="hero-ripple2" id="hero-ripple2"></div>
+
           <div class="hero-tag"><span class="tick"></span>Өнөөдөр</div>
           <h1 class="headline">Өнөөдөр таны<br>сэтгэл санаа ямар байна вэ?</h1>
           <p class="hero-sub">Өөрийгөө ойлгох жижиг алхмыг өнөөдөр эхлүүлээрэй.</p>
@@ -1831,30 +1831,32 @@ function applyHeroScene() {
 applyHeroScene();
 setInterval(applyHeroScene, 5000); // 5 секунд тутамд солигдоно
 
-/* ================= Hero-ийн хулгана дагасан усан долгионы эффект ================= */
-(function initHeroRipple() {
-  const heroEl = document.querySelector('.hero');
-  const r1 = document.getElementById('hero-ripple');
-  const r2 = document.getElementById('hero-ripple2');
-  if (!heroEl || !r1 || !r2) return;
-  function moveTo(x, y) {
-    r1.style.transform = `translate(${x - 55}px, ${y - 55}px)`;
-    r2.style.transform = `translate(${x - 25}px, ${y - 25}px)`;
+/* ================= Бүх сайтад хулгана дагасан усан долгионы эффект ================= */
+(function initWaterRipple() {
+  let lastTime = 0;
+  const THROTTLE_MS = 90; // хэт олон долгион үүсэхээс сэргийлнэ
+  function spawnRipple(x, y) {
+    const el = document.createElement('div');
+    el.className = 'water-ripple';
+    el.style.left = (x - 18) + 'px';
+    el.style.top = (y - 18) + 'px';
+    el.style.setProperty('--wr-x', '0px');
+    el.style.setProperty('--wr-y', '0px');
+    document.body.appendChild(el);
+    el.addEventListener('animationend', () => el.remove());
+    // Хамгаалалт: animationend ажиллаагүй тохиолдолд 1.3с дараа устгана
+    setTimeout(() => { if (el.parentNode) el.remove(); }, 1300);
   }
-  // Эхнээс нь hero-ийн төвд байрлуулж, шууд харагдахаар болгоно (холоос гүйж ирэхгүй)
-  function setInitialCenter() {
-    const rect = heroEl.getBoundingClientRect();
-    moveTo(rect.width / 2, rect.height / 2);
-    r1.classList.add('active');
-    r2.classList.add('active');
+  function handleMove(x, y) {
+    const now = performance.now();
+    if (now - lastTime < THROTTLE_MS) return;
+    lastTime = now;
+    spawnRipple(x, y);
   }
-  setInitialCenter();
-  window.addEventListener('resize', setInitialCenter);
-  heroEl.addEventListener('mousemove', (e) => {
-    const rect = heroEl.getBoundingClientRect();
-    moveTo(e.clientX - rect.left, e.clientY - rect.top);
-  });
-  // Хулгана гарсан ч долгион үргэлж харагдсаар байна (сүүлийн байрлалдаа тогтоно)
+  document.addEventListener('mousemove', (e) => handleMove(e.clientX, e.clientY));
+  document.addEventListener('touchmove', (e) => {
+    if (e.touches && e.touches[0]) handleMove(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: true });
 })();
 
 /* ================= 12 САРЫН СЭТГЭЛ ЗҮЙН БАЙДАЛ (тестийн дүнд суурилсан) ================= */

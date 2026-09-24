@@ -976,34 +976,31 @@
             </div>
           </div>
           </div>
-          <div id="admin-other-sections">
-          <div class="section-card">
-            <div class="section-head collapsible" onclick="toggleAdminSection('branch-comp')"><h3>🎖️ Алба хаагчдын бүрэлдэхүүн</h3><span class="collapse-arrow" id="branch-comp-arrow">▾</span></div>
-            <div class="collapsible-body" id="branch-comp-body">
-              <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Цэргийн төрөл, албан хаагчийн төрлөөр нэгтгэсэн тоо. Хувь хүнийг тодорхойлохгүй.</p>
+          <div id="admin-stats-section" class="section-card" style="display:none;">
+            <button class="modal-close" style="margin-bottom:1rem;" onclick="hideAdminStatsView()">← Буцах</button>
+            <div class="section-head"><h3>📊 Статистик</h3></div>
+            <p style="font-size:.8rem;color:var(--sub);margin:0 0 1.2rem;">Платформын нэгтгэсэн үзүүлэлтүүд. Хувь хүнийг тодорхойлохгүй, зөвхөн нэгтгэсэн тоо.</p>
+            <div class="section-card">
+              <div class="section-head"><h3>🎖️ Алба хаагчдын бүрэлдэхүүн</h3></div>
+              <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Цэргийн төрөл, албан хаагчийн төрлөөр нэгтгэсэн тоо.</p>
               <div id="branch-stats"></div>
               <div id="role-stats" style="margin-top:1.1rem;"></div>
             </div>
-          </div>
-          <div class="section-card">
-            <div class="section-head collapsible" onclick="toggleAdminSection('test-branch-stats')"><h3>📊 Тестийн дүн — цэргийн ангиар</h3><span class="collapse-arrow" id="test-branch-stats-arrow">▾</span></div>
-            <div class="collapsible-body" id="test-branch-stats-body">
-              <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Тест сонгоход, тухайн тестийг цэргийн төрөл (жишээ нь Хуурай замын цэргийн командлал) тус бүрээс хэдэн хүн бөглөсөн, нийт үзүүлэлт нь ямар байгааг харуулна. Хувь хүнийг тодорхойлохгүй, зөвхөн нэгтгэсэн тоо.</p>
+            <div class="section-card">
+              <div class="section-head"><h3>📊 Тестийн дүн — цэргийн ангиар</h3></div>
+              <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Тест сонгоход, тухайн тестийг цэргийн төрөл (жишээ нь Хуурай замын цэргийн командлал) тус бүрээс хэдэн хүн бөглөсөн, нийт үзүүлэлт нь ямар байгааг харуулна.</p>
               <select id="test-branch-stats-select" onchange="loadTestBranchStats()" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;font-family:inherit;font-size:.9rem;background:#fff;color:var(--cream);margin-bottom:1rem;">
                 <option value="">— Тест сонгоно уу —</option>
               </select>
-              <div style="position:relative;height:320px;margin-bottom:1rem;"><canvas id="test-branch-chart"></canvas></div>
               <div id="test-branch-stats-result"></div>
             </div>
-          </div>
-          <div class="section-card">
-            <div class="section-head collapsible" onclick="toggleAdminSection('mood-branch-stats')"><h3>😊 Сэтгэл санааны түргэн бүртгэл — цэргийн ангиар</h3><span class="collapse-arrow" id="mood-branch-stats-arrow">▾</span></div>
-            <div class="collapsible-body" id="mood-branch-stats-body">
-              <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Нүүр хуудасны "Өнөөдөр таны сэтгэл санаа хэр байна?" гэсэн түргэн бүртгэлийг цэргийн төрөл тус бүрээр нэгтгэж харуулна. Хувь хүнийг тодорхойлохгүй, зөвхөн нэгтгэсэн тоо.</p>
-              <div style="position:relative;height:320px;margin-bottom:1rem;"><canvas id="mood-branch-chart"></canvas></div>
+            <div class="section-card">
+              <div class="section-head"><h3>😊 Сэтгэл санааны түргэн бүртгэл — цэргийн ангиар</h3></div>
+              <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Нүүр хуудасны "Өнөөдөр таны сэтгэл санаа хэр байна?" гэсэн түргэн бүртгэлийг цэргийн төрөл тус бүрээр нэгтгэж харуулна.</p>
               <div id="mood-branch-stats-result"><div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div></div>
             </div>
           </div>
+          <div id="admin-other-sections">
           <div class="section-card">
             <div class="section-head collapsible" onclick="toggleAdminSection('pro-chat')"><h3>💬 Мэргэжилтний чат (зөвхөн админ)</h3><span class="collapse-arrow" id="pro-chat-arrow">▾</span></div>
             <div class="collapsible-body" id="pro-chat-body">
@@ -4818,6 +4815,7 @@ document.getElementById('admin-grid').innerHTML = ADMIN_ITEMS.map(a => `
     a.label === 'Хэрэглэгч' ? "showAdminUsersView()" :
     a.label === 'Пост' ? "showAdminPostsView()" :
     a.label === 'Мэргэжилтэн' ? "showAdminProfessionalsView()" :
+    a.label === 'Статистик' ? "showAdminStatsView()" :
     a.label === 'Цэргийн төрөл харах' ? "adminPreviewOnboarding()" :
     `showToast('${a.label} — demo хувилбарт зөвхөн харагдацтай, production дээр бүрэн удирдах боломжтой.', 'info')`
   }"><div class="admin-icon">${a.icon}</div><div class="admin-lbl">${a.label}</div></div>
@@ -4881,6 +4879,24 @@ function showAdminProfessionalsView() {
 }
 function hideAdminProfessionalsView() {
   document.getElementById('admin-professionals-panel').style.display = 'none';
+  document.getElementById('admin-grid').style.display = '';
+  document.getElementById('admin-other-sections').style.display = '';
+}
+function showAdminStatsView() {
+  document.getElementById('admin-grid').style.display = 'none';
+  document.getElementById('admin-other-sections').style.display = 'none';
+  document.getElementById('admin-registered-users-section').style.display = 'none';
+  document.getElementById('admin-posts-section').style.display = 'none';
+  document.getElementById('admin-professionals-panel').style.display = 'none';
+  document.getElementById('admin-stats-section').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  // Хэрэв өмнө нь ачаалагдаагүй бол, эсвэл шинэчлэхийн тулд дахин дуудна
+  loadCompositionStats();
+  populateTestBranchStatsSelect();
+  loadMoodBranchStats();
+}
+function hideAdminStatsView() {
+  document.getElementById('admin-stats-section').style.display = 'none';
   document.getElementById('admin-grid').style.display = '';
   document.getElementById('admin-other-sections').style.display = '';
 }
@@ -5262,15 +5278,26 @@ async function loadCompositionStats() {
 
 /* ================= Тестийн дүн — цэргийн ангиар (админ) ================= */
 const CHART_PALETTE = ['#0A677A','#D8BC8A','#C0504D','#4F81BD','#9BBB59','#8064A2','#4BACC6','#F79646','#B5A642','#7F7F7F'];
-let testBranchChartInstance = null;
-let moodBranchChartInstance = null;
+let testBranchChartInstances = [];
+let moodBranchChartInstances = [];
 
-function populateTestBranchStatsSelect() {
+async function populateTestBranchStatsSelect() {
   const sel = document.getElementById('test-branch-stats-select');
   if (!sel) return;
   const entries = Object.entries(TESTS).sort((a,b) => a[1].title.localeCompare(b[1].title, 'mn'));
   sel.innerHTML = '<option value="">— Тест сонгоно уу —</option>' +
     entries.map(([key, t]) => `<option value="${key}">${t.emo ? t.emo+' ' : ''}${t.title}</option>`).join('');
+
+  // Хамгийн олон хүн бөглөсөн тестийг олж, түүгээр анхны үзүүлэлтийг шууд харуулна
+  const { data, error } = await sb.from('test_results').select('test_key').limit(5000);
+  if (error || !data || data.length === 0) return;
+  const counts = {};
+  data.forEach(r => { if (TESTS[r.test_key]) counts[r.test_key] = (counts[r.test_key] || 0) + 1; });
+  const topKey = Object.entries(counts).sort((a,b) => b[1]-a[1])[0]?.[0];
+  if (topKey) {
+    sel.value = topKey;
+    loadTestBranchStats();
+  }
 }
 
 async function loadTestBranchStats() {
@@ -5304,48 +5331,45 @@ async function loadTestBranchStats() {
 
   const totalCount = data.length;
   const branches = Object.entries(byBranch).sort((a,b) => b[1].count - a[1].count);
-
-  // ----- Графикаар харуулах -----
-  const chartLabels = branches.map(([bKey]) => BRANCH_LABELS[bKey] || (bKey === 'unknown' ? 'Тодорхойгүй' : bKey));
   const allLevels = Array.from(new Set(branches.flatMap(([, g]) => Object.keys(g.levels))));
-  const chartDatasets = allLevels.map((lvl, i) => ({
-    label: lvl,
-    data: branches.map(([, g]) => g.levels[lvl] || 0),
-    backgroundColor: CHART_PALETTE[i % CHART_PALETTE.length],
-  }));
-  const canvas = document.getElementById('test-branch-chart');
-  if (canvas && window.Chart) {
-    if (testBranchChartInstance) testBranchChartInstance.destroy();
-    testBranchChartInstance = new Chart(canvas, {
-      type: 'bar',
-      data: { labels: chartLabels, datasets: chartDatasets },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { position: 'bottom' }, title: { display: true, text: TESTS[key]?.title || '' } },
-        scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } } },
-      },
-    });
-  }
+  const levelColor = {}; allLevels.forEach((lvl, i) => { levelColor[lvl] = CHART_PALETTE[i % CHART_PALETTE.length]; });
+
+  testBranchChartInstances.forEach(c => c.destroy());
+  testBranchChartInstances = [];
 
   el.innerHTML = `
     <div style="font-size:.85rem;font-weight:800;margin-bottom:.8rem;">Нийт бөглөсөн: ${totalCount} хүн</div>
-    ${branches.map(([bKey, g]) => {
+    <div style="display:flex;flex-wrap:wrap;gap:1.2rem;">
+    ${branches.map(([bKey, g], idx) => {
       const label = BRANCH_LABELS[bKey] || (bKey === 'unknown' ? 'Тодорхойгүй' : bKey);
       const avgPct = g.scoreCount ? Math.round(g.scoreSum / g.scoreCount) : null;
-      const levelEntries = Object.entries(g.levels).sort((a,b) => b[1]-a[1]);
       return `
-        <div class="section-card" style="margin-bottom:.9rem;background:var(--panel-2);">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;">
-            <div style="font-weight:800;font-size:.9rem;">${label}</div>
-            <div style="font-size:.8rem;color:var(--sub);">${g.count} хүн бөглөсөн${avgPct !== null ? ' · дундаж ' + avgPct + '%' : ''}</div>
-          </div>
-          ${levelEntries.map(([lvl, c]) => {
-            const pct = Math.round(c / g.count * 100);
-            return `<div class="unit-row"><div class="unit-name">${lvl}</div><div class="unit-track"><div class="unit-fill" style="width:${pct}%;"></div></div><div class="unit-pct">${c}</div></div>`;
-          }).join('')}
+        <div class="section-card" style="flex:1 1 260px;min-width:240px;background:var(--panel-2);text-align:center;">
+          <div style="font-weight:800;font-size:.88rem;margin-bottom:.2rem;">${label}</div>
+          <div style="font-size:.78rem;color:var(--sub);margin-bottom:.6rem;">${g.count} хүн бөглөсөн${avgPct !== null ? ' · дундаж ' + avgPct + '%' : ''}</div>
+          <div style="position:relative;height:200px;"><canvas id="test-branch-pie-${idx}"></canvas></div>
         </div>`;
     }).join('')}
+    </div>
   `;
+
+  branches.forEach(([bKey, g], idx) => {
+    const canvas = document.getElementById(`test-branch-pie-${idx}`);
+    if (!canvas || !window.Chart) return;
+    const levelEntries = Object.entries(g.levels).sort((a,b) => b[1]-a[1]);
+    const chart = new Chart(canvas, {
+      type: 'doughnut',
+      data: {
+        labels: levelEntries.map(([lvl]) => lvl),
+        datasets: [{ data: levelEntries.map(([,c]) => c), backgroundColor: levelEntries.map(([lvl]) => levelColor[lvl]) }],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } },
+      },
+    });
+    testBranchChartInstances.push(chart);
+  });
 }
 
 /* ================= Сэтгэл санааны түргэн бүртгэл — цэргийн ангиар (админ) ================= */
@@ -5376,48 +5400,46 @@ async function loadMoodBranchStats() {
 
   const totalCount = data.length;
   const branches = Object.entries(byBranch).sort((a,b) => b[1].count - a[1].count);
-
-  // ----- Графикаар харуулах -----
-  const chartLabels = branches.map(([bKey]) => BRANCH_LABELS[bKey] || (bKey === 'unknown' ? 'Тодорхойгүй' : bKey));
   const allMoods = Array.from(new Set(branches.flatMap(([, g]) => Object.keys(g.moods))));
-  const chartDatasets = allMoods.map((m, i) => ({
-    label: MOOD_BRANCH_LABELS[m] || m,
-    data: branches.map(([, g]) => g.moods[m] || 0),
-    backgroundColor: CHART_PALETTE[i % CHART_PALETTE.length],
-  }));
-  const canvas = document.getElementById('mood-branch-chart');
-  if (canvas && window.Chart) {
-    if (moodBranchChartInstance) moodBranchChartInstance.destroy();
-    moodBranchChartInstance = new Chart(canvas, {
-      type: 'bar',
-      data: { labels: chartLabels, datasets: chartDatasets },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { position: 'bottom' } },
-        scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } } },
-      },
-    });
-  }
+  const moodColor = {}; allMoods.forEach((m, i) => { moodColor[m] = CHART_PALETTE[i % CHART_PALETTE.length]; });
+
+  moodBranchChartInstances.forEach(c => c.destroy());
+  moodBranchChartInstances = [];
 
   el.innerHTML = `
     <div style="font-size:.85rem;font-weight:800;margin-bottom:.8rem;">Нийт бүртгэл: ${totalCount}</div>
-    ${branches.map(([bKey, g]) => {
+    <div style="display:flex;flex-wrap:wrap;gap:1.2rem;">
+    ${branches.map(([bKey, g], idx) => {
       const label = BRANCH_LABELS[bKey] || (bKey === 'unknown' ? 'Тодорхойгүй' : bKey);
-      const moodEntries = Object.entries(g.moods).sort((a,b) => b[1]-a[1]);
       return `
-        <div class="section-card" style="margin-bottom:.9rem;background:var(--panel-2);">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;">
-            <div style="font-weight:800;font-size:.9rem;">${label}</div>
-            <div style="font-size:.8rem;color:var(--sub);">${g.count} бүртгэл</div>
-          </div>
-          ${moodEntries.map(([m, c]) => {
-            const pct = Math.round(c / g.count * 100);
-            return `<div class="unit-row"><div class="unit-name">${MOOD_BRANCH_LABELS[m] || m}</div><div class="unit-track"><div class="unit-fill" style="width:${pct}%;"></div></div><div class="unit-pct">${c}</div></div>`;
-          }).join('')}
+        <div class="section-card" style="flex:1 1 260px;min-width:240px;background:var(--panel-2);text-align:center;">
+          <div style="font-weight:800;font-size:.88rem;margin-bottom:.2rem;">${label}</div>
+          <div style="font-size:.78rem;color:var(--sub);margin-bottom:.6rem;">${g.count} бүртгэл</div>
+          <div style="position:relative;height:200px;"><canvas id="mood-branch-pie-${idx}"></canvas></div>
         </div>`;
     }).join('')}
+    </div>
   `;
+
+  branches.forEach(([bKey, g], idx) => {
+    const canvas = document.getElementById(`mood-branch-pie-${idx}`);
+    if (!canvas || !window.Chart) return;
+    const moodEntries = Object.entries(g.moods).sort((a,b) => b[1]-a[1]);
+    const chart = new Chart(canvas, {
+      type: 'doughnut',
+      data: {
+        labels: moodEntries.map(([m]) => MOOD_BRANCH_LABELS[m] || m),
+        datasets: [{ data: moodEntries.map(([,c]) => c), backgroundColor: moodEntries.map(([m]) => moodColor[m]) }],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } },
+      },
+    });
+    moodBranchChartInstances.push(chart);
+  });
 }
+
 
 /* ================= INIT: эхлээд хэрэглэгч бэлдээд, дараа нь бүх мэдээллийг ачаална ================= */
 async function init() {

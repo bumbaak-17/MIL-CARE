@@ -994,11 +994,6 @@
               </select>
               <div id="test-branch-stats-result"></div>
             </div>
-            <div class="section-card">
-              <div class="section-head"><h3>😊 Сэтгэл санааны түргэн бүртгэл — цэргийн ангиар</h3></div>
-              <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Нүүр хуудасны "Өнөөдөр таны сэтгэл санаа хэр байна?" гэсэн түргэн бүртгэлийг цэргийн төрөл тус бүрээр нэгтгэж харуулна.</p>
-              <div id="mood-branch-stats-result"><div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div></div>
-            </div>
           </div>
           <div id="admin-other-sections">
           <div class="section-card">
@@ -4893,7 +4888,6 @@ function showAdminStatsView() {
   // Хэрэв өмнө нь ачаалагдаагүй бол, эсвэл шинэчлэхийн тулд дахин дуудна
   loadCompositionStats();
   populateTestBranchStatsSelect();
-  loadMoodBranchStats();
 }
 function hideAdminStatsView() {
   document.getElementById('admin-stats-section').style.display = 'none';
@@ -5279,7 +5273,6 @@ async function loadCompositionStats() {
 /* ================= Тестийн дүн — цэргийн ангиар (админ) ================= */
 const CHART_PALETTE = ['#0A677A','#D8BC8A','#C0504D','#4F81BD','#9BBB59','#8064A2','#4BACC6','#F79646','#B5A642','#7F7F7F'];
 let testBranchChartInstances = [];
-let moodBranchChartInstances = [];
 
 async function populateTestBranchStatsSelect() {
   const sel = document.getElementById('test-branch-stats-select');
@@ -5372,75 +5365,6 @@ async function loadTestBranchStats() {
   });
 }
 
-/* ================= Сэтгэл санааны түргэн бүртгэл — цэргийн ангиар (админ) ================= */
-const MOOD_BRANCH_LABELS = { grateful:'❤️ Талархаж байна', happy:'🥰 Баяртай', calm:'😌 Тайван', tired:'😴 Ядарсан', sad:'😢 Гунигтай', anxious:'😰 Түгшүүртэй', lonely:'😔 Ганцаардсан', angry:'😡 Ууртай' };
-
-async function loadMoodBranchStats() {
-  const el = document.getElementById('mood-branch-stats-result');
-  if (!el) return;
-  el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div>';
-
-  const { data, error } = await sb.from('mood_entries')
-    .select('mood, users(branch)')
-    .eq('note', 'Нүүр хуудасны хурдан бүртгэл')
-    .order('created_at', { ascending:false })
-    .limit(3000);
-
-  if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Дүн татахад алдаа гарлаа: ' + error.message + '</div>'; console.error('loadMoodBranchStats error:', error); return; }
-  if (!data || data.length === 0) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор хэн ч түргэн бүртгэл хийгээгүй байна.</div>'; return; }
-
-  const byBranch = {};
-  data.forEach(r => {
-    const b = r.users?.branch || 'unknown';
-    if (!byBranch[b]) byBranch[b] = { count:0, moods:{} };
-    byBranch[b].count++;
-    const m = r.mood || '—';
-    byBranch[b].moods[m] = (byBranch[b].moods[m] || 0) + 1;
-  });
-
-  const totalCount = data.length;
-  const branches = Object.entries(byBranch).sort((a,b) => b[1].count - a[1].count);
-  const allMoods = Array.from(new Set(branches.flatMap(([, g]) => Object.keys(g.moods))));
-  const moodColor = {}; allMoods.forEach((m, i) => { moodColor[m] = CHART_PALETTE[i % CHART_PALETTE.length]; });
-
-  moodBranchChartInstances.forEach(c => c.destroy());
-  moodBranchChartInstances = [];
-
-  el.innerHTML = `
-    <div style="font-size:.85rem;font-weight:800;margin-bottom:.8rem;">Нийт бүртгэл: ${totalCount}</div>
-    <div style="display:flex;flex-wrap:wrap;gap:1.2rem;">
-    ${branches.map(([bKey, g], idx) => {
-      const label = BRANCH_LABELS[bKey] || (bKey === 'unknown' ? 'Тодорхойгүй' : bKey);
-      return `
-        <div class="section-card" style="flex:1 1 260px;min-width:240px;background:var(--panel-2);text-align:center;">
-          <div style="font-weight:800;font-size:.88rem;margin-bottom:.2rem;">${label}</div>
-          <div style="font-size:.78rem;color:var(--sub);margin-bottom:.6rem;">${g.count} бүртгэл</div>
-          <div style="position:relative;height:200px;"><canvas id="mood-branch-pie-${idx}"></canvas></div>
-        </div>`;
-    }).join('')}
-    </div>
-  `;
-
-  branches.forEach(([bKey, g], idx) => {
-    const canvas = document.getElementById(`mood-branch-pie-${idx}`);
-    if (!canvas || !window.Chart) return;
-    const moodEntries = Object.entries(g.moods).sort((a,b) => b[1]-a[1]);
-    const chart = new Chart(canvas, {
-      type: 'doughnut',
-      data: {
-        labels: moodEntries.map(([m]) => MOOD_BRANCH_LABELS[m] || m),
-        datasets: [{ data: moodEntries.map(([,c]) => c), backgroundColor: moodEntries.map(([m]) => moodColor[m]) }],
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } },
-      },
-    });
-    moodBranchChartInstances.push(chart);
-  });
-}
-
-
 /* ================= INIT: эхлээд хэрэглэгч бэлдээд, дараа нь бүх мэдээллийг ачаална ================= */
 async function init() {
   await ensureUser();
@@ -5465,7 +5389,6 @@ async function init() {
     loadIdentityList();
     loadCompositionStats();
     populateTestBranchStatsSelect();
-    loadMoodBranchStats();
     loadRegisteredUsers();
     loadAdminChatThreads();
     loadAdminPosts();

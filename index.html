@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <style>
   :root{
     /* Дизайны токен: гүн, итгэлтэй "signal navy" үндсэн өнгө, хүрлийн акцент,
@@ -991,6 +992,7 @@
               <select id="test-branch-stats-select" onchange="loadTestBranchStats()" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;font-family:inherit;font-size:.9rem;background:#fff;color:var(--cream);margin-bottom:1rem;">
                 <option value="">— Тест сонгоно уу —</option>
               </select>
+              <div style="position:relative;height:320px;margin-bottom:1rem;"><canvas id="test-branch-chart"></canvas></div>
               <div id="test-branch-stats-result"></div>
             </div>
           </div>
@@ -998,6 +1000,7 @@
             <div class="section-head collapsible" onclick="toggleAdminSection('mood-branch-stats')"><h3>😊 Сэтгэл санааны түргэн бүртгэл — цэргийн ангиар</h3><span class="collapse-arrow" id="mood-branch-stats-arrow">▾</span></div>
             <div class="collapsible-body" id="mood-branch-stats-body">
               <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Нүүр хуудасны "Өнөөдөр таны сэтгэл санаа хэр байна?" гэсэн түргэн бүртгэлийг цэргийн төрөл тус бүрээр нэгтгэж харуулна. Хувь хүнийг тодорхойлохгүй, зөвхөн нэгтгэсэн тоо.</p>
+              <div style="position:relative;height:320px;margin-bottom:1rem;"><canvas id="mood-branch-chart"></canvas></div>
               <div id="mood-branch-stats-result"><div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div></div>
             </div>
           </div>
@@ -5258,6 +5261,10 @@ async function loadCompositionStats() {
 }
 
 /* ================= Тестийн дүн — цэргийн ангиар (админ) ================= */
+const CHART_PALETTE = ['#0A677A','#D8BC8A','#C0504D','#4F81BD','#9BBB59','#8064A2','#4BACC6','#F79646','#B5A642','#7F7F7F'];
+let testBranchChartInstance = null;
+let moodBranchChartInstance = null;
+
 function populateTestBranchStatsSelect() {
   const sel = document.getElementById('test-branch-stats-select');
   if (!sel) return;
@@ -5297,6 +5304,28 @@ async function loadTestBranchStats() {
 
   const totalCount = data.length;
   const branches = Object.entries(byBranch).sort((a,b) => b[1].count - a[1].count);
+
+  // ----- Графикаар харуулах -----
+  const chartLabels = branches.map(([bKey]) => BRANCH_LABELS[bKey] || (bKey === 'unknown' ? 'Тодорхойгүй' : bKey));
+  const allLevels = Array.from(new Set(branches.flatMap(([, g]) => Object.keys(g.levels))));
+  const chartDatasets = allLevels.map((lvl, i) => ({
+    label: lvl,
+    data: branches.map(([, g]) => g.levels[lvl] || 0),
+    backgroundColor: CHART_PALETTE[i % CHART_PALETTE.length],
+  }));
+  const canvas = document.getElementById('test-branch-chart');
+  if (canvas && window.Chart) {
+    if (testBranchChartInstance) testBranchChartInstance.destroy();
+    testBranchChartInstance = new Chart(canvas, {
+      type: 'bar',
+      data: { labels: chartLabels, datasets: chartDatasets },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom' }, title: { display: true, text: TESTS[key]?.title || '' } },
+        scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } } },
+      },
+    });
+  }
 
   el.innerHTML = `
     <div style="font-size:.85rem;font-weight:800;margin-bottom:.8rem;">Нийт бөглөсөн: ${totalCount} хүн</div>
@@ -5347,6 +5376,28 @@ async function loadMoodBranchStats() {
 
   const totalCount = data.length;
   const branches = Object.entries(byBranch).sort((a,b) => b[1].count - a[1].count);
+
+  // ----- Графикаар харуулах -----
+  const chartLabels = branches.map(([bKey]) => BRANCH_LABELS[bKey] || (bKey === 'unknown' ? 'Тодорхойгүй' : bKey));
+  const allMoods = Array.from(new Set(branches.flatMap(([, g]) => Object.keys(g.moods))));
+  const chartDatasets = allMoods.map((m, i) => ({
+    label: MOOD_BRANCH_LABELS[m] || m,
+    data: branches.map(([, g]) => g.moods[m] || 0),
+    backgroundColor: CHART_PALETTE[i % CHART_PALETTE.length],
+  }));
+  const canvas = document.getElementById('mood-branch-chart');
+  if (canvas && window.Chart) {
+    if (moodBranchChartInstance) moodBranchChartInstance.destroy();
+    moodBranchChartInstance = new Chart(canvas, {
+      type: 'bar',
+      data: { labels: chartLabels, datasets: chartDatasets },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom' } },
+        scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } } },
+      },
+    });
+  }
 
   el.innerHTML = `
     <div style="font-size:.85rem;font-weight:800;margin-bottom:.8rem;">Нийт бүртгэл: ${totalCount}</div>

@@ -124,18 +124,15 @@
   .mood-btn.selected{border-color:#D8BC8A;background:rgba(216,188,138,.16);}
   .mood-btn.selected .lbl{color:#EDDBB8;}
 
-  /* ---------- Бүх сайтад хулгана дагасан усан долгионы эффект ---------- */
-  .water-ripple{position:fixed;top:0;left:0;width:36px;height:36px;border-radius:50%;
-    pointer-events:none;z-index:99999;
-    border:2px solid rgba(120,190,255,.55);
-    background:radial-gradient(circle, rgba(160,215,255,.25), transparent 70%);
-    transform:translate(-1000px,-1000px) scale(.3);
-    opacity:.85;
-    animation:waterRippleExpand 1.1s cubic-bezier(.15,.6,.35,1) forwards;}
-  @keyframes waterRippleExpand{
-    0%{opacity:.8;}
-    100%{transform:translate(var(--wr-x,-1000px),var(--wr-y,-1000px)) scale(2.6);opacity:0;}
-  }
+  /* ---------- Hero-ийн хулгана дагасан гэрлэн (blur) эффект ---------- */
+  .hero{position:relative;overflow:hidden;}
+  .hero-glow{position:absolute;width:340px;height:340px;border-radius:50%;pointer-events:none;
+    background:radial-gradient(circle, rgba(216,188,138,.42), rgba(216,188,138,.14) 45%, transparent 72%);
+    filter:blur(38px);top:0;left:0;transform:translate(-1000px,-1000px);
+    transition:transform .5s cubic-bezier(.22,.9,.35,1), opacity .4s ease;
+    opacity:0;z-index:0;mix-blend-mode:screen;}
+  .hero-glow.active{opacity:1;}
+  .hero > *:not(.hero-glow){position:relative;z-index:1;}
 
   /* ---------- QUICK ACTIONS ---------- */
   .quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.9rem;margin-bottom:1.4rem;}
@@ -588,7 +585,7 @@
       <!-- ================= HOME ================= -->
       <div id="view-home" class="view active">
         <div class="hero">
-
+          <div class="hero-glow" id="hero-glow"></div>
           <div class="hero-tag"><span class="tick"></span>Өнөөдөр</div>
           <h1 class="headline">Өнөөдөр таны<br>сэтгэл санаа ямар байна вэ?</h1>
           <p class="hero-sub">Өөрийгөө ойлгох жижиг алхмыг өнөөдөр эхлүүлээрэй.</p>
@@ -1831,31 +1828,29 @@ function applyHeroScene() {
 applyHeroScene();
 setInterval(applyHeroScene, 5000); // 5 секунд тутамд солигдоно
 
-/* ================= Бүх сайтад хулгана дагасан усан долгионы эффект ================= */
-(function initWaterRipple() {
-  let lastTime = 0;
-  const THROTTLE_MS = 90; // хэт олон долгион үүсэхээс сэргийлнэ
-  function spawnRipple(x, y) {
-    const el = document.createElement('div');
-    el.className = 'water-ripple';
-    el.style.left = (x - 18) + 'px';
-    el.style.top = (y - 18) + 'px';
-    el.style.setProperty('--wr-x', '0px');
-    el.style.setProperty('--wr-y', '0px');
-    document.body.appendChild(el);
-    el.addEventListener('animationend', () => el.remove());
-    // Хамгаалалт: animationend ажиллаагүй тохиолдолд 1.3с дараа устгана
-    setTimeout(() => { if (el.parentNode) el.remove(); }, 1300);
+/* ================= Hero-ийн хулгана дагасан гэрлэн (blur) эффект ================= */
+(function initHeroGlow() {
+  const heroEl = document.querySelector('.hero');
+  const glow = document.getElementById('hero-glow');
+  if (!heroEl || !glow) return;
+  function moveTo(x, y) {
+    glow.style.transform = `translate(${x - 170}px, ${y - 170}px)`;
   }
-  function handleMove(x, y) {
-    const now = performance.now();
-    if (now - lastTime < THROTTLE_MS) return;
-    lastTime = now;
-    spawnRipple(x, y);
+  function setInitialCenter() {
+    const rect = heroEl.getBoundingClientRect();
+    moveTo(rect.width / 2, rect.height / 2);
+    glow.classList.add('active');
   }
-  document.addEventListener('mousemove', (e) => handleMove(e.clientX, e.clientY));
-  document.addEventListener('touchmove', (e) => {
-    if (e.touches && e.touches[0]) handleMove(e.touches[0].clientX, e.touches[0].clientY);
+  setInitialCenter();
+  window.addEventListener('resize', setInitialCenter);
+  heroEl.addEventListener('mousemove', (e) => {
+    const rect = heroEl.getBoundingClientRect();
+    moveTo(e.clientX - rect.left, e.clientY - rect.top);
+  });
+  heroEl.addEventListener('touchmove', (e) => {
+    if (!e.touches || !e.touches[0]) return;
+    const rect = heroEl.getBoundingClientRect();
+    moveTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
   }, { passive: true });
 })();
 

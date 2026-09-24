@@ -985,6 +985,23 @@
             </div>
           </div>
           <div class="section-card">
+            <div class="section-head collapsible" onclick="toggleAdminSection('test-branch-stats')"><h3>📊 Тестийн дүн — цэргийн ангиар</h3><span class="collapse-arrow" id="test-branch-stats-arrow">▾</span></div>
+            <div class="collapsible-body" id="test-branch-stats-body">
+              <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Тест сонгоход, тухайн тестийг цэргийн төрөл (жишээ нь Хуурай замын цэргийн командлал) тус бүрээс хэдэн хүн бөглөсөн, нийт үзүүлэлт нь ямар байгааг харуулна. Хувь хүнийг тодорхойлохгүй, зөвхөн нэгтгэсэн тоо.</p>
+              <select id="test-branch-stats-select" onchange="loadTestBranchStats()" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;font-family:inherit;font-size:.9rem;background:#fff;color:var(--cream);margin-bottom:1rem;">
+                <option value="">— Тест сонгоно уу —</option>
+              </select>
+              <div id="test-branch-stats-result"></div>
+            </div>
+          </div>
+          <div class="section-card">
+            <div class="section-head collapsible" onclick="toggleAdminSection('mood-branch-stats')"><h3>😊 Сэтгэл санааны түргэн бүртгэл — цэргийн ангиар</h3><span class="collapse-arrow" id="mood-branch-stats-arrow">▾</span></div>
+            <div class="collapsible-body" id="mood-branch-stats-body">
+              <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Нүүр хуудасны "Өнөөдөр таны сэтгэл санаа хэр байна?" гэсэн түргэн бүртгэлийг цэргийн төрөл тус бүрээр нэгтгэж харуулна. Хувь хүнийг тодорхойлохгүй, зөвхөн нэгтгэсэн тоо.</p>
+              <div id="mood-branch-stats-result"><div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div></div>
+            </div>
+          </div>
+          <div class="section-card">
             <div class="section-head collapsible" onclick="toggleAdminSection('pro-chat')"><h3>💬 Мэргэжилтний чат (зөвхөн админ)</h3><span class="collapse-arrow" id="pro-chat-arrow">▾</span></div>
             <div class="collapsible-body" id="pro-chat-body">
               <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Хэрэглэгчдийн мэргэжилтэнтэй чатласан мессежүүд. Мэргэжилтний нэрийн өмнөөс хариулах боломжтой.</p>
@@ -1112,7 +1129,7 @@
 
     </div>
 
-    <footer>© 2026 MIL-CARE СЭТГЭЛ ЗҮЙН ДЭМЖЛЭГИЙН ПЛАТФОРМ &nbsp;<a href="#">НУУЦЛАЛЫН БОДЛОГО</a> | <a href="#">ҮЙЛЧИЛГЭЭНИЙ НӨХЦӨЛ</a> | <a href="#">БИДНИЙ ТУХАЙ</a></footer>
+    <footer>© 2026 MIL-CARE СЭТГЭЛ ЗҮЙН ДЭМЖЛЭГИЙН ПЛАТФОРМ &nbsp;<a href="#">ХОЛБОО БАРИХ</a></footer>
   </div>
 </div>
 
@@ -5240,6 +5257,117 @@ async function loadCompositionStats() {
   roleEl.innerHTML = '<p style="font-weight:800;font-size:.85rem;margin-bottom:.6rem;">Албан хаагчийн төрлөөр</p>' + renderBars(roleCounts, ROLE_LABELS, roleTotal);
 }
 
+/* ================= Тестийн дүн — цэргийн ангиар (админ) ================= */
+function populateTestBranchStatsSelect() {
+  const sel = document.getElementById('test-branch-stats-select');
+  if (!sel) return;
+  const entries = Object.entries(TESTS).sort((a,b) => a[1].title.localeCompare(b[1].title, 'mn'));
+  sel.innerHTML = '<option value="">— Тест сонгоно уу —</option>' +
+    entries.map(([key, t]) => `<option value="${key}">${t.emo ? t.emo+' ' : ''}${t.title}</option>`).join('');
+}
+
+async function loadTestBranchStats() {
+  const sel = document.getElementById('test-branch-stats-select');
+  const el = document.getElementById('test-branch-stats-result');
+  if (!sel || !el) return;
+  const key = sel.value;
+  if (!key) { el.innerHTML = ''; return; }
+  el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div>';
+
+  const { data, error } = await sb.from('test_results')
+    .select('score, max_score, level, users(branch)')
+    .eq('test_key', key)
+    .order('created_at', { ascending:false })
+    .limit(2000);
+
+  if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Дүн татахад алдаа гарлаа: ' + error.message + '</div>'; console.error('loadTestBranchStats error:', error); return; }
+  if (!data || data.length === 0) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Энэ тестийг одоогоор хэн ч бөглөөгүй байна.</div>'; return; }
+
+  // Салбар тус бүрээр бүлэглэнэ
+  const byBranch = {};
+  data.forEach(r => {
+    const b = r.users?.branch || 'unknown';
+    if (!byBranch[b]) byBranch[b] = { count:0, scoreSum:0, scoreCount:0, levels:{} };
+    const grp = byBranch[b];
+    grp.count++;
+    if (r.score != null && r.max_score) { grp.scoreSum += (r.score / r.max_score) * 100; grp.scoreCount++; }
+    const lvl = r.level || '—';
+    grp.levels[lvl] = (grp.levels[lvl] || 0) + 1;
+  });
+
+  const totalCount = data.length;
+  const branches = Object.entries(byBranch).sort((a,b) => b[1].count - a[1].count);
+
+  el.innerHTML = `
+    <div style="font-size:.85rem;font-weight:800;margin-bottom:.8rem;">Нийт бөглөсөн: ${totalCount} хүн</div>
+    ${branches.map(([bKey, g]) => {
+      const label = BRANCH_LABELS[bKey] || (bKey === 'unknown' ? 'Тодорхойгүй' : bKey);
+      const avgPct = g.scoreCount ? Math.round(g.scoreSum / g.scoreCount) : null;
+      const levelEntries = Object.entries(g.levels).sort((a,b) => b[1]-a[1]);
+      return `
+        <div class="section-card" style="margin-bottom:.9rem;background:var(--panel-2);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;">
+            <div style="font-weight:800;font-size:.9rem;">${label}</div>
+            <div style="font-size:.8rem;color:var(--sub);">${g.count} хүн бөглөсөн${avgPct !== null ? ' · дундаж ' + avgPct + '%' : ''}</div>
+          </div>
+          ${levelEntries.map(([lvl, c]) => {
+            const pct = Math.round(c / g.count * 100);
+            return `<div class="unit-row"><div class="unit-name">${lvl}</div><div class="unit-track"><div class="unit-fill" style="width:${pct}%;"></div></div><div class="unit-pct">${c}</div></div>`;
+          }).join('')}
+        </div>`;
+    }).join('')}
+  `;
+}
+
+/* ================= Сэтгэл санааны түргэн бүртгэл — цэргийн ангиар (админ) ================= */
+const MOOD_BRANCH_LABELS = { grateful:'❤️ Талархаж байна', happy:'🥰 Баяртай', calm:'😌 Тайван', tired:'😴 Ядарсан', sad:'😢 Гунигтай', anxious:'😰 Түгшүүртэй', lonely:'😔 Ганцаардсан', angry:'😡 Ууртай' };
+
+async function loadMoodBranchStats() {
+  const el = document.getElementById('mood-branch-stats-result');
+  if (!el) return;
+  el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div>';
+
+  const { data, error } = await sb.from('mood_entries')
+    .select('mood, users(branch)')
+    .eq('note', 'Нүүр хуудасны хурдан бүртгэл')
+    .order('created_at', { ascending:false })
+    .limit(3000);
+
+  if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Дүн татахад алдаа гарлаа: ' + error.message + '</div>'; console.error('loadMoodBranchStats error:', error); return; }
+  if (!data || data.length === 0) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор хэн ч түргэн бүртгэл хийгээгүй байна.</div>'; return; }
+
+  const byBranch = {};
+  data.forEach(r => {
+    const b = r.users?.branch || 'unknown';
+    if (!byBranch[b]) byBranch[b] = { count:0, moods:{} };
+    byBranch[b].count++;
+    const m = r.mood || '—';
+    byBranch[b].moods[m] = (byBranch[b].moods[m] || 0) + 1;
+  });
+
+  const totalCount = data.length;
+  const branches = Object.entries(byBranch).sort((a,b) => b[1].count - a[1].count);
+
+  el.innerHTML = `
+    <div style="font-size:.85rem;font-weight:800;margin-bottom:.8rem;">Нийт бүртгэл: ${totalCount}</div>
+    ${branches.map(([bKey, g]) => {
+      const label = BRANCH_LABELS[bKey] || (bKey === 'unknown' ? 'Тодорхойгүй' : bKey);
+      const moodEntries = Object.entries(g.moods).sort((a,b) => b[1]-a[1]);
+      return `
+        <div class="section-card" style="margin-bottom:.9rem;background:var(--panel-2);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;">
+            <div style="font-weight:800;font-size:.9rem;">${label}</div>
+            <div style="font-size:.8rem;color:var(--sub);">${g.count} бүртгэл</div>
+          </div>
+          ${moodEntries.map(([m, c]) => {
+            const pct = Math.round(c / g.count * 100);
+            return `<div class="unit-row"><div class="unit-name">${MOOD_BRANCH_LABELS[m] || m}</div><div class="unit-track"><div class="unit-fill" style="width:${pct}%;"></div></div><div class="unit-pct">${c}</div></div>`;
+          }).join('')}
+        </div>`;
+    }).join('')}
+  `;
+}
+
 /* ================= INIT: эхлээд хэрэглэгч бэлдээд, дараа нь бүх мэдээллийг ачаална ================= */
 async function init() {
   await ensureUser();
@@ -5263,6 +5391,8 @@ async function init() {
     document.getElementById('admin-panel').style.display = 'block';
     loadIdentityList();
     loadCompositionStats();
+    populateTestBranchStatsSelect();
+    loadMoodBranchStats();
     loadRegisteredUsers();
     loadAdminChatThreads();
     loadAdminPosts();

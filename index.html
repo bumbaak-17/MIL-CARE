@@ -125,18 +125,16 @@
   .mood-btn.selected .lbl{color:#EDDBB8;}
 
   /* ---------- Hero-ийн хулгана дагасан усан долгионы эффект ---------- */
-  .hero{position:relative;overflow:hidden;}
   .hero-ripple{position:absolute;width:110px;height:110px;border-radius:50%;pointer-events:none;
     background:radial-gradient(circle, rgba(190,225,255,.55), rgba(190,225,255,.18) 45%, transparent 72%);
     filter:blur(8px);top:0;left:0;transform:translate(-1000px,-1000px);mix-blend-mode:screen;
-    transition:transform .55s cubic-bezier(.22,.9,.35,1), opacity .35s ease;opacity:0;z-index:0;}
+    transition:transform .55s cubic-bezier(.22,.9,.35,1), opacity .35s ease;opacity:0;z-index:1;}
   .hero-ripple.active{opacity:1;}
   .hero-ripple2{position:absolute;width:50px;height:50px;border-radius:50%;pointer-events:none;
     background:radial-gradient(circle, rgba(255,255,255,.6), transparent 70%);
     filter:blur(3px);top:0;left:0;transform:translate(-1000px,-1000px);mix-blend-mode:screen;
-    transition:transform .28s ease-out, opacity .3s ease;opacity:0;z-index:0;}
+    transition:transform .28s ease-out, opacity .3s ease;opacity:0;z-index:1;}
   .hero-ripple2.active{opacity:1;}
-  .hero > *:not(.hero-ripple):not(.hero-ripple2){position:relative;z-index:1;}
 
   /* ---------- QUICK ACTIONS ---------- */
   .quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.9rem;margin-bottom:1.4rem;}

@@ -543,6 +543,7 @@
       <li class="navitem" data-view="attention"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>Анхаарал шалгах тест</li>
       <li class="navitem" data-view="projective"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19c-4-3-8-6-8-10a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 4-4 7-8 10-.5.4-1.5.4-2 0Z"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/></svg>Хувь хүнийг тодорхойлох проектив аргууд</li>
       <li class="navitem" data-view="pros"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>Сэтгэл зүйч<span id="pros-nav-badge" class="nav-badge" style="display:none;">0</span></li>
+      <li class="navitem" data-view="ai-chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><circle cx="9" cy="11" r="1"/><circle cx="13" cy="11" r="1"/><circle cx="17" cy="11" r="1"/></svg>AI Туслах</li>
       <li class="navitem" data-view="analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>Миний сэтгэл зүй</li>
 
       <div class="navgroup-label">БАЙГУУЛЛАГА</div>
@@ -819,6 +820,21 @@
         </div>
       </div>
 
+      <!-- ================= AI ТУСЛАХ ================= -->
+      <div id="view-ai-chat" class="view">
+        <div class="page-head"><h2>🤖 AI Туслах</h2><p>Сэтгэл зүйн асуудлаараа хиймэл оюун ухаантай ямар ч цагт ярилцаарай. Энэ бол мэргэжлийн сэтгэл зүйчийг орлохгүй — ноцтой асуудал бол "Сэтгэл зүйч" хэсгээр мэргэжилтэнтэй холбогдоно уу.</p></div>
+        <div class="section-card">
+          <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.8rem;padding:.7rem .9rem;background:rgba(216,188,138,.12);border-radius:10px;font-size:.8rem;color:var(--sub);">
+            ⚠️ Хэрэв та амиа хорлох бодолтой байгаа, эсвэл яаралтай тусламж хэрэгтэй байвал шууд <b>103</b> дугаарт залгах эсвэл ойрын хүнтэйгээ холбогдоно уу.
+          </div>
+          <div id="ai-chat-messages" style="height:420px;overflow-y:auto;border:1px solid var(--line);border-radius:12px;padding:.9rem;margin-bottom:.8rem;background:var(--panel-2);"></div>
+          <div style="display:flex;gap:.6rem;">
+            <input type="text" id="ai-chat-input" placeholder="Мессежээ бичих..." onkeydown="if(event.key==='Enter'){sendAIChatMessage();}" style="flex:1;border:1px solid var(--line);border-radius:10px;padding:.7rem .9rem;font-family:inherit;font-size:.9rem;background:#fff;color:var(--cream);">
+            <button class="connect-btn" style="width:auto;padding:.7rem 1.3rem;" id="ai-chat-send-btn" onclick="sendAIChatMessage()">Илгээх</button>
+          </div>
+        </div>
+      </div>
+
       <!-- ================= PROS ================= -->
       <div id="view-pros" class="view">
         <div class="page-head"><h2>Сэтгэл зүйч</h2><p>Мэргэжилтэн хайж, текст эсвэл видео зөвлөгөө товлоорой.</p></div>
@@ -893,6 +909,18 @@
             <div class="section-head"><h3>📧 Хэрэглэгч (зөвхөн админ)</h3></div>
             <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Имэйл/нууц үгээр бүртгүүлсэн хэрэглэгчдийн жагсаалт.</p>
             <div id="registered-users-list"></div>
+          </div>
+          <div class="section-card" id="admin-test-results-section" style="display:none;">
+            <button class="modal-close" style="margin-bottom:1rem;" onclick="hideAdminTestResultsView()">← Буцах</button>
+            <div class="section-head"><h3>🧠 Тестийн үр дүн (хэрэглэгчээр, зөвхөн админ)</h3></div>
+            <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Хэрэглэгч бүрийн өгсөн тестүүд, оноо, түвшинг эндээс харна. Нэрээ нуусан ID эсвэл цэргийн ангиар хайж шүүж болно.</p>
+            <div style="display:flex;gap:.6rem;margin-bottom:1rem;flex-wrap:wrap;">
+              <input type="text" id="admin-test-results-search" placeholder="Нэрээ нуусан ID-гаар хайх..." oninput="renderAdminTestResultsList()" style="flex:1;min-width:180px;border:1px solid var(--line);border-radius:10px;padding:.5rem .8rem;font-family:inherit;font-size:.85rem;">
+              <select id="admin-test-results-branch-filter" onchange="renderAdminTestResultsList()" style="border:1px solid var(--line);border-radius:10px;padding:.5rem .8rem;font-family:inherit;font-size:.85rem;">
+                <option value="">Бүх цэргийн төрөл</option>
+              </select>
+            </div>
+            <div id="admin-test-results-list"></div>
           </div>
           <div class="section-card" id="admin-posts-section" style="display:none;">
             <button class="modal-close" style="margin-bottom:1rem;" onclick="hideAdminPostsView()">← Буцах</button>
@@ -996,6 +1024,13 @@
             </div>
           </div>
           <div id="admin-other-sections">
+          <div class="section-card">
+            <div class="section-head collapsible" onclick="toggleAdminSection('ai-chat')"><h3>🤖 AI Туслахын түүх (зөвхөн админ)</h3><span class="collapse-arrow" id="ai-chat-arrow">▾</span></div>
+            <div class="collapsible-body" id="ai-chat-body">
+              <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Хэрэглэгчид AI Туслахтай хийсэн харилцан яриа. Эрсдэлтэй агуулга илэрвэл мэргэжилтэнтэй холбогдоорой.</p>
+              <div id="admin-ai-chat-threads"></div>
+            </div>
+          </div>
           <div class="section-card">
             <div class="section-head collapsible" onclick="toggleAdminSection('pro-chat')"><h3>💬 Мэргэжилтний чат (зөвхөн админ)</h3><span class="collapse-arrow" id="pro-chat-arrow">▾</span></div>
             <div class="collapsible-body" id="pro-chat-body">
@@ -1141,6 +1176,29 @@
 const SUPABASE_URL = 'https://zsceezpxjigxdcwfrlkm.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_t5jPFZ1ZQS3_LsXSUq3ftg_OPpH0nxb';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* ================= АЮУЛГҮЙ БАЙДАЛ: HTML escape ================= */
+// Хэрэглэгчийн бичсэн чөлөөт текст (пост, сэтгэгдэл, чат мессеж, нэр гэх мэт) innerHTML руу орохын
+// өмнө ЭНЭ функцээр дамжуулна — эс тэгвэл хэн нэгэн <script> тэмдэгт бичээд бусдын (админ,
+// мэргэжилтэн, өөр хэрэглэгчийн) хөтчид код ажиллуулах (XSS халдлага) боломжтой болно.
+function esc(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+// onclick="fn('...')" маягийн газарт динамик текстийг дамжуулахад ашиглана:
+// эхлээд JS мөрийн доторх backslash/single-quote-ыг escape хийж, дараа нь
+// HTML attribute-д аюулгүй болгож esc() дамжуулна (эсрэг дараалалтай хийвэл
+// escape нь дахин задарч аюулгүй байдал алдагдана).
+function escAttr(str) {
+  if (str === null || str === undefined) return '';
+  const jsEscaped = String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+  return esc(jsEscaped);
+}
 
 /* ================= ANONYMOUS USER (localStorage-д тогтвортой хадгалагдана) ================= */
 /* ---- Монголын цагийн бүс (Asia/Ulaanbaatar) — Intl.DateTimeFormat ашиглан найдвартай тооцоолно ----
@@ -1485,7 +1543,7 @@ async function loadIdentityList() {
   if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Жагсаалт татахад алдаа гарлаа.</div>'; return; }
   if (!data || data.length===0) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор бодит нэр бүртгүүлсэн хэрэглэгч алга.</div>'; return; }
   el.innerHTML = data.map(d => `
-    <div class="risk-row"><span class="risk-id">${d.users?.anon_handle || '—'}</span><span>${d.real_name || '(нэр өгөгдөөгүй)'} ${d.rank ? '· '+d.rank : ''}</span></div>
+    <div class="risk-row"><span class="risk-id">${esc(d.users?.anon_handle) || '—'}</span><span>${d.real_name ? esc(d.real_name) : '(нэр өгөгдөөгүй)'} ${d.rank ? '· '+esc(d.rank) : ''}</span></div>
   `).join('');
 }
 
@@ -1517,7 +1575,7 @@ async function loadHrResults() {
     data.forEach(r => { (byUser[r.user_id] ||= { user: r.users, results: [] }).results.push(r); });
     el.innerHTML = Object.values(byUser).map(u => `
       <div class="comment-row" style="display:flex;flex-direction:column;gap:.3rem;padding:.7rem 0;border-top:1px solid var(--line);">
-        <div style="font-weight:700;font-size:.88rem;">${u.user?.anon_handle || '—'} <span style="font-weight:400;color:var(--sub);font-size:.78rem;">${u.user?.branch || ''} ${u.user?.personnel_type ? '· '+u.user.personnel_type : ''}</span></div>
+        <div style="font-weight:700;font-size:.88rem;">${esc(u.user?.anon_handle) || '—'} <span style="font-weight:400;color:var(--sub);font-size:.78rem;">${esc(u.user?.branch) || ''} ${u.user?.personnel_type ? '· '+esc(u.user.personnel_type) : ''}</span></div>
         ${u.results.map(r => `<div style="font-size:.82rem;color:var(--sub);padding-left:.5rem;">• ${r.test_key} — ${r.score}/${r.max_score} (${r.level || ''}) · ${timeAgo(r.created_at)}</div>`).join('')}
       </div>
     `).join('');
@@ -1559,6 +1617,7 @@ function goto(view, pushState) {
   if (view === 'analytics') { loadAnalyticsSummary(); loadMonthlyAnalysis(); }
   if (view === 'org') { loadOrgStats(); loadUnitStress(); }
   if (view === 'pros') { loadPros(); }
+  if (view === 'ai-chat') { loadAIChatHistory(); }
   if (view === 'proportal') { loadProPortal(); }
   // Хөтчийн "Буцах" товч ажиллахын тулд history-д хуудсаа бүртгэнэ
   if (pushState !== false) {
@@ -2073,7 +2132,7 @@ function renderDiaryList() {
   const el = document.getElementById('diary-list');
   if (diaryEntries.length===0){ el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;text-align:center;padding:1.5rem 0;">Одоогоор тэмдэглэл байхгүй байна.</div>'; return; }
   el.innerHTML = diaryEntries.map(d => `
-    <div class="diary-entry"><div class="diary-top"><span class="diary-emo">${d.emo}</span><span style="font-weight:700;font-size:.85rem;">${d.label}</span><span class="diary-date">${d.date}</span></div><div class="diary-text">${d.text}</div></div>
+    <div class="diary-entry"><div class="diary-top"><span class="diary-emo">${esc(d.emo)}</span><span style="font-weight:700;font-size:.85rem;">${esc(d.label)}</span><span class="diary-date">${esc(d.date)}</span></div><div class="diary-text">${esc(d.text)}</div></div>
   `).join('');
 }
 async function loadDiary() {
@@ -2141,11 +2200,11 @@ async function loadOrders(category, elId, subElId) {
     <div class="section-card" style="display:flex;align-items:center;gap:.8rem;margin-bottom:.8rem;">
       <div style="font-size:1.6rem;flex-shrink:0;">${category === 'guide' ? '📘' : category === 'military_test' ? '🎖️' : '📄'}</div>
       <div style="flex:1;min-width:0;">
-        <div style="font-weight:700;font-size:.92rem;">${d.title}</div>
+        <div style="font-weight:700;font-size:.92rem;">${esc(d.title)}</div>
         <div style="font-size:.78rem;color:var(--sub);">${d.file_size ? (Math.round(d.file_size/1024)) + ' KB' : ''}</div>
       </div>
-      <button class="modal-close" style="width:auto;padding:.5rem 1rem;font-size:.85rem;flex-shrink:0;" onclick="viewOrderDoc('${d.storage_path}')">Харах</button>
-      <button class="connect-btn" style="width:auto;padding:.5rem 1rem;font-size:.85rem;flex-shrink:0;" onclick="downloadOrderDoc('${d.storage_path}','${(d.title||'document').replace(/'/g,"")}')">Татах</button>
+      <button class="modal-close" style="width:auto;padding:.5rem 1rem;font-size:.85rem;flex-shrink:0;" onclick="viewOrderDoc('${escAttr(d.storage_path)}')">Харах</button>
+      <button class="connect-btn" style="width:auto;padding:.5rem 1rem;font-size:.85rem;flex-shrink:0;" onclick="downloadOrderDoc('${escAttr(d.storage_path)}','${escAttr(d.title||'document')}')">Татах</button>
     </div>
   `).join('');
 }
@@ -2172,11 +2231,11 @@ async function loadAdminDocuments() {
     <div class="comment-row" style="display:flex;gap:.5rem;padding:.6rem 0;border-top:1px solid var(--line);align-items:center;">
       <div style="font-size:1.3rem;flex-shrink:0;">${d.category === 'guide' ? '📘' : d.category === 'military_test' ? '🎖️' : '📄'}</div>
       <div style="flex:1;min-width:0;">
-        <div style="font-size:.85rem;font-weight:700;">${d.title}</div>
+        <div style="font-size:.85rem;font-weight:700;">${esc(d.title)}</div>
         <div style="font-size:.78rem;color:var(--sub);">${d.category === 'guide' ? 'Гарын авлага' : d.category === 'military_test' ? 'Цэргийн алба хаагчдаас авах тест' : 'Тушаал'} · ${timeAgo(d.created_at)}</div>
       </div>
-      <button onclick="editDocumentTitle('${d.id}', '${(d.title||'').replace(/'/g,"\\'")}')" title="Засах" style="background:none;border:none;color:var(--gold);cursor:pointer;font-size:.85rem;flex-shrink:0;">✏️</button>
-      <button onclick="adminDeleteDocument('${d.id}','${d.storage_path}')" title="Устгах" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>
+      <button onclick="editDocumentTitle('${d.id}', '${escAttr(d.title||'')}')" title="Засах" style="background:none;border:none;color:var(--gold);cursor:pointer;font-size:.85rem;flex-shrink:0;">✏️</button>
+      <button onclick="adminDeleteDocument('${d.id}','${escAttr(d.storage_path)}')" title="Устгах" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>
     </div>
   `).join('');
 }
@@ -2585,6 +2644,9 @@ const TESTS = {
 
   temperament: { title:'Темперамент тодорхойлох тест', emo:'🎭', dur:'8 минут', personality:true, custom:'temperament',
     blurb:'Ганц тестээр таны темпераментийг Холерик, Сангвиник, Меланхолик, Флегматик төрлүүдийн алинд хамгийн ойр болохыг тодорхойлно.' },
+
+  mbti16: { title:'Зан төлөвийн 16 хэв шинжийг тодорхойлох тест', emo:'🧩', dur:'12 минут', personality:true, custom:'mbti16',
+    blurb:'Юнгийн сонгодог онолд суурилсан, 4 хэмжигдэхүүнээр (Экстраверт/Интроверт, Мэдрэхүй/Зөн совин, Логик/Мэдрэмж, Төлөвлөгч/Уян хатан) таны зан төлөвийн 16 хэв шинжийн алинд илүү ойр болохыг тодорхойлж, дэлгэрэнгүй тодорхойлолт өгнө.' },
 
   kovalev_survey: { title:'Хувь хүний өөрийгөө үнэлэх түвшинг тодорхойлох тест (С.В.Ковалев)', emo:'🪞', dur:'8 минут',
     blurb:'Өөрийгөө үнэлэх түвшинг (өндөр/дунд/бага) тодорхойлох арга зүйн тест.',
@@ -3239,6 +3301,7 @@ function openModal(key) {
   if (t.custom === 'gender_role') { openGenderRoleTest(); return; }
   if (t.custom === 'character_traits') { openCharacterTraitsTest(); return; }
   if (t.custom === 'temperament') { openTemperamentTest(); return; }
+  if (t.custom === 'mbti16') { openMBTI16Test(); return; }
   const box = document.getElementById('modal-box');
   box.innerHTML = `
     <h3>${t.emo} ${t.title}</h3>
@@ -3843,6 +3906,251 @@ async function scoreTemperamentTest() {
   `;
 }
 
+/* ================= ЗАН ТӨЛӨВИЙН 16 ХЭВ ШИНЖИЙГ ТОДОРХОЙЛОХ ТЕСТ (Юнгийн 4 хэмжигдэхүүн) ================= */
+const MBTI_EI_QS = [
+  { text:'Хэдэн өдөр гэртээ ганцаараа байсны дараа та ямар мэдрэмжтэй байх вэ?', opts:['А. Эрч хүчээ нөхөж авсан мэт тайван','Б. Уйдаж, хүн уулзмаар санагдана'], values:[0,5] },
+  { text:'Танилцахдаа та ихэвчлэн:', opts:['А. Өөрөө эхлүүлж ярилцдаг','Б. Нөгөө хүнийг эхлүүлэхийг хүлээдэг'], values:[5,0] },
+  { text:'Ажлын завсарлагаанд та:', opts:['А. Хамт олонтойгоо ярилцаж цайлдаг','Б. Ганцаараа амардаг'], values:[5,0] },
+  { text:'Мэдээллийг та хэрхэн боловсруулдаг вэ?', opts:['А. Ярьж байхдаа бодлоо тодорхойлдог','Б. Дотроо эргэцүүлж, дараа нь хэлдэг'], values:[5,0] },
+  { text:'Найз нөхдийн тоо:', opts:['А. Олон, өргөн хүрээтэй','Б. Цөөхөн, гүнзгий'], values:[5,0] },
+  { text:'Шинэ орчинд орохдоо та:', opts:['А. Хурдан дасаж, идэвхтэй оролцдог','Б. Эхлээд ажигласны дараа оролцдог'], values:[5,0] },
+  { text:'Найр наадамд явахад та:', opts:['А. Эрч хүчээ авдаг','Б. Ядрал мэдэрдэг'], values:[5,0] },
+  { text:'Утсаар дуудлага ирэхэд та:', opts:['А. Шууд авдаг','Б. Хожим залгахыг илүүд үздэг'], values:[5,0] },
+  { text:'Танд хамгийн тав тухтай орчин бол:', opts:['А. Хүн олонтой, чимээ шуугиантай','Б. Тайван, цөөн хүнтэй'], values:[5,0] },
+  { text:'Бусдын анхаарлын төвд байх нь танд:', opts:['А. Таатай','Б. Тааламжгүй'], values:[5,0] },
+  { text:'Асуудал шийдэхдээ та:', opts:['А. Бусадтай ярилцаж шийддэг','Б. Ганцаараа бодож шийддэг'], values:[5,0] },
+  { text:'Ажилдаа та юуг илүүд үзэх вэ?', opts:['А. Багаар хамтарч ажиллах','Б. Ганцаараа ажиллах'], values:[5,0] },
+  { text:'Урт хугацаагаар ганцаараа сууж байвал та:', opts:['А. Тайван бус болдог','Б. Тухтай байдаг'], values:[5,0] },
+  { text:'Шинэ хүмүүстэй танилцах нь танд:', opts:['А. Хялбар, таатай','Б. Хүчин чармайлт шаарддаг'], values:[5,0] },
+  { text:'Таны ярианы хэв маяг:', opts:['А. Чанга, эрч хүчтэй','Б. Тайван, зохион байгуулалттай'], values:[5,0] },
+];
+const MBTI_SN_QS = [
+  { text:'Та ямар мэдээлэлд илүү итгэдэг вэ?', opts:['А. Мэдрэхүйгээр мэдэрсэн бодит баримт','Б. Зөн совин, боломж'], values:[5,0] },
+  { text:'Шинэ санааг сонсоход та:', opts:['А. Хэрхэн бодит амьдралд хэрэгжихийг бодно','Б. Ямар шинэ боломж авчрахыг бодно'], values:[5,0] },
+  { text:'Ном уншихдаа та илүүд үздэг:', opts:['А. Бодит, практик агуулгатай','Б. Дүрслэл, бэлгэдэл ихтэй'], values:[5,0] },
+  { text:'Ажил хийхдээ та:', opts:['А. Батлагдсан, туршигдсан аргыг баримталдаг','Б. Шинэ арга сорьж үздэг'], values:[5,0] },
+  { text:'Танд илүү сонирхолтой нь:', opts:['А. Одоо юу болж байгаа','Б. Ирээдүйд юу болох боломжтой'], values:[5,0] },
+  { text:'Заавар авахдаа та илүүд үздэг:', opts:['А. Алхам алхмаар, тодорхой заавар','Б. Ерөнхий ойлголт, өөрөө нөхөх'], values:[5,0] },
+  { text:'Та илүү:', opts:['А. Практик, бодитой хүн','Б. Төсөөлөлтэй, онолын хүн'], values:[5,0] },
+  { text:'Ярианд та илүүд үздэг:', opts:['А. Тодорхой, нарийвчилсан жишээ','Б. Ерөнхий санаа, зүйрлэл'], values:[5,0] },
+  { text:'Асуудал шийдэхдээ түрүүлж юуг бодох вэ?', opts:['А. Өмнө тохиолдож байсан туршлага','Б. Шинэ боломж, өөр өнцөг'], values:[5,0] },
+  { text:'Та юуг илүү үнэлдэг вэ?', opts:['А. Бодит үр дүн','Б. Шинэлэг санаа'], values:[5,0] },
+  { text:'Таны анхаарал ихэвчлэн хандах нь:', opts:['А. Одоогийн нарийн ширийн зүйлд','Б. Ирээдүйн том зурагт'], values:[5,0] },
+  { text:'Та бусдыг ямар байдлаар дүгнэдэг вэ?', opts:['А. Юу хийсэн, ямар үр дүнтэй','Б. Ямар боломж, чадавхитай'], values:[5,0] },
+  { text:'Танд илүү таалагддаг ажил:', opts:['А. Тодорхой, давтагддаг үүрэгтэй','Б. Уян хатан, өөрчлөгддөг үүрэгтэй'], values:[5,0] },
+  { text:'Та мөрөөдлөө хэрхэн харах вэ?', opts:['А. Бодит алхмуудаар','Б. Өргөн боломжуудаар'], values:[5,0] },
+  { text:'Шинэ орчинд орохдоо та юуг түрүүлж анзаардаг вэ?', opts:['А. Нарийн ширийн зүйлс','Б. Ерөнхий уур амьсгал, боломж'], values:[5,0] },
+];
+const MBTI_TF_QS = [
+  { text:'Шийдвэр гаргахдаа та юуг илүүд үздэг вэ?', opts:['А. Логик, шударга ёс','Б. Хүмүүсийн мэдрэмж, харилцаа'], values:[5,0] },
+  { text:'Маргаан гарахад та:', opts:['А. Үнэн зөвийг тогтооход анхаардаг','Б. Харилцаагаа сэргээхэд анхаардаг'], values:[5,0] },
+  { text:'Бусдыг шүүмжлэхдээ та:', opts:['А. Шууд, шулуухан хэлдэг','Б. Зөөлөн, анхааралтай хэлдэг'], values:[5,0] },
+  { text:'Танд илүү чухал нь:', opts:['А. Шударга байх','Б. Энэрэнгүй байх'], values:[5,0] },
+  { text:'Хүнд шийдвэр гаргахдаа та:', opts:['А. Обьектив баримт дээр тулгуурладаг','Б. Өөрийн болон бусдын мэдрэмжийг харгалздаг'], values:[5,0] },
+  { text:'Таныг бусад юу гэж тодорхойлдог вэ?', opts:['А. Логик сэтгэлгээтэй','Б. Дулаан сэтгэлтэй'], values:[5,0] },
+  { text:'Багийн гишүүн алдаа гаргавал та:', opts:['А. Алдааг тодорхой заана','Б. Сэтгэлийг нь хайрлан хэлнэ'], values:[5,0] },
+  { text:'Та илүү юунд итгэдэг вэ?', opts:['А. Тогтолцоо, дүрэм журам','Б. Өрөвч сэтгэл'], values:[5,0] },
+  { text:'Хэлэлцээрт та юуг илүү эрмэлздэг вэ?', opts:['А. Шударга, тэнцвэртэй шийдэл','Б. Хоёр талдаа таалагдах шийдэл'], values:[5,0] },
+  { text:'Та шийдвэрээ хэрхэн үнэлдэг вэ?', opts:['А. Логикоор нь','Б. Хэн хэрхэн мэдрэхээр нь'], values:[5,0] },
+  { text:'Таны хувьд аль нь илүү сорилт вэ?', opts:['А. Мэдрэмжээ илэрхийлэх','Б. Шүүмжлэлийг тэвчих'], values:[5,0] },
+  { text:'Ажлын шүүмж хийхдээ та юуг эхлээд хэлэх вэ?', opts:['А. Сул талыг шууд','Б. Давуу талыг эхлээд'], values:[5,0] },
+  { text:'Та бусдад туслахдаа:', opts:['А. Практик шийдэл санал болгодог','Б. Сэтгэлийн дэмжлэг үзүүлдэг'], values:[5,0] },
+  { text:'Танд илүү амархан нь:', opts:['А. Шийдвэрээ тайлбарлах','Б. Бусдын сэтгэлийг ойлгох'], values:[5,0] },
+  { text:'Багийн уур амьсгал муудвал та юуг эхэлж хийх вэ?', opts:['А. Асуудлыг шинжилж, шийдэл олно','Б. Хүмүүсийн мэдрэмжийг сонсоно'], values:[5,0] },
+];
+const MBTI_JP_QS = [
+  { text:'Аяллаа төлөвлөхдөө та:', opts:['А. Дэлгэрэнгүй хуваарь гаргадаг','Б. Тухай бүрд нь шийддэг'], values:[5,0] },
+  { text:'Даалгаврыг та:', opts:['А. Эрт дуусгах дуртай','Б. Эцсийн хугацаанд ойртуулж дуусгадаг'], values:[5,0] },
+  { text:'Таны ширээ, өрөө:', opts:['А. Цэгцтэй, эмх дэгтэй','Б. Чөлөөтэй, зохион байгуулалт багатай'], values:[5,0] },
+  { text:'Төлөвлөгөө өөрчлөгдвөл та:', opts:['А. Тааламжгүй санагдана','Б. Сонирхолтой санагдана'], values:[5,0] },
+  { text:'Та ажил дээрээ илүүд үздэг:', opts:['А. Тодорхой хуваарь, дэс дараалал','Б. Уян хатан, нээлттэй байдал'], values:[5,0] },
+  { text:'Шийдвэр гаргахдаа та:', opts:['А. Хурдан шийдвэрлэж дуусгах хүсэлтэй','Б. Сонголтоо нээлттэй байлгах хүсэлтэй'], values:[5,0] },
+  { text:'Танд амьдрал бол:', opts:['А. Төлөвлөж, хянаж явуулах зүйл','Б. Урсгалаар нь мэдэрч явах зүйл'], values:[5,0] },
+  { text:'Эцсийн хугацаанд дөхөхөд та:', opts:['А. Түгшүүртэй болдог','Б. Урам зориг нэмэгддэг'], values:[5,0] },
+  { text:'Хийх ажлын жагсаалт (to-do list) хийх нь та:', opts:['А. Байнга хийдэг, дагадаг','Б. Ховор хийдэг, чөлөөтэй явдаг'], values:[5,0] },
+  { text:'Шинэ мэдээлэл гарч ирвэл та:', opts:['А. Шийдвэрээ өөрчлөхөд бэрхшээлтэй','Б. Амархан дасан зохицдог'], values:[5,0] },
+  { text:'Танд илүү таалагддаг нь:', opts:['А. Асуудал бүрэн шийдэгдсэн байх','Б. Сонголт олон нээлттэй байх'], values:[5,0] },
+  { text:'Аяллын үеэр та:', opts:['А. Урьдчилан захиалга хийдэг','Б. Тухай бүрд нь шийддэг'], values:[5,0] },
+  { text:'Ажлаа дуусгаагүй үлдээх нь та:', opts:['А. Тайван бус байдал төрүүлдэг','Б. Тийм ч хамаагүй'], values:[5,0] },
+  { text:'Та амьдралдаа:', opts:['А. Тогтсон дэглэмтэй','Б. Импульсив, аяндаа'], values:[5,0] },
+  { text:'Бусад таныг ямар гэж дүгнэдэг вэ?', opts:['А. Найдвартай, төлөвлөгөөтэй','Б. Уян хатан, дасан зохицдог'], values:[5,0] },
+];
+
+const MBTI_TYPES = {
+  ISTJ:{ nick:'Найдвартай Зохион байгуулагч', group:'Харуулчид',
+    desc:'Та тодорхой дүрэм, дараалал, хариуцлагыг эрхэмлэдэг, үг үйлдэлдээ найдвартай хүн. Амласнаа биелүүлж, нарийн ширийн зүйлд анхаарал тавьдаг тул бусад танд итгэдэг.',
+    strengths:['Хариуцлагатай, найдвартай','Нарийн ширийн зүйлд анхаарал сайтай','Тогтвортой, тэвчээртэй','Практик шийдэл гаргадаг'],
+    weaknesses:['Өөрчлөлтөд удаан дасдаг','Хэт хатуу дүрэмч байж болзошгүй','Мэдрэмжээ илэрхийлэхэд түвэгтэй','Шинэ санааг эргэлзэн хүлээж авдаг'],
+    relationships:'Харилцаандаа тогтвортой, найдвартай хамтрагч боловч мэдрэмжээ илэрхийлэхэд бага зэрэг хаалттай байж болно.',
+    career:['Санхүү, нягтлан бодох бүртгэл','Цэрэг, хууль сахиулах','Инженер, чанарын хяналт','Захиргаа, менежмент'] },
+  ISFJ:{ nick:'Анхаарал халамжтай Хамгаалагч', group:'Харуулчид',
+    desc:'Та бусдын хэрэгцээг мэдэрч, чимээгүйхэн туслах дуртай, өндөр хариуцлагатай хүн. Уламжлал, тогтвортой байдлыг эрхэмлэж, ойр дотныхоо аюулгүй байдлыг хамгаалахыг эрмэлздэг.',
+    strengths:['Анхааралтай, өрөвч сэтгэлтэй','Найдвартай, тэвчээртэй','Практик тусламж үзүүлдэг','Багаар сайн ажилладаг'],
+    weaknesses:['Өөрийн хэрэгцээгээ орхигддог','Зөрчилдөөнөөс зайлсхийдэг','Шүүмжлэлд мэдрэмтгий','Өөрчлөлтөд дасахад хэцүү'],
+    relationships:'Гэр бүл, найз нөхдөдөө маш үнэнч, тэдний сайн сайхны төлөө чимээгүйхэн зүтгэдэг хамгаалагч шинжтэй.',
+    career:['Сувилагч, эмнэлгийн ажилтан','Багш, боловсрол','Нийгмийн ажилтан','Захиргааны туслах'] },
+  INFJ:{ nick:'Гүн ухаант Зөвлөгч', group:'Дипломатууд',
+    desc:'Та хүмүүсийн дотоод сэтгэл хөдлөлийг гүнзгий ойлгодог, зорилго чиглэлтэй, идеалист хүн. Бусдад тусалж, утга учиртай өөрчлөлт авчрахыг эрмэлздэг.',
+    strengths:['Гүн ойлголттой, зөн совинтой','Идеалист, зорилготой','Бусдыг урамшуулдаг','Бүтээлч сэтгэлгээтэй'],
+    weaknesses:['Хэт төгс байхыг хүсдэг','Өөрийгөө шаналгадаг','Зөрчилдөөнөөс зайлсхийдэг','Ганцаардмал байдалд орох хандлагатай'],
+    relationships:'Гүнзгий, утга учиртай харилцааг эрхэмлэдэг, гэхдээ өөрийн дотоод ертөнцийг бага хүнтэй хуваалцдаг.',
+    career:['Сэтгэл зүйч, зөвлөгч','Багш, эрдэмтэн','Бичгийн болон бүтээлч ажил','Нийгмийн шинэчлэлийн чиглэл'] },
+  INTJ:{ nick:'Стратегич Сэтгэгч', group:'Аналитикууд',
+    desc:'Та урт хугацааны төлөвлөгөө, стратегийн сэтгэлгээтэй, бие даасан хүн. Логик, үр дүнтэй систем зохион бүтээхэд дуртай.',
+    strengths:['Стратегийн сэтгэлгээтэй','Бие даасан, шийдэмгий','Өндөр стандарт тавьдаг','Асуудлыг систем байдлаар шийддэг'],
+    weaknesses:['Хэт шүүмжлэгч байж болзошгүй','Мэдрэмжийн илэрхийллийг үл тоомсорлодог','Уян хатан бус байж болзошгүй','Ганцаардахад дуртай'],
+    relationships:'Гүн бодолтой хамтрагч боловч мэдрэмжээ шууд илэрхийлэхээс илүү үйлдлээрээ хайраа харуулдаг.',
+    career:['Стратегийн төлөвлөлт, менежмент','Инженер, IT архитектор','Судалгаа, шинжлэх ухаан','Хуулийн болон санхүүгийн шинжээч'] },
+  ISTP:{ nick:'Ур чадварлаг Мастерчин', group:'Судлаачид',
+    desc:'Та практик асуудлыг гараараа, туршилтаар шийддэг, тайван, бие даасан хүн. Механизм, техник хэрхэн ажилладагт сонирхолтой.',
+    strengths:['Практик, шийдэл гаргадаг','Тайван, стресст тэсвэртэй','Уян хатан, дасан зохицдог','Гараар хийх чадвар сайтай'],
+    weaknesses:['Урт хугацааны төлөвлөлтөд дургүй','Сэтгэл хөдлөлөө нуудаг','Дүрэм журмыг үл тоомсорлодог','Тогтмол уйтгартай ажлаас залхдаг'],
+    relationships:'Хамтрагчдаа орон зай, эрх чөлөөг үнэлдэг, үйлдлээрээ илүү анхаарал халамжаа харуулдаг.',
+    career:['Инженер, механик','IT, программ хангамж','Спорт, гар урлал','Онцгой байдал, аврах ажилтан'] },
+  ISFP:{ nick:'Уян зохих Зураач', group:'Судлаачид',
+    desc:'Та гоо зүй, мэдрэмжээ дагаж амьдардаг, зөөлөн, хүлээцтэй хүн. Одоо энэ мөчид амьдрахыг эрхэмлэдэг.',
+    strengths:['Уран сэтгэмжтэй, эмзэг мэдрэмжтэй','Хүлээцтэй, тэвчээртэй','Практик тусламж үзүүлдэг','Уян хатан, дасан зохицдог'],
+    weaknesses:['Зөрчилдөөнөөс зайлсхийдэг','Урт хугацааны төлөвлөлтөд дургүй','Өөрийгөө дутуу үнэлдэг','Шүүмжлэлд мэдрэмтгий'],
+    relationships:'Дулаан, мэдрэмжтэй хамтрагч, гэхдээ өөрийн мэдрэмжийг үгээр илэрхийлэхээс илүү үйлдлээр харуулдаг.',
+    career:['Урлаг, дизайн','Хөгжим, бүтээлч ажил','Мал эмнэлэг, амьтадтай ажиллах','Аялал жуулчлал, зочид буудал'] },
+  INFP:{ nick:'Идеалист Зохиолч', group:'Дипломатууд',
+    desc:'Та өөрийн үнэт зүйлсдээ үнэнч, гүн ухаант, бүтээлч хүн. Дэлхийг илүү сайхан газар болгохыг мөрөөддөг.',
+    strengths:['Идеалист, үнэт зүйлдээ үнэнч','Бүтээлч, төсөөлөлтэй','Өрөвч сэтгэлтэй','Уян хатан, нээлттэй'],
+    weaknesses:['Практик асуудлаас холдох хандлагатай','Хэт өөрийгөө шүүмжилдэг','Зөрчилдөөнөөс зайлсхийдэг','Шийдвэр гаргахад удаан'],
+    relationships:'Гүн, чин сэтгэлийн холбоог эрмэлздэг, хамтрагчийнхаа өвөрмөц зан чанарыг үнэлдэг.',
+    career:['Бичгийн ажил, зохиолч','Сэтгэл зүйч, зөвлөгч','Урлаг, хөгжим','Нийгмийн ажил, буяны байгууллага'] },
+  INTP:{ nick:'Логикч Судлаач', group:'Аналитикууд',
+    desc:'Та онол, санаа, тогтолцоог гүнзгий шинжлэх дуртай, шинжлэх ухааны сэтгэлгээтэй хүн. Асуулт асуух, ойлголтыг гүнзгийрүүлэхэд дуртай.',
+    strengths:['Логик, шинжлэх сэтгэлгээтэй','Бие даасан, шинэлэг','Гүнзгий мэдлэгтэй','Уян хатан, нээлттэй сэтгэлгээ'],
+    weaknesses:['Практик асуудлыг үл тоомсорлодог','Мэдрэмжийн илэрхийлэл султай','Даалгавраа дуусгахад удаан','Нийгмийн харилцаанд дургүй'],
+    relationships:'Оюуны хувьд өдөөх хамтрагчийг эрмэлздэг, гэхдээ мэдрэмжийн илэрхийлэл багатай байж болно.',
+    career:['Судалгаа, шинжлэх ухаан','IT, программ хангамж','Инженер','Их сургууль, эрдэм шинжилгээ'] },
+  ESTP:{ nick:'Идэвхтэй Тэмцэгч', group:'Судлаачид',
+    desc:'Та үйлдэлдээ шуурхай, эрсдэлээс айдаггүй, одоо энэ мөчид амьдардаг эрч хүчтэй хүн. Практик асуудлыг шуурхай шийддэг.',
+    strengths:['Шуурхай, шийдэмгий','Практик, бодитой','Нийгмийн харилцаанд амжилттай','Стресст тэсвэртэй'],
+    weaknesses:['Урт хугацааны төлөвлөлтөд дургүй','Тэвчээр багатай','Эрсдэлд дуртай','Дэлгэрэнгүй судалгаанаас зайлсхийдэг'],
+    relationships:'Хөгжилтэй, эрч хүчтэй хамтрагч, амьдралыг хамт идэвхтэй мэдрэхийг эрмэлздэг.',
+    career:['Худалдаа, борлуулалт','Спорт, дасгалжуулагч','Онцгой байдал, цагдаа','Бизнес эрхлэгч'] },
+  ESFP:{ nick:'Хөгжилтэй Жүжигчин', group:'Судлаачид',
+    desc:'Та найрсаг, эрч хүчтэй, хүмүүстэй байхад баяр хөөртэй хүн. Амьдралыг тэмдэглэж, бусдыг хөгжөөхөд дуртай.',
+    strengths:['Найрсаг, эерэг','Уян хатан, дасан зохицдог','Практик тусламж үзүүлдэг','Багаар сайн ажилладаг'],
+    weaknesses:['Урт хугацааны төлөвлөлтөд дургүй','Шүүмжлэлд мэдрэмтгий','Анхаарал төвлөрөл сул','Зөрчилдөөнөөс зайлсхийдэг'],
+    relationships:'Дулаан, нээлттэй хамтрагч, хамт цагийг хөгжилтэй өнгөрөөхийг эрмэлздэг.',
+    career:['Урлаг, тайзны ажил','Зочид буудал, үйлчилгээ','Хүүхдийн боловсрол','Худалдаа, PR'] },
+  ENFP:{ nick:'Урам зоригтой Илтгэгч', group:'Дипломатууд',
+    desc:'Та шинэ боломж, санааг эрч хүчтэйгээр эрэлхийлдэг, найрсаг, бүтээлч хүн. Хүмүүсийг холбож, урам зориг өгөхөд дуртай.',
+    strengths:['Урам зоригтой, эерэг','Бүтээлч, шинэлэг','Найрсаг, харилцаа сайтай','Уян хатан, дасан зохицдог'],
+    weaknesses:['Анхаарал төвлөрөл сул','Дэлгэрэнгүй ажлаас залхдаг','Хэт олон зүйл эхэлдэг','Шүүмжлэлд мэдрэмтгий'],
+    relationships:'Эрч хүчтэй, урам зоригтой хамтрагч, гүнзгий холбоо, шинэ адал явдлыг хоёуланг нь эрмэлздэг.',
+    career:['Маркетинг, PR','Сэтгүүл зүй, контент бүтээх','Багш, сургалт','Бизнес эрхлэгч, инновац'] },
+  ENTP:{ nick:'Мэтгэлцэгч Шинэлэгч', group:'Аналитикууд',
+    desc:'Та санаа бодлыг мэтгэлцэж, шинэ боломж, шийдэл олоход дуртай, эрч хүчтэй, оюуны хувьд түргэн хүн.',
+    strengths:['Шинэлэг, бүтээлч','Мэтгэлцэх чадвар сайтай','Уян хатан сэтгэлгээ','Асуудлыг шинэ өнцгөөр харах'],
+    weaknesses:['Даалгавраа дуусгахад удаан','Дэлгэрэнгүй ажлаас залхдаг','Бусдын мэдрэмжийг үл тоомсорлож болзошгүй','Тогтвортой байдалд дургүй'],
+    relationships:'Оюуны хувьд өдөөх, мэтгэлцээнд дуртай хамтрагч, гэхдээ тогтвортой дэглэмд дуртай хүнд эсрэг тэсрэг санагдаж болно.',
+    career:['Бизнес эрхлэгч','Хуульч, зөвлөгч','Маркетинг, инновац','IT, стартап'] },
+  ESTJ:{ nick:'Тууштай Удирдагч', group:'Харуулчид',
+    desc:'Та тодорхой зорилго, дүрэм журмаар удирдан зохион байгуулдаг, шийдэмгий, практик хүн. Хариуцлага хүлээхэд бэлэн.',
+    strengths:['Зохион байгуулалттай, шийдэмгий','Найдвартай, хариуцлагатай','Практик шийдэл гаргадаг','Удирдах чадвар сайтай'],
+    weaknesses:['Уян хатан бус байж болзошгүй','Мэдрэмжийг үл тоомсорлож болзошгүй','Шүүмжлэгч байдаг','Өөрчлөлтөд удаан дасдаг'],
+    relationships:'Найдвартай, тогтвортой хамтрагч, гэр бүл, найз нөхдийнхөө төлөө хариуцлага хүлээхэд бэлэн.',
+    career:['Менежмент, удирдлага','Цэрэг, хууль сахиулах','Санхүү, банк','Захиргаа, төрийн алба'] },
+  ESFJ:{ nick:'Найрсаг Зохион байгуулагч', group:'Харуулчид',
+    desc:'Та бусдын хэрэгцээнд анхаарал тавьдаг, найрсаг, зохион байгуулалттай хүн. Хамт олны эв нэгдлийг эрхэмлэдэг.',
+    strengths:['Найрсаг, өрөвч сэтгэлтэй','Зохион байгуулалттай','Хариуцлагатай, найдвартай','Багаар сайн ажилладаг'],
+    weaknesses:['Шүүмжлэлд мэдрэмтгий','Бусдын зөвшөөрлийг хэт эрэлхийлдэг','Өөрчлөлтөд удаан дасдаг','Зөрчилдөөнөөс зайлсхийдэг'],
+    relationships:'Дулаан, анхааралтай хамтрагч, гэр бүл найз нөхдийнхөө сайн сайхны төлөө идэвхтэй зүтгэдэг.',
+    career:['Боловсрол, багш','Эрүүл мэнд, сувилахуй','Үйлчилгээний салбар','Хүний нөөц'] },
+  ENFJ:{ nick:'Урамшуулагч Удирдагч', group:'Дипломатууд',
+    desc:'Та бусдыг урамшуулж, тэдний потенциалыг нээхэд туслах хүсэлтэй, найрсаг, зорилготой удирдагч.',
+    strengths:['Урам зориг өгдөг','Харилцааны чадвар сайтай','Зорилготой, зохион байгуулалттай','Бусдын мэдрэмжийг сайн ойлгодог'],
+    weaknesses:['Өөрийн хэрэгцээгээ орхигддог','Бусдын зөвшөөрлийг хэт эрэлхийлдэг','Шүүмжлэлд мэдрэмтгий','Хэт их үүрэг хариуцлага авдаг'],
+    relationships:'Гүн, дэмжлэгтэй хамтрагч, харилцаандаа бусдын өсөлт хөгжлийг эрмэлздэг.',
+    career:['Багш, сургагч','Хүний нөөц, зөвлөгч','Нийгмийн ажил','Удирдлага, менежмент'] },
+  ENTJ:{ nick:'Тэргүүлэгч Командлагч', group:'Аналитикууд',
+    desc:'Та зорилгодоо хүрэхийн тулд хүмүүс, нөөцийг зохион байгуулдаг, шийдэмгий, стратегийн сэтгэлгээтэй удирдагч.',
+    strengths:['Шийдэмгий, зорилготой','Стратегийн сэтгэлгээтэй','Удирдах чадвар сайтай','Үр дүнд төвлөрдөг'],
+    weaknesses:['Тэвчээргүй байж болзошгүй','Мэдрэмжийг үл тоомсорлож болзошгүй','Хэт шаардлагатай байдаг','Уян хатан бус байж болзошгүй'],
+    relationships:'Хамтрагчдаасаа өндөр стандарт хүлээдэг, гэхдээ хамтдаа зорилгодоо хүрэхийг эрмэлздэг.',
+    career:['Дээд шатны менежмент','Бизнес эрхлэгч','Хууль, улс төр','Стратегийн зөвлөгч'] },
+};
+
+function openMBTI16Test() {
+  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('modal-box').innerHTML = `
+    <h3>🧩 Зан төлөвийн 16 хэв шинжийг тодорхойлох тест</h3>
+    <p class="msub">Бүх 60 асуултад үнэн зөв хариулна уу. Эцэст нь таны зан төлөв 16 хэв шинжийн алинд хамгийн ойр болохыг тодорхойлж, дэлгэрэнгүй тодорхойлолт гаргана.</p>
+    <div id="mq-wrap">
+      <div style="font-weight:800;font-size:.9rem;margin:.6rem 0;color:var(--gold);">1-р хэсэг · Экстраверт ↔ Интроверт</div>
+      ${MBTI_EI_QS.map((q,i)=>renderQuestionBlock({}, q, i, 'mei')).join('')}
+      <div style="font-weight:800;font-size:.9rem;margin:.6rem 0;color:var(--gold);">2-р хэсэг · Мэдрэхүй ↔ Зөн совин</div>
+      ${MBTI_SN_QS.map((q,i)=>renderQuestionBlock({}, q, i, 'msn')).join('')}
+      <div style="font-weight:800;font-size:.9rem;margin:.6rem 0;color:var(--gold);">3-р хэсэг · Логик ↔ Мэдрэмж</div>
+      ${MBTI_TF_QS.map((q,i)=>renderQuestionBlock({}, q, i, 'mtf')).join('')}
+      <div style="font-weight:800;font-size:.9rem;margin:.6rem 0;color:var(--gold);">4-р хэсэг · Төлөвлөгч ↔ Уян хатан</div>
+      ${MBTI_JP_QS.map((q,i)=>renderQuestionBlock({}, q, i, 'mjp')).join('')}
+    </div>
+    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="scoreMBTI16Test()">Дүн харах</button></div>
+  `;
+}
+
+async function scoreMBTI16Test() {
+  const readGroup = (qs, prefix) => {
+    let total = 0;
+    for (let i=0;i<qs.length;i++){
+      const sel = document.querySelector(`input[name="${prefix}${i}"]:checked`);
+      if (!sel) return null;
+      total += parseFloat(sel.value);
+    }
+    return total;
+  };
+  const eiScore = readGroup(MBTI_EI_QS, 'mei'); // өндөр = E
+  const snScore = readGroup(MBTI_SN_QS, 'msn'); // өндөр = S
+  const tfScore = readGroup(MBTI_TF_QS, 'mtf'); // өндөр = T
+  const jpScore = readGroup(MBTI_JP_QS, 'mjp'); // өндөр = J
+  if ([eiScore, snScore, tfScore, jpScore].some(v => v === null)) { showToast('Бүх асуултад хариулна уу.', 'warn'); return; }
+
+  const MAX = 75; // 15 асуулт * 5 оноо
+  const dich = [
+    { letters:['E','I'], score:eiScore, pctFirst: Math.round(eiScore/MAX*100) },
+    { letters:['S','N'], score:snScore, pctFirst: Math.round(snScore/MAX*100) },
+    { letters:['T','F'], score:tfScore, pctFirst: Math.round(tfScore/MAX*100) },
+    { letters:['J','P'], score:jpScore, pctFirst: Math.round(jpScore/MAX*100) },
+  ];
+  const typeCode = dich.map(d => d.pctFirst >= 50 ? d.letters[0] : d.letters[1]).join('');
+  const info = MBTI_TYPES[typeCode];
+
+  if (currentUser?.id) {
+    const { error } = await sb.from('test_results').insert({ user_id: currentUser.id, test_key:'mbti16', score: Math.round((eiScore+snScore+tfScore+jpScore)/4/MAX*100), max_score: 100, level: `${typeCode} — ${info.nick}` });
+    if (error) console.error('test_results save error:', error);
+    loadMonthlyAnalysis();
+  }
+
+  const dichBars = dich.map(d => {
+    const pctA = d.pctFirst, pctB = 100 - pctA;
+    const dominant = pctA >= 50 ? d.letters[0] : d.letters[1];
+    const dominantPct = pctA >= 50 ? pctA : pctB;
+    return `<div style="margin-bottom:.9rem;">
+      <div style="display:flex;justify-content:space-between;font-size:.84rem;font-weight:700;margin-bottom:.3rem;"><span>${d.letters[0]}</span><span>${d.letters[1]}</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pctA}%;"></div></div>
+      <div style="text-align:center;font-size:.78rem;color:var(--sub);margin-top:.2rem;">${dominant} — ${dominantPct}%</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('modal-box').innerHTML = `
+    <h3>Зан төлөвийн 16 хэв шинж — Үр дүн</h3>
+    <div class="result-level">${typeCode} — ${info.nick} <span style="font-size:.75rem;font-weight:600;color:var(--sub);">(${info.group})</span></div>
+    <div class="result-block">${info.desc}</div>
+    <div style="margin:1.1rem 0;">${dichBars}</div>
+    <div class="result-block"><b>💪 Давуу тал:</b><ul style="margin:.4rem 0 0 1.1rem;padding:0;">${info.strengths.map(s=>`<li>${s}</li>`).join('')}</ul></div>
+    <div class="result-block"><b>⚠️ Сул тал:</b><ul style="margin:.4rem 0 0 1.1rem;padding:0;">${info.weaknesses.map(s=>`<li>${s}</li>`).join('')}</ul></div>
+    <div class="result-block"><b>💞 Харилцаанд хэрхэн илэрдэг:</b> ${info.relationships}</div>
+    <div class="result-block"><b>💼 Тохирох карьерийн чиглэл:</b><ul style="margin:.4rem 0 0 1.1rem;padding:0;">${info.career.map(s=>`<li>${s}</li>`).join('')}</ul></div>
+    <div class="result-block"><b>Тайлбар:</b> Энэ бол таны зан төлөвийн онцлог бөгөөд "засах шаардлагатай асуудал" биш — хүн бүр өөр өөр хэв шинжтэй байдаг.</div>
+    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button></div>
+  `;
+}
+
 /* ================= FEED (Facebook маягийн нийтийн пост + сэтгэгдэл, Supabase-тэй холбогдсон) ================= */
 let feedState = [];
 let COMMENTS_BY_POST = {};
@@ -3864,8 +4172,8 @@ function commentHTML(c) {
   return `<div class="comment-row" style="display:flex;gap:.5rem;padding:.5rem 0;border-top:1px solid var(--line);">
     <div class="post-avatar" style="width:26px;height:26px;font-size:.75rem;flex-shrink:0;">🪖</div>
     <div style="flex:1;min-width:0;">
-      <div style="font-size:.78rem;font-weight:700;">${c.anon_handle}<span style="font-weight:400;color:var(--sub);margin-left:.5rem;">${timeAgo(c.created_at)}</span></div>
-      <div style="font-size:.85rem;word-break:break-word;">${c.text}</div>
+      <div style="font-size:.78rem;font-weight:700;">${esc(c.anon_handle)}<span style="font-weight:400;color:var(--sub);margin-left:.5rem;">${timeAgo(c.created_at)}</span></div>
+      <div style="font-size:.85rem;word-break:break-word;">${esc(c.text)}</div>
     </div>
     ${isMine ? `<button onclick="deleteComment('${c.id}','${c.post_id}')" title="Устгах" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>` : ''}
   </div>`;
@@ -3883,10 +4191,10 @@ function postHTML(p) {
   const { emo, body } = splitPostText(p.text);
   return `
   <div class="post" id="post-${p.id}">
-    <div class="post-head"><div class="post-avatar">🪖${emo ? `<span class="post-mood-badge">${emo}</span>` : ''}</div><div><div class="post-name">${p.anon_handle}</div><div class="post-time">${timeAgo(p.created_at)}</div></div>
+    <div class="post-head"><div class="post-avatar">🪖${emo ? `<span class="post-mood-badge">${esc(emo)}</span>` : ''}</div><div><div class="post-name">${esc(p.anon_handle)}</div><div class="post-time">${timeAgo(p.created_at)}</div></div>
       ${isMine ? `<button onclick="deletePost('${p.id}')" title="Устгах" style="margin-left:auto;background:none;border:none;color:var(--sub);cursor:pointer;">🗑</button>` : ''}
     </div>
-    <p class="post-text">${body}</p>
+    <p class="post-text">${esc(body)}</p>
     <div style="display:flex;align-items:center;justify-content:space-between;padding:.3rem 0;">
       ${reactionSummaryHTML(p.id)}
       <div class="post-action" onclick="toggleComments('${p.id}')" style="cursor:pointer;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5A8.5 8.5 0 1 1 21 11.5z"/></svg>${comments.length} сэтгэгдэл</div>
@@ -3909,8 +4217,8 @@ function postPreviewHTML(p) {
   const comments = COMMENTS_BY_POST[p.id] || [];
   return `
   <div class="post">
-    <div class="post-head"><div class="post-avatar">🪖${emo ? `<span class="post-mood-badge">${emo}</span>` : ''}</div><div><div class="post-name">${p.anon_handle}</div><div class="post-time">${timeAgo(p.created_at)}</div></div></div>
-    <p class="post-text">${body}</p>
+    <div class="post-head"><div class="post-avatar">🪖${emo ? `<span class="post-mood-badge">${esc(emo)}</span>` : ''}</div><div><div class="post-name">${esc(p.anon_handle)}</div><div class="post-time">${timeAgo(p.created_at)}</div></div></div>
+    <p class="post-text">${esc(body)}</p>
     <div style="display:flex;align-items:center;justify-content:space-between;">
       ${reactionSummaryHTML(p.id)}
       <div style="color:var(--sub);font-size:.78rem;font-weight:700;">${comments.length} сэтгэгдэл</div>
@@ -4083,13 +4391,13 @@ function renderPros() {
     <div class="pro-card">
       <div class="pro-top">
         <div class="pro-avatar">👩‍⚕️</div>
-        <div style="flex:1;"><div class="pro-name">${p.name}</div><div class="pro-spec">${p.spec}</div>
-          <div class="pro-meta"><span class="star">★ ${p.rating}</span><span>${p.years} жилийн туршлага</span><span>📍 ${p.location}</span></div>
+        <div style="flex:1;"><div class="pro-name">${esc(p.name)}</div><div class="pro-spec">${esc(p.spec)}</div>
+          <div class="pro-meta"><span class="star">★ ${p.rating}</span><span>${p.years} жилийн туршлага</span><span>📍 ${esc(p.location)}</span></div>
         </div>
         <div class="pro-price">${p.price.toLocaleString()}₮</div>
       </div>
       <div class="pro-actions">
-        <button class="txt" onclick="openChat('${p.id}','${p.name}')">💬 Чатаар холбогдох</button>
+        <button class="txt" onclick="openChat('${p.id}','${escAttr(p.name)}')">💬 Чатаар холбогдох</button>
       </div>
     </div>`).join('');
 }
@@ -4184,7 +4492,7 @@ function subscribeMyContentRealtime() {
     refreshBellBadge();
     loadPosts();
     const r = REACTION_MAP[payload.new.reaction] || REACTION_MAP.like;
-    showToast(`${r.emo} ${payload.new.anon_handle} таны нийтлэлд ${r.label} өгсөн!`, 'info', 5000);
+    showToast(`${r.emo} ${esc(payload.new.anon_handle)} таны нийтлэлд ${r.label} өгсөн!`, 'info', 5000);
   };
   myContentChannel = sb.channel('my-content-' + currentUser.id)
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'comments' }, (payload) => {
@@ -4192,7 +4500,7 @@ function subscribeMyContentRealtime() {
       const post = feedState.find(p => p.id === payload.new.post_id);
       if (!post || post.user_id !== currentUser.id) return; // миний нийтлэл биш бол алгасна
       refreshBellBadge();
-      showToast(`💬 ${payload.new.anon_handle} таны нийтлэлд сэтгэгдэл бичлээ!`, 'info', 5000);
+      showToast(`💬 ${esc(payload.new.anon_handle)} таны нийтлэлд сэтгэгдэл бичлээ!`, 'info', 5000);
     })
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'post_likes' }, onReaction)
     .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'post_likes' }, onReaction)
@@ -4305,12 +4613,12 @@ document.addEventListener('click', (e) => {
 function notifItemHtml(item) {
   return `
     <div class="notif-item" onclick="${item.onclick}">
-      <div class="ni-icon">${item.icon}</div>
+      <div class="ni-icon">${esc(item.icon)}</div>
       <div class="ni-body">
-        <div class="ni-title">${item.title}</div>
-        <div class="ni-sub">${item.sub}</div>
+        <div class="ni-title">${esc(item.title)}</div>
+        <div class="ni-sub">${esc(item.sub)}</div>
       </div>
-      <div class="ni-time">${item.time}</div>
+      <div class="ni-time">${esc(item.time)}</div>
     </div>`;
 }
 
@@ -4368,7 +4676,7 @@ async function loadNotifItems() {
           sub: m.body,
           time: timeAgo(m.created_at),
           ts: new Date(m.created_at).getTime(),
-          onclick: `toggleNotifDropdown(); goto('pros'); setTimeout(()=>openChat('${proId}', '${(pro?.name||'').replace(/'/g,"")}'), 200);`,
+          onclick: `toggleNotifDropdown(); goto('pros'); setTimeout(()=>openChat('${proId}', '${escAttr(pro?.name||'')}'), 200);`,
         });
       }
     }
@@ -4485,8 +4793,8 @@ async function loadRiskAlertsForPro() {
     <div class="unit-row" style="align-items:flex-start;${a.acknowledged?'opacity:.55;':''}">
       <div style="flex:1;">
         <div style="font-weight:700;font-size:.85rem;">${riskAlertLabel(a.reason)}</div>
-        <div style="font-size:.8rem;color:var(--sub);margin:.2rem 0;">${a.detail}</div>
-        <div style="font-size:.72rem;color:var(--sub);">${a.anon_handle} · ${timeAgo(a.created_at)}</div>
+        <div style="font-size:.8rem;color:var(--sub);margin:.2rem 0;">${esc(a.detail)}</div>
+        <div style="font-size:.72rem;color:var(--sub);">${esc(a.anon_handle)} · ${timeAgo(a.created_at)}</div>
       </div>
       ${a.acknowledged
         ? `<span style="font-size:.75rem;color:var(--sub);">✓ Хүлээж авсан</span>`
@@ -4528,7 +4836,7 @@ async function loadProChatThreads() {
   el.innerHTML = list.map(([uid, m]) => `
     <div class="unit-row" style="cursor:pointer;" onclick="openProChat('${uid}')">
       <div class="unit-name">Нэрээ нуусан хэрэглэгч #${uid.slice(0,8)}…</div>
-      <div style="color:var(--sub);font-size:.78rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.sender === 'user' ? '👤' : '✅'} ${m.body}</div>
+      <div style="color:var(--sub);font-size:.78rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.sender === 'user' ? '👤' : '✅'} ${esc(m.body)}</div>
     </div>
   `).join('');
 }
@@ -4578,7 +4886,7 @@ async function loadProChatMessages() {
       <div style="max-width:75%;padding:.5rem .8rem;border-radius:12px;font-size:.85rem;
         background:${m.sender !== 'user' ? 'var(--gold)' : '#fff'};
         color:${m.sender !== 'user' ? '#fff' : 'var(--cream)'};
-        border:1px solid var(--line);">${m.body}</div>
+        border:1px solid var(--line);">${esc(m.body)}</div>
     </div>`).join('');
   el.scrollTop = el.scrollHeight;
 }
@@ -4673,7 +4981,7 @@ function renderChatMessages(msgs) {
       <div style="max-width:75%;padding:.5rem .8rem;border-radius:12px;font-size:.85rem;
         background:${m.sender === 'user' ? 'var(--gold)' : '#fff'};
         color:${m.sender === 'user' ? '#fff' : 'var(--cream)'};
-        border:1px solid var(--line);">${m.body}</div>
+        border:1px solid var(--line);">${esc(m.body)}</div>
     </div>`).join('');
   el.scrollTop = el.scrollHeight;
 }
@@ -4689,6 +4997,73 @@ async function sendChatMessage() {
   if (error) { showToast('Илгээхэд алдаа гарлаа: ' + error.message, 'error'); return; }
   loadChatMessages();
   refreshUserUnreadReplies();
+}
+
+/* ================= AI ТУСЛАХ (Сэтгэл зүйн дэмжлэг үзүүлдэг чат-бот) ================= */
+let aiChatHistoryCache = [];
+
+function renderAIChatMessages(showTyping) {
+  const el = document.getElementById('ai-chat-messages');
+  if (!el) return;
+  if (!aiChatHistoryCache.length && !showTyping) {
+    el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;text-align:center;padding:2rem 0;">Сайн байна уу 👋 Би танд сэтгэл зүйн талаар туслах AI туслах байна. Юугаараа туслах вэ?</div>';
+    return;
+  }
+  el.innerHTML = aiChatHistoryCache.map(m => `
+    <div style="display:flex;justify-content:${m.role === 'user' ? 'flex-end' : 'flex-start'};margin-bottom:.6rem;">
+      <div style="max-width:78%;padding:.6rem .85rem;border-radius:14px;font-size:.87rem;line-height:1.45;white-space:pre-wrap;
+        background:${m.role === 'user' ? 'var(--gold)' : '#fff'};
+        color:${m.role === 'user' ? '#fff' : 'var(--cream)'};
+        border:1px solid var(--line);">${esc(m.content)}</div>
+    </div>`).join('') + (showTyping ? `
+    <div style="display:flex;justify-content:flex-start;margin-bottom:.6rem;">
+      <div style="padding:.6rem .85rem;border-radius:14px;font-size:.87rem;background:#fff;border:1px solid var(--line);color:var(--sub);">бичиж байна...</div>
+    </div>` : '');
+  el.scrollTop = el.scrollHeight;
+}
+
+async function loadAIChatHistory() {
+  if (!currentUser?.id) return;
+  const { data, error } = await sb.from('ai_chat_messages')
+    .select('role, content, created_at')
+    .eq('user_id', currentUser.id)
+    .order('created_at', { ascending: true })
+    .limit(200);
+  if (error) { console.error('loadAIChatHistory error:', error); return; }
+  aiChatHistoryCache = data || [];
+  renderAIChatMessages(false);
+}
+
+async function sendAIChatMessage() {
+  const input = document.getElementById('ai-chat-input');
+  const sendBtn = document.getElementById('ai-chat-send-btn');
+  const message = input.value.trim();
+  if (!message || !currentUser?.id) return;
+  input.value = '';
+  sendBtn.disabled = true;
+
+  // Хэрэглэгчийн мессежийг шууд дэлгэцэнд, мөн санд хадгална
+  aiChatHistoryCache.push({ role: 'user', content: message, created_at: new Date().toISOString() });
+  renderAIChatMessages(true);
+  const { error: insErr } = await sb.from('ai_chat_messages').insert({ user_id: currentUser.id, role: 'user', content: message });
+  if (insErr) console.error('ai_chat_messages insert (user) error:', insErr);
+
+  try {
+    // Supabase Edge Function руу дуудна (backend дээр AI API түлхүүрийг нууцаар хадгалдаг)
+    const { data, error } = await sb.functions.invoke('ai-chat', {
+      body: { message, history: aiChatHistoryCache.slice(-20) },
+    });
+    if (error) throw error;
+    const reply = data?.reply || 'Уучлаарай, одоогоор хариу өгч чадсангүй. Дахин оролдоно уу.';
+    aiChatHistoryCache.push({ role: 'assistant', content: reply, created_at: new Date().toISOString() });
+    const { error: insErr2 } = await sb.from('ai_chat_messages').insert({ user_id: currentUser.id, role: 'assistant', content: reply });
+    if (insErr2) console.error('ai_chat_messages insert (assistant) error:', insErr2);
+  } catch (e) {
+    console.error('AI chat error:', e);
+    aiChatHistoryCache.push({ role: 'assistant', content: 'Уучлаарай, AI туслахтай холбогдоход алдаа гарлаа. Түр хүлээгээд дахин оролдоно уу, эсвэл "Сэтгэл зүйч" хэсгээр мэргэжилтэнтэй холбогдоно уу.', created_at: new Date().toISOString() });
+  }
+  renderAIChatMessages(false);
+  sendBtn.disabled = false;
 }
 
 function subscribeChatRealtime() {
@@ -4808,6 +5183,7 @@ const ADMIN_ITEMS = [
 document.getElementById('admin-grid').innerHTML = ADMIN_ITEMS.map(a => `
   <div class="admin-card" onclick="${
     a.label === 'Хэрэглэгч' ? "showAdminUsersView()" :
+    a.label === 'Тест' ? "showAdminTestResultsView()" :
     a.label === 'Пост' ? "showAdminPostsView()" :
     a.label === 'Мэргэжилтэн' ? "showAdminProfessionalsView()" :
     a.label === 'Статистик' ? "showAdminStatsView()" :
@@ -4823,7 +5199,7 @@ async function loadAdminRiskAlerts() {
   if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж чадсангүй (SQL хүснэгт тохируулагдаагүй байж болзошгүй).</div>'; return; }
   if (!data || !data.length) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор эрсдэлийн дохио алга.</div>'; return; }
   el.innerHTML = data.map(a => `
-    <div class="risk-row"><span class="risk-id">${a.anon_handle}</span><span>${a.detail}</span><span class="risk-score ${a.severity==='critical'?'risk-high':'risk-med'}">${a.severity==='critical'?'Яаралтай':'Өндөр'}${a.acknowledged?' · Хүлээж авсан':''}</span></div>
+    <div class="risk-row"><span class="risk-id">${esc(a.anon_handle)}</span><span>${esc(a.detail)}</span><span class="risk-score ${a.severity==='critical'?'risk-high':'risk-med'}">${a.severity==='critical'?'Яаралтай':'Өндөр'}${a.acknowledged?' · Хүлээж авсан':''}</span></div>
   `).join('');
 }
 
@@ -4843,6 +5219,7 @@ function showAdminUsersView() {
   document.getElementById('admin-other-sections').style.display = 'none';
   document.getElementById('admin-posts-section').style.display = 'none';
   document.getElementById('admin-professionals-panel').style.display = 'none';
+  document.getElementById('admin-test-results-section').style.display = 'none';
   document.getElementById('admin-registered-users-section').style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -4856,6 +5233,7 @@ function showAdminPostsView() {
   document.getElementById('admin-other-sections').style.display = 'none';
   document.getElementById('admin-registered-users-section').style.display = 'none';
   document.getElementById('admin-professionals-panel').style.display = 'none';
+  document.getElementById('admin-test-results-section').style.display = 'none';
   document.getElementById('admin-posts-section').style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -4869,11 +5247,27 @@ function showAdminProfessionalsView() {
   document.getElementById('admin-other-sections').style.display = 'none';
   document.getElementById('admin-registered-users-section').style.display = 'none';
   document.getElementById('admin-posts-section').style.display = 'none';
+  document.getElementById('admin-test-results-section').style.display = 'none';
   document.getElementById('admin-professionals-panel').style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 function hideAdminProfessionalsView() {
   document.getElementById('admin-professionals-panel').style.display = 'none';
+  document.getElementById('admin-grid').style.display = '';
+  document.getElementById('admin-other-sections').style.display = '';
+}
+function showAdminTestResultsView() {
+  document.getElementById('admin-grid').style.display = 'none';
+  document.getElementById('admin-other-sections').style.display = 'none';
+  document.getElementById('admin-registered-users-section').style.display = 'none';
+  document.getElementById('admin-posts-section').style.display = 'none';
+  document.getElementById('admin-professionals-panel').style.display = 'none';
+  document.getElementById('admin-test-results-section').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  loadAdminTestResultsList();
+}
+function hideAdminTestResultsView() {
+  document.getElementById('admin-test-results-section').style.display = 'none';
   document.getElementById('admin-grid').style.display = '';
   document.getElementById('admin-other-sections').style.display = '';
 }
@@ -4883,6 +5277,7 @@ function showAdminStatsView() {
   document.getElementById('admin-registered-users-section').style.display = 'none';
   document.getElementById('admin-posts-section').style.display = 'none';
   document.getElementById('admin-professionals-panel').style.display = 'none';
+  document.getElementById('admin-test-results-section').style.display = 'none';
   document.getElementById('admin-stats-section').style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'smooth' });
   // Хэрэв өмнө нь ачаалагдаагүй бол, эсвэл шинэчлэхийн тулд дахин дуудна
@@ -4893,6 +5288,43 @@ function hideAdminStatsView() {
   document.getElementById('admin-stats-section').style.display = 'none';
   document.getElementById('admin-grid').style.display = '';
   document.getElementById('admin-other-sections').style.display = '';
+}
+
+/* ================= АДМИН: Хэрэглэгч тус бүрийн тестийн үр дүн ================= */
+let adminTestResultsRaw = [];
+async function loadAdminTestResultsList() {
+  const el = document.getElementById('admin-test-results-list');
+  if (!el) return;
+  el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div>';
+  const { data, error } = await sb.from('test_results').select('*, users(anon_handle, branch, personnel_type)').order('created_at', { ascending:false }).limit(3000);
+  if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Жагсаалт татахад алдаа гарлаа: ' + esc(error.message) + '</div>'; console.error('loadAdminTestResultsList error:', error); return; }
+  if (!data || !data.length) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор ямар ч тестийн үр дүн алга.</div>'; return; }
+  const byUser = {};
+  data.forEach(r => { (byUser[r.user_id] ||= { user: r.users, results: [] }).results.push(r); });
+  adminTestResultsRaw = Object.entries(byUser).map(([uid, v]) => ({ uid, user: v.user, results: v.results }));
+  const branchSel = document.getElementById('admin-test-results-branch-filter');
+  if (branchSel && branchSel.options.length <= 1) {
+    BRANCHES.forEach(b => { const opt = document.createElement('option'); opt.value = b.key; opt.textContent = b.label; branchSel.appendChild(opt); });
+  }
+  renderAdminTestResultsList();
+}
+function renderAdminTestResultsList() {
+  const el = document.getElementById('admin-test-results-list');
+  if (!el) return;
+  const q = (document.getElementById('admin-test-results-search')?.value || '').trim().toLowerCase();
+  const branchFilter = document.getElementById('admin-test-results-branch-filter')?.value || '';
+  let list = adminTestResultsRaw;
+  if (branchFilter) list = list.filter(u => u.user?.branch === branchFilter);
+  if (q) list = list.filter(u => (u.user?.anon_handle || '').toLowerCase().includes(q));
+  if (!list.length) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Тохирох үр дүн олдсонгүй.</div>'; return; }
+  el.innerHTML = list.map(u => `
+    <div class="comment-row" style="padding:.7rem 0;border-top:1px solid var(--line);">
+      <div style="font-weight:700;font-size:.88rem;">${esc(u.user?.anon_handle) || '—'} <span style="font-weight:400;color:var(--sub);font-size:.78rem;">${esc(BRANCH_LABELS[u.user?.branch]) || ''}${u.user?.personnel_type ? ' · '+esc(ROLE_LABELS[u.user.personnel_type]||u.user.personnel_type) : ''}</span> <span style="color:var(--sub);font-size:.75rem;">(${u.results.length} тест)</span></div>
+      <div style="margin-top:.4rem;">
+        ${u.results.map(r => `<div style="font-size:.82rem;color:var(--sub);padding-left:.5rem;border-left:2px solid var(--line);margin:.15rem 0;">• ${esc(TESTS[r.test_key]?.title || r.test_key)} — ${r.score}${r.max_score!=null?('/'+r.max_score):''} ${r.level?('('+esc(r.level)+')'):''} · ${timeAgo(r.created_at)}</div>`).join('')}
+      </div>
+    </div>
+  `).join('');
 }
 
 /* ================= АДМИН: Бүх сэтгэгдлийг удирдах (харах/устгах) ================= */
@@ -4908,8 +5340,8 @@ async function loadAdminPosts() {
     <div class="comment-row" style="display:flex;gap:.5rem;padding:.6rem 0;border-top:1px solid var(--line);align-items:flex-start;">
       <div class="post-avatar" style="width:26px;height:26px;font-size:.75rem;flex-shrink:0;">🪖</div>
       <div style="flex:1;min-width:0;">
-        <div style="font-size:.78rem;font-weight:700;">${p.anon_handle}<span style="font-weight:400;color:var(--sub);margin-left:.5rem;">${timeAgo(p.created_at)}</span></div>
-        <div style="font-size:.85rem;word-break:break-word;">${p.text}</div>
+        <div style="font-size:.78rem;font-weight:700;">${esc(p.anon_handle)}<span style="font-weight:400;color:var(--sub);margin-left:.5rem;">${timeAgo(p.created_at)}</span></div>
+        <div style="font-size:.85rem;word-break:break-word;">${esc(p.text)}</div>
       </div>
       <button onclick="adminDeletePost('${p.id}')" title="Устгах" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>
     </div>
@@ -4937,8 +5369,8 @@ async function loadAdminComments() {
     <div class="comment-row" style="display:flex;gap:.5rem;padding:.6rem 0;border-top:1px solid var(--line);align-items:flex-start;">
       <div class="post-avatar" style="width:26px;height:26px;font-size:.75rem;flex-shrink:0;">🪖</div>
       <div style="flex:1;min-width:0;">
-        <div style="font-size:.78rem;font-weight:700;">${c.anon_handle}<span style="font-weight:400;color:var(--sub);margin-left:.5rem;">${timeAgo(c.created_at)}</span></div>
-        <div style="font-size:.85rem;word-break:break-word;">${c.text}</div>
+        <div style="font-size:.78rem;font-weight:700;">${esc(c.anon_handle)}<span style="font-weight:400;color:var(--sub);margin-left:.5rem;">${timeAgo(c.created_at)}</span></div>
+        <div style="font-size:.85rem;word-break:break-word;">${esc(c.text)}</div>
       </div>
       <button onclick="adminDeleteComment('${c.id}')" title="Устгах" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>
     </div>
@@ -4969,7 +5401,7 @@ async function loadAdminProfessionals() {
   el.innerHTML = data.map(p => `
     <div class="unit-row">
       <div class="unit-name" style="width:auto;flex:1;">
-        <b>${p.name}</b> <span style="color:var(--sub);font-weight:400;">— ${p.spec}, ${p.location}, ${p.price.toLocaleString()}₮, ★${p.rating}</span>
+        <b>${esc(p.name)}</b> <span style="color:var(--sub);font-weight:400;">— ${esc(p.spec)}, ${esc(p.location)}, ${p.price.toLocaleString()}₮, ★${p.rating}</span>
         ${p.auth_user_id ? '<span style="color:var(--gold);font-size:.72rem;font-weight:800;"> ✓ Нэвтрэх эрхтэй</span>' : '<span style="color:var(--sub);font-size:.72rem;"> · Нэвтрэх эрхгүй</span>'}
       </div>
       <button class="modal-close" style="padding:.3rem .8rem;font-size:.78rem;" onclick='editProfessional(${JSON.stringify(p).replace(/'/g, "&apos;")})'>Засах</button>
@@ -4978,7 +5410,7 @@ async function loadAdminProfessionals() {
   `).join('');
   const linkSelect = document.getElementById('pro-link-select');
   if (linkSelect) {
-    linkSelect.innerHTML = data.map(p => `<option value="${p.id}">${p.name}${p.auth_user_id ? ' (холбогдсон)' : ''}</option>`).join('');
+    linkSelect.innerHTML = data.map(p => `<option value="${p.id}">${esc(p.name)}${p.auth_user_id ? ' (холбогдсон)' : ''}</option>`).join('');
   }
 }
 
@@ -5027,7 +5459,7 @@ async function loadAdminHrList() {
   el.innerHTML = data.map(h => `
     <div class="comment-row" style="display:flex;gap:.5rem;padding:.5rem 0;border-top:1px solid var(--line);align-items:center;">
       <div style="flex:1;min-width:0;">
-        <div style="font-size:.85rem;font-weight:700;">${h.name} <span style="font-weight:400;color:var(--sub);">${h.unit || ''}</span></div>
+        <div style="font-size:.85rem;font-weight:700;">${esc(h.name)} <span style="font-weight:400;color:var(--sub);">${esc(h.unit)}</span></div>
         ${h.auth_user_id ? '<span style="color:var(--gold);font-size:.72rem;font-weight:800;">✓ Нэвтрэх эрхтэй</span>' : '<span style="color:var(--sub);font-size:.72rem;">· Нэвтрэх эрхгүй</span>'}
       </div>
       <button onclick="adminDeleteHrSpecialist('${h.id}')" title="Устгах" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>
@@ -5134,11 +5566,71 @@ async function loadAdminChatThreads() {
   el.innerHTML = list.map(([key, m]) => {
     const [uid, proId] = key.split('|');
     const proName = (PROS.find(p => String(p.id) === String(proId)) || {}).name || ('Мэргэжилтэн #' + proId);
-    return `<div class="unit-row" style="cursor:pointer;" onclick="openAdminChat('${uid}','${proId}','${proName.replace(/'/g,"\\'")}')">
-      <div class="unit-name">Anonymous ${uid.slice(0,8)}… → ${proName}</div>
-      <div style="color:var(--sub);font-size:.78rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.sender === 'user' ? '👤' : '👩‍⚕️'} ${m.body}</div>
+    return `<div class="unit-row" style="cursor:pointer;" onclick="openAdminChat('${uid}','${proId}','${escAttr(proName)}')">
+      <div class="unit-name">Anonymous ${uid.slice(0,8)}… → ${esc(proName)}</div>
+      <div style="color:var(--sub);font-size:.78rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.sender === 'user' ? '👤' : '👩‍⚕️'} ${esc(m.body)}</div>
     </div>`;
   }).join('');
+}
+
+/* ================= АДМИН: AI Туслахын түүх (зөвхөн унших) ================= */
+async function loadAdminAIChatThreads() {
+  const el = document.getElementById('admin-ai-chat-threads');
+  if (!el) return;
+  el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div>';
+  const { data, error } = await sb.from('ai_chat_messages')
+    .select('user_id, role, content, created_at, users(branch)')
+    .order('created_at', { ascending: false })
+    .limit(2000);
+  if (error) {
+    console.error('loadAdminAIChatThreads error:', error);
+    el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж чадсангүй (ai_chat_messages хүснэгт үүсээгүй байж болзошгүй).</div>';
+    return;
+  }
+  if (!data || data.length === 0) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор хэн ч AI Туслахтай ярилцаагүй байна.</div>'; return; }
+
+  const byUser = {};
+  data.forEach(m => {
+    if (!byUser[m.user_id]) byUser[m.user_id] = { count: 0, last: m, branch: m.users?.branch };
+    byUser[m.user_id].count++;
+  });
+  const list = Object.entries(byUser).sort((a,b) => new Date(b[1].last.created_at) - new Date(a[1].last.created_at));
+
+  el.innerHTML = list.map(([uid, info]) => {
+    const branchLabel = BRANCH_LABELS[info.branch] || 'Тодорхойгүй анги';
+    const preview = (info.last.content || '').slice(0, 60);
+    return `<div class="unit-row" style="cursor:pointer;" onclick="openAdminAIChatView('${uid}')">
+      <div class="unit-name">Anonymous ${uid.slice(0,8)}… (${branchLabel})</div>
+      <div style="color:var(--sub);font-size:.78rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${info.last.role === 'user' ? '👤' : '🤖'} ${esc(preview)}</div>
+      <div style="color:var(--sub);font-size:.75rem;">${info.count} мессеж</div>
+    </div>`;
+  }).join('');
+}
+
+async function openAdminAIChatView(uid) {
+  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('modal-box').innerHTML = '<h3>🤖 AI Туслахын түүх</h3><div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div>';
+  const { data, error } = await sb.from('ai_chat_messages')
+    .select('role, content, created_at')
+    .eq('user_id', uid)
+    .order('created_at', { ascending: true });
+  if (error || !data) {
+    document.getElementById('modal-box').innerHTML = '<h3>🤖 AI Туслахын түүх</h3><p>Ачаалж чадсангүй.</p><div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button></div>';
+    return;
+  }
+  document.getElementById('modal-box').innerHTML = `
+    <h3>🤖 AI Туслахын түүх — Anonymous ${uid.slice(0,8)}…</h3>
+    <div style="max-height:420px;overflow-y:auto;border:1px solid var(--line);border-radius:12px;padding:.9rem;margin:.8rem 0;background:var(--panel-2);">
+      ${data.map(m => `
+        <div style="display:flex;justify-content:${m.role === 'user' ? 'flex-end' : 'flex-start'};margin-bottom:.6rem;">
+          <div style="max-width:78%;padding:.55rem .8rem;border-radius:12px;font-size:.84rem;white-space:pre-wrap;
+            background:${m.role === 'user' ? 'var(--gold)' : '#fff'};
+            color:${m.role === 'user' ? '#fff' : 'var(--cream)'};
+            border:1px solid var(--line);">${esc(m.content)}</div>
+        </div>`).join('')}
+    </div>
+    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button></div>
+  `;
 }
 
 function openAdminChat(uid, proId, proName) {
@@ -5146,7 +5638,7 @@ function openAdminChat(uid, proId, proName) {
   currentAdminChatProId = proId;
   document.getElementById('modal-overlay').classList.add('open');
   document.getElementById('modal-box').innerHTML = `
-    <h3>💬 ${proName}-ийн нэрийн өмнөөс хариулах</h3>
+    <h3>💬 ${esc(proName)}-ийн нэрийн өмнөөс хариулах</h3>
     <p class="msub">Хэрэглэгч: Anonymous ${uid.slice(0,8)}…</p>
     <div id="admin-chat-messages" style="max-height:320px;overflow-y:auto;border:1px solid var(--line);border-radius:12px;padding:.8rem;margin:.8rem 0;background:var(--panel-2);"></div>
     <div style="display:flex;gap:.5rem;">
@@ -5172,7 +5664,7 @@ async function loadAdminChatMessages() {
       <div style="max-width:75%;padding:.5rem .8rem;border-radius:12px;font-size:.85rem;
         background:${m.sender === 'admin' ? 'var(--gold)' : '#fff'};
         color:${m.sender === 'admin' ? '#fff' : 'var(--cream)'};
-        border:1px solid var(--line);">${m.body}</div>
+        border:1px solid var(--line);">${esc(m.body)}</div>
     </div>`).join('');
   el.scrollTop = el.scrollHeight;
 }
@@ -5234,8 +5726,8 @@ async function loadRegisteredUsers() {
       <tbody>
         ${data.map(u => `
           <tr style="border-bottom:1px solid var(--line);">
-            <td style="padding:.5rem .4rem;font-weight:700;">${u.email}</td>
-            <td style="padding:.5rem .4rem;color:var(--sub);">${u.anon_handle || '—'}</td>
+            <td style="padding:.5rem .4rem;font-weight:700;">${esc(u.email)}</td>
+            <td style="padding:.5rem .4rem;color:var(--sub);">${esc(u.anon_handle) || '—'}</td>
             <td style="padding:.5rem .4rem;color:var(--sub);">${BRANCH_LABELS[u.branch] || '—'}</td>
             <td style="padding:.5rem .4rem;color:var(--sub);">${formatUbFull(u.registered_at)}</td>
           </tr>
@@ -5391,6 +5883,7 @@ async function init() {
     populateTestBranchStatsSelect();
     loadRegisteredUsers();
     loadAdminChatThreads();
+    loadAdminAIChatThreads();
     loadAdminPosts();
     loadAdminComments();
     loadAdminHrList();

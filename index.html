@@ -1583,12 +1583,13 @@ async function loadHrResults() {
   const content = document.getElementById('hr-portal-content');
   if (!content) return;
 
-  if (isAdmin || myHrId) {
+  if ((isAdmin || myHrId) && !window.__hrAdminTestPreview) {
     // ХН мэргэжилтэн / админ горим: бөглөсөн хүмүүсийн дэлгэрэнгүй жагсаалт
     subtitle.textContent = 'Хүний нөөцийн чиглэлийн тестүүдийг бөглөсөн хүмүүсийн жагсаалт, дэлгэрэнгүй үр дүн.';
     content.innerHTML = `
       <div class="section-card">
-        <p style="font-size:.85rem;color:var(--sub);margin:0;">Хүний нөөцийн чиглэлийн тестүүд (авьяс, чадварчлага, удирдлагын чадвар гэх мэт) одоогоор боловсруулагдаж байгаа тул жагсаалт хоосон байна. Тестүүд идэвхжсэний дараа энд бөглөсөн хүмүүсийн дэлгэрэнгүй үр дүн автоматаар харагдана.</p>
+        <p style="font-size:.85rem;color:var(--sub);margin:0 0 .8rem;">5 тест (IQ — ICAR, Зан төлөв — Big Five/IPIP-50, EQ — Schutte SSEIT, Багаар ажиллах ба Ур чадвар — O*NET Work Styles) идэвхтэй ажиллаж байна. "Хүний нөөц" хэсгийг зөвхөн админаас тусгай эрх авсан хэрэглэгч л харж, бөглөх боломжтой тул доорх жагсаалт нь зөвхөн тийнхүү эрх авч, тестээ бөглөсөн хүмүүсийг харуулна. Эрх олгохын тулд "Админ систем" → "🔐 Хүний нөөцийн тест бөглөх эрх олгох" хэсэгт тухайн хүний бүртгүүлсэн имэйлийг оруулна уу.</p>
+        <button class="modal-close" style="margin:0;" onclick="window.__hrAdminTestPreview=true; loadHrResults();">🧪 Тестүүдийг өөрөө бөглөж туршиж үзэх</button>
       </div>
       <div class="section-card">
         <div class="section-head"><h3>📋 Тест бөглөсөн хүмүүсийн жагсаалт</h3></div>
@@ -1600,7 +1601,7 @@ async function loadHrResults() {
     const { data, error } = await sb.from('test_results').select('*, users(anon_handle, branch, personnel_type)')
       .like('test_key', 'hr_%').order('created_at', { ascending:false }).limit(500);
     if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Жагсаалт татахад алдаа гарлаа: ' + error.message + '</div>'; console.error('loadHrResults error:', error); return; }
-    if (!data || data.length===0) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор хүний нөөцийн чиглэлийн тест өгсөн хүн алга.</div>'; return; }
+    if (!data || data.length===0) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор хүний нөөцийн чиглэлийн тест өгсөн хүн алга (эрх авсан хэрэглэгч байхгүй эсвэл тэд тестээ эхлээгүй байна).</div>'; return; }
     const byUser = {};
     data.forEach(r => { (byUser[r.user_id] ||= { user: r.users, results: [] }).results.push(r); });
     el.innerHTML = Object.values(byUser).map(u => `
@@ -1610,9 +1611,15 @@ async function loadHrResults() {
       </div>
     `).join('');
   } else {
-    // Энгийн хэрэглэгчийн горим: HR тестүүдийг бөглөх, явцыг харах, бүгдийг бөглөсний дараа нэгдсэн тайлан гаргах
+    // Энгийн хэрэглэгчийн горим (эсвэл админ/ХН мэргэжилтний "туршиж үзэх" горим):
+    // HR тестүүдийг бөглөх, явцыг харах, бүгдийг бөглөсний дараа нэгдсэн тайлан гаргах
     subtitle.textContent = 'Ажилд орох, цэргийн албанд татагдах, энхийг дэмжих ажиллагаанд явах гэх мэт үед бөглөдөг хүний нөөцийн чиглэлийн тестүүд. Таны хариултыг зөвхөн эрх бүхий хүний нөөцийн мэргэжилтэн, админ л харна.';
-    await renderHrPortalUser(content);
+    if ((isAdmin || myHrId) && window.__hrAdminTestPreview) {
+      content.innerHTML = `<button class="modal-close" style="margin-bottom:1rem;" onclick="window.__hrAdminTestPreview=false; loadHrResults();">← Жагсаалт руу буцах</button><div id="hr-portal-preview-inner"></div>`;
+      await renderHrPortalUser(document.getElementById('hr-portal-preview-inner'));
+    } else {
+      await renderHrPortalUser(content);
+    }
   }
 }
 

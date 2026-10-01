@@ -553,7 +553,7 @@
       <li class="navitem" data-view="psy-corner" id="psy-corner-navitem" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><path d="M12 2 3 6v6c0 5 3.5 8.5 9 10 5.5-1.5 9-5 9-10V6z"/></svg>Сэтгэл зүйчдийн булан</li>
 
       <div class="navgroup-label">ХҮНИЙ НӨӨЦ</div>
-      <li class="navitem" data-view="hr-portal" id="hr-portal-navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Хүний нөөц</li>
+      <li class="navitem" data-view="hr-portal" id="hr-portal-navitem" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Хүний нөөц</li>
 
       <div class="navgroup-label">ХЭРЭГЛЭГЧ</div>
       <li class="navitem" data-view="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>Миний профайл</li>
@@ -1001,6 +1001,20 @@
               <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" onclick="addAndLinkHrSpecialist()">Бүртгэж холбох</button>
               <div id="hr-reg-msg" style="font-size:.82rem;margin-top:.7rem;"></div>
               <div id="admin-hr-list" style="margin-top:1.1rem;"></div>
+            </div>
+          </div>
+          <div class="section-card">
+            <div class="section-head collapsible" onclick="toggleAdminSection('hr-access')"><h3>🔐 Хүний нөөцийн тест бөглөх эрх олгох</h3><span class="collapse-arrow" id="hr-access-arrow">▾</span></div>
+            <div class="collapsible-body" id="hr-access-body">
+              <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">
+                "Хүний нөөц" хэсэг (IQ, зан төлөв, EQ, багаар ажиллах, ур чадварын тестүүд) анхдагчаар бүх хэрэглэгчид ХАРАГДАХГҮЙ, зөвхөн доор эрх өгсөн хэрэглэгч л энэ хэсгийг харж, тестүүдийг бөглөх боломжтой. Тухайн хэрэглэгч эхлээд өөрөө сайтад имэйл/нууц үгээрээ бүртгүүлсэн байх ёстой, дараа нь та энд түүний бүртгүүлсэн имэйлийг оруулж эрх олгоно.
+              </p>
+              <div class="filter-bar" style="margin-bottom:.7rem;">
+                <input type="email" id="hr-access-email" placeholder="Эрх өгөх хэрэглэгчийн бүртгүүлсэн имэйл" style="border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
+              </div>
+              <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" onclick="grantHrTestAccess()">Эрх олгох</button>
+              <div id="hr-access-msg" style="font-size:.82rem;margin-top:.7rem;"></div>
+              <div id="admin-hr-access-list" style="margin-top:1.1rem;"></div>
             </div>
           </div>
           </div>
@@ -1520,10 +1534,26 @@ async function checkAdminStatus() {
   const navItem = document.getElementById('admin-navitem');
   if (navItem) navItem.style.display = isAdmin ? 'flex' : 'none';
   updatePsyCornerVisibility();
+  updateHrPortalVisibility();
 }
 function updatePsyCornerVisibility() {
   const el = document.getElementById('psy-corner-navitem');
   if (el) el.style.display = (isAdmin || myProId) ? 'flex' : 'none';
+}
+
+/* ================= "Хүний нөөц" хэсгийн хандалтын эрх =================
+   Анхдагчаар ХААГДМАЛ: зөвхөн админ, ХН мэргэжилтэн, эсвэл админаас тусгайлан
+   эрх авсан хэрэглэгч (hr_test_access хүснэгтэд бүртгэлтэй) л харна. */
+let myHrTestAccess = false;
+async function checkHrTestAccess() {
+  if (!currentUser?.id) { myHrTestAccess = false; updateHrPortalVisibility(); return; }
+  const { data, error } = await sb.from('hr_test_access').select('id').eq('user_id', currentUser.id).maybeSingle();
+  myHrTestAccess = !!data && !error;
+  updateHrPortalVisibility();
+}
+function updateHrPortalVisibility() {
+  const el = document.getElementById('hr-portal-navitem');
+  if (el) el.style.display = (isAdmin || myHrId || myHrTestAccess) ? 'flex' : 'none';
 }
 async function adminLogout() {
   await sb.auth.signOut();
@@ -1580,13 +1610,99 @@ async function loadHrResults() {
       </div>
     `).join('');
   } else {
-    // Энгийн хэрэглэгчийн горим: бөглөх боломжтой тестүүдийн жагсаалт
+    // Энгийн хэрэглэгчийн горим: HR тестүүдийг бөглөх, явцыг харах, бүгдийг бөглөсний дараа нэгдсэн тайлан гаргах
     subtitle.textContent = 'Ажилд орох, цэргийн албанд татагдах, энхийг дэмжих ажиллагаанд явах гэх мэт үед бөглөдөг хүний нөөцийн чиглэлийн тестүүд. Таны хариултыг зөвхөн эрх бүхий хүний нөөцийн мэргэжилтэн, админ л харна.';
-    content.innerHTML = `
-      <div class="section-card">
-        <p style="font-size:.85rem;color:var(--sub);margin:0;">Хүний нөөцийн чиглэлийн тестүүд одоогоор боловсруулагдаж байна. Тестүүд идэвхжмэгц энд гарч ирж, шууд эндээс бөглөх боломжтой болно.</p>
+    await renderHrPortalUser(content);
+  }
+}
+
+async function renderHrPortalUser(content) {
+  content.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div>';
+  if (!currentUser?.id) { content.innerHTML = '<div class="section-card"><p style="font-size:.85rem;color:var(--sub);margin:0;">Эхлээд нэвтэрнэ үү.</p></div>'; return; }
+
+  const { data: myResults, error } = await sb.from('test_results').select('test_key, score, max_score, level, created_at')
+    .eq('user_id', currentUser.id).in('test_key', HR_TEST_KEYS).order('created_at', { ascending:false });
+  if (error) { content.innerHTML = '<div class="section-card"><p style="font-size:.85rem;color:var(--sub);margin:0;">Ачаалахад алдаа гарлаа: ' + esc(error.message) + '</p></div>'; console.error('renderHrPortalUser error:', error); return; }
+
+  const latestByKey = {};
+  (myResults || []).forEach(r => { if (!latestByKey[r.test_key]) latestByKey[r.test_key] = r; }); // хамгийн сүүлийнх нь эхэнд ирдэг (order desc)
+  const doneCount = HR_TEST_KEYS.filter(k => latestByKey[k]).length;
+  const allDone = doneCount === HR_TEST_KEYS.length;
+
+  let reportHtml = '';
+  if (allDone) {
+    let reportRow = null;
+    try {
+      const res = await sb.from('hr_reports').select('*').eq('user_id', currentUser.id).order('created_at', { ascending:false }).limit(1).maybeSingle();
+      reportRow = res.data || null;
+    } catch (e) { console.error('hr_reports fetch error:', e); }
+    reportHtml = `
+      <div class="section-card" id="hr-report-card">
+        <div class="section-head"><h3>📄 Нэгдсэн тайлан</h3></div>
+        ${reportRow ? `
+          <div class="result-block" style="white-space:pre-wrap;">${esc(reportRow.report_text)}</div>
+          <div style="font-size:.75rem;color:var(--sub);margin:.4rem 0 .8rem;">Үүсгэсэн: ${timeAgo(reportRow.created_at)}</div>
+          <button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="generateHrReport()">🔄 Дахин үүсгэх</button>
+        ` : `
+          <p style="font-size:.85rem;color:var(--sub);">Та бүх 5 тестээ бөглөсөн байна! Одоо AI (Claude)-аар нэгтгэсэн, найруулсан нэгдсэн тайлан гаргуулж болно.</p>
+          <button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="generateHrReport()" id="hr-generate-btn">✨ Нэгдсэн тайлан гаргах</button>
+        `}
+        <div id="hr-report-status" style="font-size:.82rem;color:var(--sub);margin-top:.6rem;"></div>
       </div>
     `;
+  }
+
+  content.innerHTML = `
+    <div class="section-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;">
+        <div style="font-weight:700;font-size:.9rem;">Явц: ${doneCount} / ${HR_TEST_KEYS.length} тест бөглөсөн</div>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(doneCount/HR_TEST_KEYS.length*100)}%;"></div></div>
+      ${!allDone ? `<div class="disclaimer-note" style="margin-top:.8rem;">⚠️ Тест дутуу бөглөсөн байна. Нэгдсэн тайлан гаргахын тулд доорх бүх 5 тестийг бөглөнө үү.</div>` : ''}
+    </div>
+    <div class="section-card">
+      <div class="section-head"><h3>📝 Тестүүд</h3></div>
+      ${HR_TEST_KEYS.map(k => {
+        const t = TESTS[k];
+        const r = latestByKey[k];
+        return `<div class="unit-row" style="align-items:flex-start;">
+          <div style="flex:1;">
+            <div style="font-weight:700;font-size:.87rem;">${t.emo} ${esc(t.title)}</div>
+            <div style="font-size:.78rem;color:var(--sub);margin:.15rem 0;">${esc(t.blurb)}</div>
+            ${r ? `<div style="font-size:.78rem;color:var(--gold);font-weight:700;">✓ Дууссан — ${esc(r.level)} · ${timeAgo(r.created_at)}</div>` : `<div style="font-size:.78rem;color:var(--sub);">○ Дуусаагүй</div>`}
+          </div>
+          <button class="modal-close" style="margin:0;" onclick="openModal('${k}')">${r ? 'Дахин өгөх' : 'Эхлэх'}</button>
+        </div>`;
+      }).join('')}
+    </div>
+    ${reportHtml}
+  `;
+}
+
+let hrProgressRefreshTimer = null;
+function refreshHrProgressSoon() {
+  clearTimeout(hrProgressRefreshTimer);
+  hrProgressRefreshTimer = setTimeout(() => {
+    const view = document.getElementById('view-hr-portal');
+    if (view && view.classList.contains('active')) loadHrResults();
+  }, 300);
+}
+
+async function generateHrReport() {
+  const statusEl = document.getElementById('hr-report-status');
+  if (statusEl) statusEl.textContent = 'Тайлан үүсгэж байна... (энэ 10-20 секунд үргэлжилж болно)';
+  const btn = document.getElementById('hr-generate-btn');
+  if (btn) btn.disabled = true;
+  try {
+    const { data, error } = await sb.functions.invoke('hr-report', {});
+    if (error) throw error;
+    showToast('Нэгдсэн тайлан амжилттай үүслээ!', 'success');
+    loadHrResults();
+  } catch (e) {
+    console.error('generateHrReport error:', e);
+    if (statusEl) statusEl.textContent = 'Тайлан үүсгэхэд алдаа гарлаа. Дараа дахин оролдоно уу.';
+    showToast('Тайлан үүсгэхэд алдаа гарлаа: ' + (e?.message || ''), 'error');
+    if (btn) btn.disabled = false;
   }
 }
 
@@ -1596,6 +1712,10 @@ document.getElementById('hamburger').addEventListener('click', () => document.ge
 function goto(view, pushState) {
   if ((view === 'psy-corner' || view === 'group-exercise' || view === 'orders' || view === 'guides' || view === 'military-test') && !(isAdmin || myProId)) {
     showToast('Энэ хэсэг зөвхөн админ болон бүртгэлтэй сэтгэл зүйчдэд нээлттэй.', 'error');
+    view = 'home';
+  }
+  if (view === 'hr-portal' && !(isAdmin || myHrId || myHrTestAccess)) {
+    showToast('"Хүний нөөц" хэсэг зөвхөн админаас тусгай эрх авсан хэрэглэгчид нээлттэй.', 'error');
     view = 'home';
   }
   document.querySelectorAll('.navitem').forEach(n => n.classList.remove('active'));
@@ -2732,6 +2852,105 @@ const TESTS = {
 };
 const OPTS = ['Огт үгүй','Ховор','Заримдаа','Байнга'];
 
+/* ================= ХҮНИЙ НӨӨЦ (HR): IQ/EQ/Багаар ажиллах/Ур чадвар тестүүд =================
+   Эдгээр нь ерөнхий тестийн жагсаалтад ХАРАГДАХГҮЙ (hrOnly:true), зөвхөн "Хүний нөөц"
+   булангаас л бөглөх боломжтой. Тестийн оноог generic openModal/scoreModal системээр
+   тооцоолуулна (custom функц шаардлагагүй), зөвхөн MBTI-г доор тусад нь custom-аар хийнэ. */
+const HR_LIKERT_OPTS = ['Огт зөвшөөрөхгүй','Голцуу зөвшөөрөхгүй','Дунд зэрэг','Голцуу зөвшөөрнө','Бүрэн зөвшөөрнө'];
+const HR_LIKERT_VALS = [1,2,3,4,5];
+Object.assign(TESTS, {
+  hr_iq: { title:'Оюун ухааны чадамжийн үнэлгээ (IQ)', emo:'🧩', dur:'8 минут', personality:true, hrOnly:true,
+    blurb:'ICAR — International Cognitive Ability Resource (Condon & Revelle, 2014) нээлттэй эрдэм шинжилгээний сан дахь баталгаажсан, зохиогчийн эрхгүй асуултуудад үндэслэсэн 12 асуулт (эх сурвалж: icar-project.com). Гурван дэд шалгуур: логик дүгнэлт, тоо/үсгийн дараалал, үгийн эргэцүүлэл. Уран зургийн (matrix) дэд хэсгийг зураг шаардлагатай тул оруулаагүй болно.',
+    qs:[
+      { text:'Пиано нь буйднаас хүнд. Буйд нь чемоданаас хүнд. Эдгээрээс аль нь хамгийн хүнд бэ?', opts:['Пиано','Буйд','Чемодан','Тодорхойгүй'], values:[1,0,0,0] },
+      { text:'Марк Иваанаас өндөр. Иваан Адамаас өндөр. Эдгээрээс хэн хамгийн намхан бэ?', opts:['Марк','Иваан','Адам','Тодорхойгүй'], values:[0,0,1,0] },
+      { text:'Улаан машин ногоон машинаас хурдан. Ногоон машин цэнхэр машинаас хурдан. Эдгээрээс аль машин хамгийн удаан явдаг вэ?', opts:['Улаан','Ногоон','Цэнхэр','Тодорхойгүй'], values:[0,0,1,0] },
+      { text:'Сараа Моли-гоос ах. Моли Жени-гээс ах. Эдгээрээс хэн хамгийн дүү вэ?', opts:['Сараа','Моли','Жени','Тодорхойгүй'], values:[0,0,1,0] },
+      { text:'Дараагийн үсгийг ол: B, D, F, H, ?', opts:['I','J','K','L'], values:[0,1,0,0] },
+      { text:'Дараагийн тоог ол: 3, 6, 9, 12, ?', opts:['13','14','15','16'], values:[0,0,1,0] },
+      { text:'Дараагийн тоог ол: 2, 4, 8, 16, ?', opts:['24','28','30','32'], values:[0,0,0,1] },
+      { text:'Дараагийн тоог ол: 1, 1, 2, 3, 5, ?', opts:['6','7','8','9'], values:[0,0,1,0] },
+      { text:'"Ховор" гэдэг үгтэй хамгийн ойролцоо утгатай үгийг сонго.', opts:['Элбэг','Ховордсон','Түгээмэл','Олон'], values:[0,1,0,0] },
+      { text:'"Элбэг" гэдэг үгийн эсрэг утгатай үгийг сонго.', opts:['Ховор','Их','Олон','Баян'], values:[1,0,0,0] },
+      { text:'Гар : Бээлий = Хөл : ?', opts:['Гутал','Малгай','Оймс','Бөгж'], values:[0,0,1,0] },
+      { text:'Ном : Сан хөмрөг = Зураг : ?', opts:['Галерей','Кино театр','Номын дэлгүүр','Сургууль'], values:[1,0,0,0] },
+    ],
+    cutoffs:[{ max:5, label:'Бага', key:'low' },{ max:9, label:'Дундаж', key:'medium' },{ max:12, label:'Өндөр', key:'high' }] },
+
+  hr_eq: { title:'Сэтгэл хөдлөлийн зохицуулалтын үнэлгээ (EQ)', emo:'❤️‍🔥', dur:'10 минут', personality:true, hrOnly:true,
+    blurb:'Schutte Self-Report Emotional Intelligence Test — SSEIT (Schutte et al., 1998, "Development and validation of a measure of emotional intelligence," Personality and Individual Differences) — Salovey-Mayer-ийн сэтгэл хөдлөлийн оюун ухааны загварт үндэслэсэн, олон улсад 5000+ судалгаанд иш татагдсан 33 асуулттай, зохиогчдын зөвшөөрснөөр судалгаа/боловсролын зорилгоор үнэ төлбөргүй ашиглаж болох өөрийгөө үнэлэх багаж.',
+    opts: HR_LIKERT_OPTS, values: HR_LIKERT_VALS,
+    qs:[
+      'Хувийн асуудлаа хэзээ, хэнд хуваалцахаа мэддэг.',
+      'Бэрхшээлтэй тулгарахад ижил төстэй зүйлийг өмнө нь хэрхэн даван туулснаа санадаг.',
+      'Ихэнх зүйлдээ амжилтад хүрнэ гэдэгт итгэлтэй байдаг.',
+      'Бусад хүмүүс надад санаагаа амархан хуваалцдаг.',
+      { text:'Бусдын үг хэлэлгүй илэрхийлдэг мэдрэмжийг ойлгоход хэцүү байдаг.', opts: HR_LIKERT_OPTS, values:[5,4,3,2,1] },
+      'Амьдралын зарим чухал үйл явдал юу нь чухал, юу нь чухал биш болохыг дахин үнэлэхэд хүргэсэн.',
+      'Сэтгэл санааны байдал өөрчлөгдөхөд шинэ боломжуудыг олж хардаг.',
+      'Мэдрэмж, сэтгэл хөдлөл бол миний амьдралыг утга учиртай болгодог зүйлсийн нэг.',
+      'Мэдрэмжээ мэдэрч байгаа тухайн мөчид нь ухамсарладаг.',
+      'Сайн зүйл тохиолдоно гэж найддаг.',
+      'Мэдрэмжээ бусадтай хуваалцах дуртай.',
+      'Эерэг мэдрэмж төрөхөд түүнийг хэрхэн уртасгахаа мэддэг.',
+      'Бусад хүмүүсийн таашаах үйл явдал зохион байгуулдаг.',
+      'Намайг баяртай болгодог үйл ажиллагааг эрж хайдаг.',
+      'Бусдад илгээж буй үг хэлэлгүй дохио зангаагаа ухамсарладаг.',
+      'Бусдад сайн сэтгэгдэл төрүүлэхээр өөрийгөө таниулдаг.',
+      'Эерэг сэтгэл санааны үед асуудлыг шийдвэрлэхэд амархан байдаг.',
+      'Хүмүүсийн нүүрний хувиралыг ажиглаад тэдний мэдрэмжийг таньдаг.',
+      'Мэдрэмж яагаад өөрчлөгдөж байгааг ойлгодог.',
+      'Эерэг сэтгэл санааны үед шинэ санаа гаргаж чаддаг.',
+      'Мэдрэмжээ хянах чадвартай.',
+      'Мэдрэмжээ мэдэрч байгаа мөчид нь амархан таньж чаддаг.',
+      'Ажил үүргээ гүйцэтгэхдээ сайн үр дүнг төсөөлж, өөрийгөө урамшуулдаг.',
+      'Бусад сайн зүйл хийхэд нь магтдаг.',
+      'Бусдын илгээж буй үг хэлэлгүй дохио зангааг ажигладаг.',
+      'Өөр хүн амьдралын чухал үйл явдлын тухай ярихад би тэр үйл явдлыг өөрөө туулсан мэт мэдрэмж төрдөг.',
+      'Мэдрэмж өөрчлөгдөхөд шинэ санаа гарган ирдэг.',
+      { text:'Бэрхшээл тулгарахад бүтэлгүйтнэ гэж бодоод гараад орхидог.', opts: HR_LIKERT_OPTS, values:[5,4,3,2,1] },
+      'Бусдыг зөвхөн ажиглаад л юу мэдэрч байгааг нь мэддэг.',
+      'Сэтгэл дарамттай үед бусдад тусалж, тайвшруулдаг.',
+      'Сайн сэтгэл санааг ашиглан бэрхшээлийн үед хичээж үргэлжлүүлдэг.',
+      'Хүний дуу хоолойны өнгө аясаар нь тэдний мэдрэмжийг мэдэрч чаддаг.',
+      { text:'Хүмүүс яагаад тухайн мэдрэмжийг мэдэрч байгааг ойлгоход надад хэцүү байдаг.', opts: HR_LIKERT_OPTS, values:[5,4,3,2,1] },
+    ],
+    cutoffs:[{ max:77, label:'Бага', key:'low' },{ max:121, label:'Дундаж', key:'medium' },{ max:165, label:'Өндөр', key:'high' }] },
+
+  hr_teamwork: { title:'Багаар ажиллах чадварын үнэлгээ', emo:'🤝', dur:'5 минут', personality:true, hrOnly:true,
+    blurb:'АНУ-ын Хөдөлмөрийн яамны санхүүжилттэй, бүрэн нээлттэй (public domain) O*NET (Occupational Information Network) мэдээллийн сангийн "Ажлын хэв маяг" (Work Styles) стандарт тодорхойлолтуудад үндэслэн, харилцаа-хамтын ажиллагааны 8 чанарыг өөрийгөө үнэлэх байдлаар боловсруулсан асуулга (эх сурвалж: onetonline.org, O*NET Content Model).',
+    opts: HR_LIKERT_OPTS, values: HR_LIKERT_VALS,
+    qs:[
+      'Ажил дээрээ бусадтай эв найртай, хамтын ажиллагаатай, дэмжлэгтэй хандлагаар харьцдаг. (O*NET: Cooperation)',
+      'Бусдын хэрэгцээ, мэдрэмжид мэдрэмтгий ханддаг, ойлгож, тусалдаг. (O*NET: Concern for Others)',
+      'Ганцаараа ажиллахаас илүү бусадтай хамтран ажиллахыг илүүд үздэг, хамт олонтойгоо нягт холбоотой байдаг. (O*NET: Social Orientation)',
+      'Маш хүнд нөхцөлд ч тайван байдлаа хадгалж, уур бухимдлаа хянаж, түрэмгий бус байдлаар харьцдаг. (O*NET: Self-Control)',
+      'Шүүмжлэлийг хүлээж авч, өндөр стресстэй нөхцөлд ч тайван, үр дүнтэй ажилладаг. (O*NET: Stress Tolerance)',
+      'Эерэг эсвэл сөрөг өөрчлөлтөд нээлттэй ханддаг, ажлын байрны олон янзын нөхцөлд уян хатан дасан зохицдог. (O*NET: Adaptability/Flexibility)',
+      'Найдвартай, хариуцлагатай бөгөөд өөрийн үүрэг хариуцлагаа биелүүлдэг. (O*NET: Dependability)',
+      'Ажилдаа шударга, ёс зүйтэй ханддаг. (O*NET: Integrity)',
+    ],
+    cutoffs:[{ max:19, label:'Бага', key:'low' },{ max:29, label:'Дундаж', key:'medium' },{ max:40, label:'Өндөр', key:'high' }] },
+
+  hr_skills: { title:'Ажлын ерөнхий ур чадварын үнэлгээ', emo:'🛠️', dur:'5 минут', personality:true, hrOnly:true,
+    blurb:'АНУ-ын Хөдөлмөрийн яамны санхүүжилттэй, бүрэн нээлттэй (public domain) O*NET мэдээллийн сангийн "Ажлын хэв маяг" (Work Styles) стандарт тодорхойлолтуудад үндэслэн, амжилт/танин мэдэхүйн чиглэлийн 8 чанарыг өөрийгөө үнэлэх байдлаар боловсруулсан асуулга (эх сурвалж: onetonline.org, O*NET Content Model).',
+    opts: HR_LIKERT_OPTS, values: HR_LIKERT_VALS,
+    qs:[
+      'Өөртөө хүндрэлтэй ч биелэх боломжтой зорилго тавьж, даалгавраа бүрэн эзэмших хүртэл хичээл зүтгэл гаргадаг. (O*NET: Achievement/Effort)',
+      'Бэрхшээл тулгарсан ч тууштай, зогсолтгүй ажилладаг. (O*NET: Persistence)',
+      'Шинэ үүрэг, сорилтыг өөрийн санаачилгаар хүлээн авдаг. (O*NET: Initiative)',
+      'Бусдыг манлайлж, удирдаж, өөрийн байр суурь, чиглэлээ санал болгодог. (O*NET: Leadership)',
+      'Ажлаа гүйцэтгэхдээ нарийвчлал, нягт нямбай байдалд анхаардаг. (O*NET: Attention to Detail)',
+      'Ажлаа хийх өөрийн гэсэн арга барилаа боловсруулж, бага хяналттай ч өөрөө удирдан ажилладаг. (O*NET: Independence)',
+      'Ажилтай холбоотой асуудалд шинэлэг, өөр өнцгөөс сэтгэж, шинэ санаа гаргадаг. (O*NET: Innovation)',
+      'Мэдээллийг шинжилж, логик дүгнэлтээр ажлын асуудлыг шийддэг. (O*NET: Analytical Thinking)',
+    ],
+    cutoffs:[{ max:19, label:'Бага', key:'low' },{ max:29, label:'Дундаж', key:'medium' },{ max:40, label:'Өндөр', key:'high' }] },
+});
+TESTS.hr_personality = { title:'Зан төлөвийн 5 хүчин зүйлийн үнэлгээ (Big Five)', emo:'🧭', dur:'12 минут', personality:true, hrOnly:true, custom:'hr_bigfive',
+  blurb:'IPIP-50 — International Personality Item Pool-ийн "Big Five Factor Markers" (Goldberg, 1992; ipip.ori.org) — сэтгэл судлалын шинжлэх ухаанд хамгийн өргөн хүлээн зөвшөөрөгдсөн, судалгаагаар олон удаа баталгаажсан, нээлттэй (public domain) 50 асуулттай зан төлөвийн тест. Экстраверси, эв найртай байдал, хариуцлагажилт, сэтгэл хөдлөлийн тогтвортой байдал, оюуны сониуч чанар гэсэн 5 үндсэн хүчин зүйлийг үнэлдэг бөгөөд MBTI-ээс ялгаатай нь эрдэм шинжилгээний уран зохиолд өргөн батлагдсан.' };
+const HR_TEST_KEYS = ['hr_iq', 'hr_personality', 'hr_eq', 'hr_teamwork', 'hr_skills'];
+
 /* Асуулт бүрийн (эсвэл тестийн) сонголт, оноог тодорхойлно — AUDIT зэрэг тестэд
    асуулт бүр өөр өөр хариултын сонголт, оноотой байдаг тул ерөнхий OPTS-оос ялгаатай */
 function getQuestionMeta(t, q) {
@@ -3032,8 +3251,9 @@ function scoreIqChecklist() {
 function renderTestCard(key, t) {
   return `<div class="test-card" onclick="openModal('${key}')"><span class="test-emo">${t.emo}</span><div class="test-title">${t.title}</div><div class="test-blurb">${t.blurb}</div><div class="test-dur">${t.dur}</div></div>`;
 }
-document.getElementById('test-row-preview').innerHTML = Object.entries(TESTS).slice(0,5).map(([k,t])=>renderTestCard(k,t)).join('');
-document.getElementById('test-grid-full').innerHTML = Object.entries(TESTS).map(([k,t])=>renderTestCard(k,t)).join('');
+const PUBLIC_TESTS_ENTRIES = Object.entries(TESTS).filter(([,t]) => !t.hrOnly);
+document.getElementById('test-row-preview').innerHTML = PUBLIC_TESTS_ENTRIES.slice(0,5).map(([k,t])=>renderTestCard(k,t)).join('');
+document.getElementById('test-grid-full').innerHTML = PUBLIC_TESTS_ENTRIES.map(([k,t])=>renderTestCard(k,t)).join('');
 
 /* ================= ӨНГӨ ЯЛГАХ ЧАДВАРЫН ТЕСТ (Ishihara-загварын dot-plate, программаар үүсгэсэн) ================= */
 const ISHIHARA_PLATES = [
@@ -3302,6 +3522,7 @@ function openModal(key) {
   if (t.custom === 'character_traits') { openCharacterTraitsTest(); return; }
   if (t.custom === 'temperament') { openTemperamentTest(); return; }
   if (t.custom === 'mbti16') { openMBTI16Test(); return; }
+  if (t.custom === 'hr_bigfive') { openHrBigFiveTest(); return; }
   const box = document.getElementById('modal-box');
   box.innerHTML = `
     <h3>${t.emo} ${t.title}</h3>
@@ -3336,6 +3557,7 @@ async function scoreModal(key) {
     if (error) console.error('test_results save error:', error);
     loadMonthlyAnalysis();
     if (hasSelfHarmFlag) await sendSelfHarmRiskAlert();
+    if (typeof HR_TEST_KEYS !== 'undefined' && HR_TEST_KEYS.includes(key)) refreshHrProgressSoon();
   }
 
   document.getElementById('modal-box').innerHTML = `
@@ -4151,6 +4373,127 @@ async function scoreMBTI16Test() {
   `;
 }
 
+/* ================= ХҮНИЙ НӨӨЦ: Big Five (hr_personality) — IPIP-50 (Goldberg, 1992; ipip.ori.org, public domain) =================
+   5 хүчин зүйл тус бүрд 10 асуулт, зарим асуулт эсрэг чиглэлтэй (урвуу оноотой, R гэж тэмдэглэсэн).
+   Урвуу асуултын оноог 6-с хасаж авна (1↔5, 2↔4, 3↔3). */
+const BIGFIVE_FACTORS = [
+  { key:'E',  label:'Экстраверси (гадагшаа чиглэсэн байдал)', prefix:'hbfE',
+    qs:[
+      { text:'Хамт олны дунд амьдралын гол дүр шиг байдаг.', r:false },
+      { text:'Их ярьдаггүй.', r:true },
+      { text:'Хүмүүсийн дунд байхдаа тухтай мэдэрдэг.', r:false },
+      { text:'Дэвсгэр дүрд байхыг илүүд үздэг.', r:true },
+      { text:'Ярилцлага эхлүүлдэг.', r:false },
+      { text:'Хэлэх зүйл цөөтэй байдаг.', r:true },
+      { text:'Наадамд олон өөр хүмүүстэй ярилцдаг.', r:false },
+      { text:'Өөрийгөө анхаарал татахыг хүсдэггүй.', r:true },
+      { text:'Бусдын анхаарлын төвд байхыг үл тоомсорлодог.', r:false },
+      { text:'Танихгүй хүмүүсийн дунд дуугүй байдаг.', r:true },
+    ]},
+  { key:'A',  label:'Эв найртай байдал (бусадтай харилцах хандлага)', prefix:'hbfA',
+    qs:[
+      { text:'Бусдын талаар бага санаа зовдог.', r:true },
+      { text:'Хүмүүст сонирхолтой ханддаг.', r:false },
+      { text:'Хүмүүсийг доромжилж ярьдаг.', r:true },
+      { text:'Бусдын мэдрэмжид өрөвдөх сэтгэлтэй ханддаг.', r:false },
+      { text:'Бусдын асуудалд сонирхолгүй байдаг.', r:true },
+      { text:'Уян зөөлөн зүрх сэтгэлтэй.', r:false },
+      { text:'Бусдад тийм ч их сонирхолгүй байдаг.', r:true },
+      { text:'Бусдад цаг зав гаргаж тусалдаг.', r:false },
+      { text:'Бусдын мэдрэмжийг мэдэрдэг.', r:false },
+      { text:'Бусдыг тухтай, чөлөөтэй байлгадаг.', r:false },
+    ]},
+  { key:'C',  label:'Хариуцлагажилт (зохион байгуулалт, сахилга бат)', prefix:'hbfC',
+    qs:[
+      { text:'Үргэлж бэлэн байдаг.', r:false },
+      { text:'Нарийн ширийн зүйлд анхаардаг.', r:false },
+      { text:'Хувийн эд зүйлээ хаа сайгүй орхидог.', r:true },
+      { text:'Ажил үүргээ шууд гүйцэтгэдэг.', r:false },
+      { text:'Дэг журамтай байхыг эрхэмлэдэг.', r:false },
+      { text:'Зүйлсийг тэдгээрийн байх ёстой газарт нь буцааж тавихаа мартдаг.', r:true },
+      { text:'Ажлаа эмх замбараагүй болгодог.', r:true },
+      { text:'Хуваарийн дагуу ажилладаг.', r:false },
+      { text:'Үүрэг хариуцлагаасаа зайлсхийдэг.', r:true },
+      { text:'Ажлаа маш нямбай, нарийвчлалтай гүйцэтгэдэг.', r:false },
+    ]},
+  { key:'ES', label:'Сэтгэл хөдлөлийн тогтвортой байдал (стресст мэдрэмтгий бус байдал)', prefix:'hbfES',
+    qs:[
+      { text:'Амархан стресст ордог.', r:true },
+      { text:'Ихэнхдээ тайван байдаг.', r:false },
+      { text:'Зүйлсийн талаар их санаа зовдог.', r:true },
+      { text:'Ховорхон гунигтай санагддаг.', r:false },
+      { text:'Амархан сэтгэлээр унадаг.', r:true },
+      { text:'Амархан бухимддаг.', r:true },
+      { text:'Сэтгэл санааны байдал маш их хувирдаг.', r:true },
+      { text:'Байнга сэтгэл санааны хэлбэлзэлтэй байдаг.', r:true },
+      { text:'Амархан цочромтгой болдог.', r:true },
+      { text:'Ойр ойрхон гунигтай мэдрэмж төрдөг.', r:true },
+    ]},
+  { key:'I',  label:'Оюуны сониуч чанар / нээлттэй байдал', prefix:'hbfI',
+    qs:[
+      { text:'Баялаг үгсийн санд эзэмшдэг.', r:false },
+      { text:'Хийсвэр санаа ойлгоход хэцүү байдаг.', r:true },
+      { text:'Тод дүрслэн төсөөлөх чадвартай.', r:false },
+      { text:'Хийсвэр санаанд сонирхолгүй байдаг.', r:true },
+      { text:'Маш сайн санаа гаргадаг.', r:false },
+      { text:'Сайн төсөөлөл байдаггүй.', r:true },
+      { text:'Зүйлсийг хурдан ойлгодог.', r:false },
+      { text:'Ховор ашиглагддаг үгсийг хэрэглэдэг.', r:false },
+      { text:'Зүйлсийн талаар цаг гаргаж бодож эргэцүүлдэг.', r:false },
+      { text:'Санаагаар дүүрэн байдаг.', r:false },
+    ]},
+];
+function openHrBigFiveTest() {
+  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('modal-box').innerHTML = `
+    <h3>🧭 Зан төлөвийн 5 хүчин зүйлийн үнэлгээ (Big Five — IPIP-50)</h3>
+    <p class="msub">Эх сурвалж: International Personality Item Pool, Goldberg (1992), ipip.ori.org — нээлттэй, шинжлэх ухаанаар баталгаажсан асуулга. Бүх 50 асуултад үнэн зөв хариулна уу.</p>
+    <div id="mq-wrap">
+      ${BIGFIVE_FACTORS.map(f => `
+        <div style="font-weight:800;font-size:.9rem;margin:.6rem 0;color:var(--gold);">${f.label}</div>
+        ${f.qs.map((q,i)=>renderQuestionBlock({ opts:HR_LIKERT_OPTS, values:HR_LIKERT_VALS }, q.text, i, f.prefix)).join('')}
+      `).join('')}
+    </div>
+    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="scoreHrBigFiveTest()">Дүн харах</button></div>
+  `;
+}
+async function scoreHrBigFiveTest() {
+  const factorScores = [];
+  for (const f of BIGFIVE_FACTORS) {
+    let total = 0;
+    for (let i=0;i<f.qs.length;i++){
+      const sel = document.querySelector(`input[name="${f.prefix}${i}"]:checked`);
+      if (!sel) { showToast('Бүх асуултад хариулна уу.', 'warn'); return; }
+      let v = parseFloat(sel.value);
+      if (f.qs[i].r) v = 6 - v; // урвуу оноо: 1↔5, 2↔4, 3↔3
+      total += v;
+    }
+    factorScores.push({ key:f.key, label:f.label, total, pct: Math.round((total-10)/40*100) });
+  }
+  const levelOf = pct => pct <= 33 ? 'Бага' : pct <= 66 ? 'Дундаж' : 'Өндөр';
+  const summaryStr = factorScores.map(f => `${f.key}:${f.pct}%`).join(' ');
+  const avgPct = Math.round(factorScores.reduce((s,f)=>s+f.pct,0)/factorScores.length);
+
+  if (currentUser?.id) {
+    const { error } = await sb.from('test_results').insert({ user_id: currentUser.id, test_key:'hr_personality', score: avgPct, max_score: 100, level: summaryStr });
+    if (error) console.error('test_results save error:', error);
+    refreshHrProgressSoon();
+  }
+
+  const bars = factorScores.map(f => `
+    <div style="margin-bottom:.9rem;">
+      <div style="display:flex;justify-content:space-between;font-size:.84rem;font-weight:700;margin-bottom:.3rem;"><span>${f.label}</span><span>${levelOf(f.pct)} — ${f.pct}%</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${f.pct}%;"></div></div>
+    </div>`).join('');
+
+  document.getElementById('modal-box').innerHTML = `
+    <h3>Big Five — Үр дүн</h3>
+    <div class="result-block" style="font-size:.82rem;color:var(--sub);">IPIP-50 (Goldberg, 1992) сэтгэл судлалын шинжлэх ухаанд өргөн баталгаажсан таван хүчин зүйлийн загвар. Дараах хувь нь хэм хэмжээт дундажтай харьцуулсан ойролцоо байрлалыг харуулна.</div>
+    <div style="margin:1.1rem 0;">${bars}</div>
+    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button></div>
+  `;
+}
+
 /* ================= FEED (Facebook маягийн нийтийн пост + сэтгэгдэл, Supabase-тэй холбогдсон) ================= */
 let feedState = [];
 let COMMENTS_BY_POST = {};
@@ -4535,6 +4878,7 @@ async function initHrNotifications() {
   myHrId = data[0].id;
   myHrName = data[0].name;
   myHrUnit = data[0].unit;
+  updateHrPortalVisibility();
 }
 
 async function refreshProUnreadCount() {
@@ -5475,6 +5819,48 @@ async function adminDeleteHrSpecialist(id) {
   loadAdminHrList();
 }
 
+/* ================= АДМИН: "Хүний нөөц" хэсгийг бөглөх эрх олгох/цуцлах ================= */
+async function grantHrTestAccess() {
+  const emailEl = document.getElementById('hr-access-email');
+  const email = emailEl.value.trim();
+  const msg = document.getElementById('hr-access-msg');
+  if (!email) { msg.style.color = 'var(--red)'; msg.textContent = 'Имэйл хаягаа оруулна уу.'; return; }
+  msg.style.color = 'var(--sub)'; msg.textContent = 'Эрх олгож байна...';
+  const { error } = await sb.rpc('grant_hr_test_access', { target_email: email });
+  if (error) { msg.style.color = 'var(--red)'; msg.textContent = 'Алдаа: ' + error.message; return; }
+  msg.style.color = 'var(--gold)';
+  msg.textContent = 'Амжилттай эрх олгогдлоо! Тэрээр дараагийн удаа нэвтрэхэд "Хүний нөөц" цэс харагдана.';
+  showToast('Хүний нөөцийн тест бөглөх эрх олгогдлоо.', 'success');
+  emailEl.value = '';
+  loadAdminHrAccessList();
+}
+
+async function loadAdminHrAccessList() {
+  const el = document.getElementById('admin-hr-access-list');
+  if (!el) return;
+  el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div>';
+  const { data, error } = await sb.rpc('get_hr_test_access_list');
+  if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Жагсаалтыг ачаалж чадсангүй (SQL функц тохируулагдаагүй байж болзошгүй): ' + esc(error.message) + '</div>'; return; }
+  if (!data || !data.length) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор эрх олгогдсон хэрэглэгч алга.</div>'; return; }
+  el.innerHTML = data.map(u => `
+    <div class="comment-row" style="display:flex;gap:.5rem;padding:.5rem 0;border-top:1px solid var(--line);align-items:center;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:.85rem;font-weight:700;">${esc(u.email)}</div>
+        <div style="font-size:.72rem;color:var(--sub);">${esc(u.anon_handle) || '—'} ${u.branch ? '· ' + esc(BRANCH_LABELS[u.branch] || u.branch) : ''}</div>
+      </div>
+      <button onclick="revokeHrTestAccess('${escAttr(u.email)}')" title="Эрх цуцлах" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>
+    </div>
+  `).join('');
+}
+
+async function revokeHrTestAccess(email) {
+  if (!confirm('Энэ хэрэглэгчийн "Хүний нөөц" хэсгийг бөглөх эрхийг цуцлах уу?')) return;
+  const { error } = await sb.rpc('revoke_hr_test_access', { target_email: email });
+  if (error) { showToast('Цуцлахад алдаа гарлаа: ' + error.message, 'error'); return; }
+  showToast('Эрх цуцлагдлаа.', 'success');
+  loadAdminHrAccessList();
+}
+
 async function saveProfessional() {
   const editId = document.getElementById('pro-edit-id').value;
   const msg = document.getElementById('pro-form-msg');
@@ -5864,6 +6250,7 @@ async function init() {
   await checkAdminStatus();
   initProfessionalNotifications(); // тухайн session мэргэжилтэнтэй холбогдсон эсэхийг чимээгүй шалгаад, шинэ зурвасын мэдэгдлийг эхлүүлнэ
   initHrNotifications(); // тухайн session хүний нөөцийн мэргэжилтэнтэй холбогдсон эсэхийг чимээгүй шалгана
+  checkHrTestAccess(); // тухайн хэрэглэгч "Хүний нөөц" хэсгийг бөглөх тусгай эрх авсан эсэхийг шалгана
   refreshUserUnreadReplies();
   subscribeUserGlobalChat();
   refreshBellBadge();
@@ -5887,6 +6274,7 @@ async function init() {
     loadAdminPosts();
     loadAdminComments();
     loadAdminHrList();
+    loadAdminHrAccessList();
     loadAdminDocuments();
     loadAdminProfessionals();
     loadAdminRiskAlerts();

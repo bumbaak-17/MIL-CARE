@@ -512,7 +512,8 @@
     .main{min-width:0;}
     .sidebar{position:fixed;left:-260px;top:0;width:240px;z-index:60;transition:left .2s;box-shadow:0 0 30px rgba(0,0,0,.4);}
     .sidebar.open{left:0;}
-    .hamburger{display:block;}
+    .hamburger{display:flex;align-items:center;gap:.4rem;padding:.35rem .5rem;}
+    .hb-label{font-size:.85rem;font-weight:800;color:var(--cream);}
     .quick-grid, .test-grid, .filter-bar, .org-grid, .admin-grid{grid-template-columns:repeat(2,1fr);}
     .body-grid{grid-template-columns:minmax(0,1fr);}
     .body-grid > *{min-width:0;}
@@ -524,14 +525,38 @@
     .hero-mascot, .hero-mascot2, .hero-mascot-wrap, .hero-mascot-wrap2{display:none;} /* мобайл дэлгэцэнд орон зай хязгаарлагдмал, зарим хөтөч дээр webm тунгалаг байдал дэмжигддэггүй тул бүрмөсөн нуух */
   }
 
-  /* ---------- Утасны дэлгэц: дээд мөр багтаж, хуудас хажуу тийш гүйхгүй байх ---------- */
+  .sidebar-backdrop{display:none;}
+  @media(max-width:980px){
+    .sidebar.open + .sidebar-backdrop{display:block;position:fixed;inset:0;background:rgba(20,30,48,.45);z-index:55;}
+  }
+
+  /* ---------- Утасны дэлгэц: дээд мөр (лого + цэсний товч), төвлөрсөн нүүр хэсэг, том товчнууд ---------- */
+  .m-brand,.m-hero{display:none;}
   @media(max-width:640px){
-    .topbar{padding:.7rem 1rem;gap:.6rem;}
-    .tagline{display:none;}
-    .topbar-right{gap:.7rem;min-width:0;}
-    #ub-clock{white-space:normal !important;font-size:.7rem !important;line-height:1.25;max-width:150px;}
+    body{background:linear-gradient(180deg,#E3F1F4 0%,#F3F6FB 420px,var(--bg) 100%) no-repeat;}
+    .topbar{padding:.65rem 1rem;gap:.6rem;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);}
+    .m-brand{display:flex;align-items:center;gap:.5rem;order:1;min-width:0;}
+    .m-brand img{width:40px;height:40px;object-fit:contain;}
+    .m-brand b{font-size:1.1rem;font-weight:800;color:var(--gold);letter-spacing:.01em;}
+    .tagline,#ub-clock,.user-chip .user-name,.user-chip .user-role{display:none !important;}
+    .topbar-right{order:2;margin-left:auto;gap:.7rem;min-width:0;}
+    .hamburger{order:3;width:46px;height:46px;justify-content:center;padding:0;border:2px solid var(--gold);border-radius:14px;background:#fff;
+      box-shadow:0 0 0 3px rgba(10,103,122,.14);color:var(--gold);}
+    .hb-label{display:none;}
     .main{overflow-x:hidden;}
     .page-head h2{font-size:1.4rem;}
+    /* Нүүр хэсэг */
+    .m-hero{display:block;text-align:center;padding:1.8rem .2rem .6rem;}
+    .m-hero-title{font-size:2.05rem;line-height:1.18;font-weight:900;letter-spacing:-.02em;color:var(--cream);margin:0 0 1rem;}
+    .m-hero-sub{font-size:1.02rem;line-height:1.55;color:var(--sub);margin:0 0 1.5rem;}
+    .m-btn-primary,.m-btn-secondary{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;min-height:56px;border-radius:16px;font-size:1.05rem;font-weight:800;font-family:inherit;cursor:pointer;}
+    .m-btn-primary{background:linear-gradient(95deg,var(--gold-deep),var(--gold));color:#fff;border:none;box-shadow:0 10px 24px rgba(10,103,122,.32);margin-bottom:.8rem;}
+    .m-btn-primary svg{width:18px;height:18px;}
+    .m-btn-secondary{background:#fff;color:var(--cream);border:1.5px solid var(--line);}
+    .m-checks{display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem 1.2rem;margin:1.3rem 0 .6rem;font-size:.9rem;color:var(--sub);font-weight:600;}
+    .m-checks span{display:inline-flex;align-items:center;gap:.35rem;}
+    .m-checks svg{width:17px;height:17px;color:var(--gold);}
+    #toast-wrap{bottom:1rem;right:.8rem;left:.8rem;}
   }
 
   /* ---------- Onboarding (эхний нэвтрэлтийн сонголт) ---------- */
@@ -645,11 +670,12 @@
       <div><div class="t1">ЯАРАЛТАЙ ТУСЛАМЖ</div><div class="t2">103</div></div>
     </div>
   </aside>
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
   <!-- MAIN -->
   <div class="main">
     <div class="topbar">
-      <button class="hamburger" id="hamburger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+      <button class="hamburger" id="hamburger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><path d="M3 6h18M3 12h18M3 18h18"/></svg><span class="hb-label">Цэс</span></button>
       <div class="tagline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 6v6c0 5 3.5 8.5 9 10 5.5-1.5 9-5 9-10V6z"/></svg>Сэтгэл зүйгээ хамгаалах нь өөрийгөө хамгаалах нэг хэлбэр.</div>
       <div class="topbar-right">
         <div id="ub-clock" style="font-size:.78rem;color:var(--cream);font-weight:700;white-space:nowrap;"></div>
@@ -669,6 +695,13 @@
 
       <!-- ================= HOME ================= -->
       <div id="view-home" class="view active">
+        <section class="m-hero">
+          <h2 class="m-hero-title">Сэтгэл зүйгээ хамгаалах нь өөрийгөө хамгаалах нэг хэлбэр</h2>
+          <p class="m-hero-sub">Богино тестээр өөрийн байдлаа үнэлж, нэрээ нууцлан мэргэжлийн сэтгэл зүйчтэй холбогдоорой.</p>
+          <button class="m-btn-primary" onclick="goto('tests')">Тест эхлүүлэх <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          <button class="m-btn-secondary" onclick="goto('pros')">Сэтгэл зүйчтэй ярилцах</button>
+          <div class="m-checks"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>3-18 минут</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Нэр нууцлагдана</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>AI Туслах</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>103 яаралтай</span></div>
+        </section>
         <div class="hero">
           <div class="hero-ripple" id="hero-ripple"></div>
           <div class="hero-ripple2" id="hero-ripple2"></div>
@@ -1673,6 +1706,17 @@ async function loadHrResults() {
 
 /* ================= NAV ROUTING ================= */
 document.getElementById('hamburger').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
+(function buildMobileBrand(){
+  const tb = document.querySelector('.topbar'); const badge = document.querySelector('.sidebar .brand-badge img');
+  if (!tb || !badge || tb.querySelector('.m-brand')) return;
+  const wrap = document.createElement('div'); wrap.className = 'm-brand';
+  const im = badge.cloneNode(); im.removeAttribute('style'); im.alt = 'MIL-CARE';
+  const t = document.createElement('b'); t.textContent = 'MIL-CARE';
+  wrap.appendChild(im); wrap.appendChild(t);
+  tb.insertBefore(wrap, tb.querySelector('.hamburger').nextSibling);
+})();
+document.getElementById('sidebar-backdrop').addEventListener('click', () => document.getElementById('sidebar').classList.remove('open'));
+
 
 function goto(view, pushState) {
   if ((view === 'psy-corner' || view === 'group-exercise' || view === 'orders' || view === 'guides' || view === 'military-test') && !(isAdmin || myProId)) {
@@ -3123,9 +3167,34 @@ const TC_ICONS = [
 const TC_ICON_LIST = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>';
 const TC_ICON_CLOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
 const TC_ICON_ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+/* Асуултын тоо болон зарцуулах хугацааг ХОЁУЛАНГ нь асуултаас автоматаар тооцно (гараар бичсэн тоо зөрөх асуудлыг арилгана).
+   Дүрэм: нэг асуултад хариулахад ≈20 секунд (4-5 сонголттой), Тийм/Үгүй, А/Б хэлбэртэй бол ≈10 секунд. Хамгийн багадаа 2 минут. */
+const TEST_CUSTOM_META = {
+  iq:               { n: () => IQ_CHECKLIST.reduce((s,c)=>s+c.qs.length,0), sec: 10 },
+  stress_symptoms:  { n: () => STRESS_SYMPTOMS_QS.length, sec: 10 },
+  insomnia:         { n: () => INSOMNIA_QS.length, sec: 10 },
+  gender_role:      { n: () => GENDER_ROLE_QS.length, sec: 8 },
+  character_traits: { n: () => CHARACTER_TRAITS_QS.length, sec: 10 },
+  temperament:      { n: () => TEMPERAMENT_SANG_QS.length + TEMPERAMENT_HOLER_QS.length + TEMPERAMENT_MF_QS.length, sec: 10 },
+  mbti16:           { n: () => MBTI_EI_QS.length + MBTI_SN_QS.length + MBTI_TF_QS.length + MBTI_JP_QS.length, sec: 12 }
+};
+function getTestStats(t) {
+  let n = null, sec = 20;
+  if (Array.isArray(t.qs)) {
+    n = t.qs.length;
+    const twoOpts = t.qs.every(q => { const o = (q && typeof q === 'object' && q.opts) ? q.opts : t.opts; return o && o.length <= 2; });
+    sec = twoOpts ? 10 : 20;
+  } else if (t.custom && TEST_CUSTOM_META[t.custom]) {
+    try { n = TEST_CUSTOM_META[t.custom].n(); sec = TEST_CUSTOM_META[t.custom].sec; } catch (e) { n = null; }
+  }
+  if (!n) return { n: null, dur: t.dur || '' };
+  const min = Math.max(2, Math.ceil(n * sec / 60));
+  return { n, dur: '≈ ' + min + ' минут' };
+}
 function renderTestCard(key, t, i = 0) {
   const num = String(i + 1).padStart(2, '0');
-  const nQ = Array.isArray(t.qs) ? t.qs.length : 0;
+  const st = getTestStats(t);
+  const nQ = st.n || 0;
   /* "PHQ-9 — Сэтгэл гутралын түвшинг тодорхойлох" гэх мэт урт нэрийг богино гарчиг + тайлбар болгон хуваана */
   let head = t.title, sub = t.blurb || '';
   const cut = t.title.indexOf(' — ');
@@ -3138,13 +3207,16 @@ function renderTestCard(key, t, i = 0) {
     <div class="tc-sub">${sub}</div>
     <div class="tc-meta">
       ${nQ ? `<span>${TC_ICON_LIST}${nQ} асуулт</span>` : ''}
-      <span>${TC_ICON_CLOCK}${t.dur || ''}</span>
+      <span>${TC_ICON_CLOCK}${st.dur}</span>
     </div>
     <span class="tc-btn">Тест эхлүүлэх ${TC_ICON_ARROW}</span>
   </div>`;
 }
-document.getElementById('test-row-preview').innerHTML = Object.entries(TESTS).slice(0,5).map(([k,t],i)=>renderTestCard(k,t,i)).join('');
-document.getElementById('test-grid-full').innerHTML = Object.entries(TESTS).map(([k,t],i)=>renderTestCard(k,t,i)).join('');
+function renderAllTestCards() {
+  document.getElementById('test-row-preview').innerHTML = Object.entries(TESTS).slice(0,5).map(([k,t],i)=>renderTestCard(k,t,i)).join('');
+  document.getElementById('test-grid-full').innerHTML = Object.entries(TESTS).map(([k,t],i)=>renderTestCard(k,t,i)).join('');
+}
+renderAllTestCards(); /* скриптийн төгсгөлд дахин дуудна — тэр үед бүх тестийн асуултын жагсаалт бэлэн болсон байна */
 
 /* ================= ӨНГӨ ЯЛГАХ ЧАДВАРЫН ТЕСТ (Ishihara-загварын dot-plate, программаар үүсгэсэн) ================= */
 const ISHIHARA_PLATES = [
@@ -3416,7 +3488,7 @@ function openModal(key) {
   const box = document.getElementById('modal-box');
   box.innerHTML = `
     <h3>${t.emo} ${t.title}</h3>
-    <p class="msub">${t.dur} — сүүлийн 2 долоо хоногт хэр олон удаа тохиолдсоныг үнэлнэ үү.</p>
+    <p class="msub">${(()=>{ const st=getTestStats(t); return (st.n ? st.n+' асуулт · ' : '')+st.dur; })()} — сүүлийн 2 долоо хоногт хэр олон удаа тохиолдсоныг үнэлнэ үү.</p>
     <div id="mq-wrap">${t.qs.map((q,i)=>renderQuestionBlock(t, q, i, 'mq')).join('')}</div>
     <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="scoreModal('${key}')">Дүн харах</button></div>
   `;
@@ -6040,6 +6112,7 @@ async function init() {
   await Promise.all([ loadPosts(), loadPros(), loadDiary(), loadWeekMood(), loadMonthlyAnalysis(), updateStreakBadge() ]);
 }
 init();
+renderAllTestCards();
 </script>
 </body>
 </html>

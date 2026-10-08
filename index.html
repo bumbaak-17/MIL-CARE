@@ -280,7 +280,8 @@
   .composer button{background:var(--gold);border:none;color:#FFFFFF;border-radius:100px;
     padding:.55rem 1.2rem;font-weight:800;font-size:.82rem;cursor:pointer;}
 
-  .body-grid{display:grid;grid-template-columns:1fr 300px;gap:1.4rem;align-items:start;}
+  .body-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:1.4rem;align-items:start;}
+  .body-grid > *{min-width:0;}
   .diary-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;align-items:start;}
   .diary-col-right .section-card{max-height:calc(100vh - 220px);overflow-y:auto;}
   .attention-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:1.4rem;align-items:start;}
@@ -513,13 +514,24 @@
     .sidebar.open{left:0;}
     .hamburger{display:block;}
     .quick-grid, .test-grid, .filter-bar, .org-grid, .admin-grid{grid-template-columns:repeat(2,1fr);}
-    .body-grid{grid-template-columns:1fr;}
-    .diary-grid{grid-template-columns:1fr;}
+    .body-grid{grid-template-columns:minmax(0,1fr);}
+    .body-grid > *{min-width:0;}
+    .diary-grid{grid-template-columns:minmax(0,1fr);}
     .diary-col-right .section-card{max-height:none;}
-    .attention-grid{grid-template-columns:1fr;}
+    .attention-grid{grid-template-columns:minmax(0,1fr);}
     .emo-grid{grid-template-columns:repeat(2,1fr);}
     .ob-grid{grid-template-columns:repeat(2,1fr) !important;}
     .hero-mascot, .hero-mascot2, .hero-mascot-wrap, .hero-mascot-wrap2{display:none;} /* мобайл дэлгэцэнд орон зай хязгаарлагдмал, зарим хөтөч дээр webm тунгалаг байдал дэмжигддэггүй тул бүрмөсөн нуух */
+  }
+
+  /* ---------- Утасны дэлгэц: дээд мөр багтаж, хуудас хажуу тийш гүйхгүй байх ---------- */
+  @media(max-width:640px){
+    .topbar{padding:.7rem 1rem;gap:.6rem;}
+    .tagline{display:none;}
+    .topbar-right{gap:.7rem;min-width:0;}
+    #ub-clock{white-space:normal !important;font-size:.7rem !important;line-height:1.25;max-width:150px;}
+    .main{overflow-x:hidden;}
+    .page-head h2{font-size:1.4rem;}
   }
 
   /* ---------- Onboarding (эхний нэвтрэлтийн сонголт) ---------- */

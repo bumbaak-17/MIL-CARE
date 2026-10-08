@@ -522,7 +522,7 @@
     .attention-grid{grid-template-columns:minmax(0,1fr);}
     .emo-grid{grid-template-columns:repeat(2,1fr);}
     .ob-grid{grid-template-columns:repeat(2,1fr) !important;}
-    .hero-mascot, .hero-mascot2, .hero-mascot-wrap, .hero-mascot-wrap2{display:none;} /* мобайл дэлгэцэнд орон зай хязгаарлагдмал, зарим хөтөч дээр webm тунгалаг байдал дэмжигддэггүй тул бүрмөсөн нуух */
+    .hero-mascot-wrap,.hero-mascot-wrap2{display:none;}
   }
 
   .sidebar-backdrop{display:none;}
@@ -547,6 +547,9 @@
     .page-head h2{font-size:1.4rem;}
     /* Нүүр хэсэг */
     .m-hero{display:block;text-align:center;padding:1.8rem .2rem .6rem;}
+    .m-hero-top{display:grid;grid-template-columns:76px minmax(0,1fr) 76px;gap:.3rem;margin:0 0 1rem;align-items:stretch;}
+    .m-hero-top .m-hero-title{font-size:1.5rem;margin:0;align-self:center;}
+    .m-hero-top video{height:165px;width:auto;max-width:none;justify-self:center;align-self:center;margin:0 -45px;display:block;pointer-events:none;}
     .m-hero-title{font-size:2.05rem;line-height:1.18;font-weight:900;letter-spacing:-.02em;color:var(--cream);margin:0 0 1rem;}
     .m-hero-sub{font-size:1.02rem;line-height:1.55;color:var(--sub);margin:0 0 1.5rem;}
     .m-btn-primary,.m-btn-secondary{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;min-height:56px;border-radius:16px;font-size:1.05rem;font-weight:800;font-family:inherit;cursor:pointer;}
@@ -696,7 +699,7 @@
       <!-- ================= HOME ================= -->
       <div id="view-home" class="view active">
         <section class="m-hero">
-          <h2 class="m-hero-title">Сэтгэл зүйгээ хамгаалах нь өөрийгөө хамгаалах нэг хэлбэр</h2>
+          <div class="m-hero-top"><video id="m-mascot-l" autoplay loop muted playsinline></video><h2 class="m-hero-title">Сэтгэл зүйгээ хамгаалах нь өөрийгөө хамгаалах нэг хэлбэр</h2><video id="m-mascot-r" autoplay loop muted playsinline></video></div>
           <p class="m-hero-sub">Богино тестээр өөрийн байдлаа үнэлж, нэрээ нууцлан мэргэжлийн сэтгэл зүйчтэй холбогдоорой.</p>
           <button class="m-btn-primary" onclick="goto('tests')">Тест эхлүүлэх <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
           <button class="m-btn-secondary" onclick="goto('pros')">Сэтгэл зүйчтэй ярилцах</button>
@@ -6113,6 +6116,12 @@ async function init() {
 }
 init();
 renderAllTestCards();
+</script>
+<script>
+(function(){ // гар утасны толгой хэсэгт хоёр хүүхэлдэйг хуулж харуулна
+  var pairs=[['m-mascot-l','hero-mascot'],['m-mascot-r','hero-mascot2']];
+  pairs.forEach(function(p){ var d=document.getElementById(p[0]),s=document.querySelector('#'+p[1]+' source'); if(d&&s){ d.src=s.src; d.muted=true; var pr=d.play&&d.play(); if(pr&&pr.catch)pr.catch(function(){}); } });
+})();
 </script>
 </body>
 </html>

@@ -728,6 +728,23 @@
 .tr-about p{margin:.4rem 0 0;line-height:1.6}
 @media (max-width:560px){.tr-lv{font-size:1.3rem}.tr-head{padding:16px}}
 </style>
+<style id="hb-css">
+.hb{background:#fff;border:1px solid #E1E9E8;border-radius:14px;padding:14px 16px;margin:12px 0}
+.hb-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.hb-n{font-weight:700;font-size:.95rem;color:#14262C}
+.hb-v{font-weight:700;font-size:.9rem;padding:2px 10px;border-radius:20px;background:#EDF3F2;color:#0A677A}
+.hb-v small{font-weight:500;color:#5A6B70;margin-left:6px}
+.hb-low{background:#F3F5F6;color:#4A5A60}.hb-high{background:#E4F1EC;color:#2F6B50}.hb-normal{background:#E4F1EC;color:#2F6B50}
+.hb-scale{position:relative;display:flex;gap:3px;margin:16px 0 4px}
+.hb-seg{height:8px;border-radius:5px;background:#DCE6E5;position:relative}
+.hb-seg.on{background:#0A677A}
+.hb-seg span{position:absolute;top:12px;left:0;right:0;text-align:center;font-size:.7rem;color:#7A8A8F}
+.hb-seg.on span{color:#0A677A;font-weight:700}
+.hb-mark{position:absolute;top:-6px;width:4px;height:20px;border-radius:3px;background:#0D3B46;transform:translateX(-2px);z-index:2;box-shadow:0 0 0 2px #fff}
+.hb-d{margin:24px 0 0;font-size:.88rem;line-height:1.6;color:#2C3F45}
+.hb-radar{padding-bottom:6px}
+.hr-last{font-size:.78rem;font-weight:700;color:var(--gold);min-height:1em;margin:.2rem 0 .4rem}
+</style>
 </head>
 <body>
 
@@ -1834,12 +1851,16 @@ async function loadHrResultsInner() {
   const subtitle = document.getElementById('hr-portal-subtitle');
   const content = document.getElementById('hr-portal-content');
   if (!content) return;
-  const cardsHtml = `<div class="test-grid">${HR_CARDS.map(c => `
-      <div class="test-card" onclick="${c.fn}()">
-        <span class="test-emo">${c.emo}</span>
-        <div class="test-title">${c.title}</div>
-        <div class="test-blurb">${c.blurb}</div>
-        <div class="test-blurb" id="hr-last-${c.keys[0]}" style="font-weight:700;color:var(--gold);margin:0;"></div>
+  const cardsHtml = `<div class="test-grid">${HR_CARDS.map((c, i) => `
+      <div class="test-card tc" title="${c.blurb.replace(/"/g,'&quot;')}" onclick="${c.fn}()">
+        <div class="tc-art" aria-hidden="true">${c.emo}</div>
+        <div class="tc-badge">${TC_ICONS[i % TC_ICONS.length]}</div>
+        <div class="tc-num">${String(i + 1).padStart(2, '0')}</div>
+        <div class="tc-title">${c.title}</div>
+        <div class="tc-sub">${c.sub || c.blurb}</div>
+        <div class="tc-meta">${c.n ? `<span>${TC_ICON_LIST}${c.n} асуулт</span>` : ''}${c.min ? `<span>${TC_ICON_CLOCK}≈ ${c.min} минут</span>` : ''}</div>
+        <div class="hr-last" id="hr-last-${c.keys[0]}"></div>
+        <span class="tc-btn">Тест эхлүүлэх ${TC_ICON_ARROW}</span>
       </div>`).join('')}</div>`;
 
   if (isAdmin || myHrId) {
@@ -4631,11 +4652,20 @@ async function hrSave(rows) {
   if (error) { console.error('hr save error:', error); showToast('Үр дүнг хадгалахад алдаа гарлаа.', 'warn'); }
 }
 function hrBar(label, score, min, max, level, desc, key) {
-  const pct = Math.round((score - min) / (max - min) * 100);
-  return `<div class="ch-card">
-    <div class="ch-title">${label}: ${score} <span style="font-weight:600;color:var(--sub);font-size:.85rem;">(${min}–${max}) · ${HR_LEVEL_LABELS[level]}</span></div>
-    <div class="bar-row" style="margin:.5rem 0 .6rem;"><div class="bar-track"><div class="bar-fill" style="width:${pct}%;"></div></div></div>
-    <div class="ch-sub" style="margin:0;">${desc}</div>${key ? hrGuideHtml(key, level, { hr: !!(isAdmin || myHrId) }) : ''}</div>`;
+  const pct = Math.max(0, Math.min(100, Math.round((Number(score) - min) / (max - min) * 100)));
+  const brs = key === 'hr_brs';
+  const bands = brs ? [[0, 50, 'Бага'], [50, 82.5, 'Хэвийн'], [82.5, 100, 'Өндөр']] : [[0, 100/3, 'Бага'], [100/3, 200/3, 'Дунд'], [200/3, 100, 'Өндөр']];
+  const cur = level === 'low' ? 0 : level === 'high' ? 2 : 1;
+  return `<div class="hb">
+    <div class="hb-top"><span class="hb-n">${label}</span><span class="hb-v hb-${level}">${HR_LEVEL_LABELS[level] || level}<small>${score} / ${max}</small></span></div>
+    <div class="hb-scale"><div class="hb-mark" style="left:${pct}%"></div>
+      ${bands.map((b, k) => `<div class="hb-seg${k === cur ? ' on' : ''}" style="flex:${b[1] - b[0]} 1 0"><span>${b[2]}</span></div>`).join('')}</div>
+    <p class="hb-d">${desc}</p>${key ? hrGuideHtml(key, level, { hr: !!(isAdmin || myHrId) }) : ''}</div>`;
+}
+/* Олон хэмжүүртэй тестийн радар график */
+function hrRadar(rows) {
+  const items = rows.filter(r => RP_SCALES[r.test_key]).map(r => ({ label: RP_SCALES[r.test_key][0], pct: rpPct(r) }));
+  return items.length >= 3 ? `<div class="hb hb-radar"><div class="hb-n" style="margin-bottom:4px">Ерөнхий зураглал</div>${svgRadar(items)}</div>` : '';
 }
 const HR_PRIVACY = 'Таны хариулт болон үр дүн танд болон эрх бүхий хүний нөөцийн мэргэжилтэн, админд харагдана.';
 const HR_DRAFT_NOTE = 'Монгол орчуулга нь урьдчилсан хувилбар бөгөөд Монголд баталгаажуулалт хийгдээгүй. Үр дүнг шийдвэр гаргах цорын ганц үндэслэл болгохгүй, мэргэжилтний ярилцлагатай хослуулна.';
@@ -4670,7 +4700,7 @@ async function scoreHrBigFive() {
     cards.push(hrBar(F.name, s, 10, 50, lvl, (lvl === 'low' ? F.lo : lvl === 'high' ? F.hi : 'Хоёр туйлын хооронд, нөхцөл байдлаас хамаарч аль алиныг илэрхийлдэг.'), F.key));
   }
   await hrSave(rows);
-  hrDone(`<h3>🧩 Зан чанарын тест — Үр дүн</h3>
+  hrDone(`${trHeadText('Зан чанарын тест', 'Зан чанарын 5 хэмжээсийн зураглал', 'low')}${hrRadar(rows)}
     <p class="msub">Зан чанарын таван үндсэн хэмжээс (оноо 10–50). Аль нэг туйл нь "сайн", "муу" гэсэн үг биш — албан тушаал, үүргийн онцлогоос хамаарч өөр өөр давуу тал болдог.</p>
     ${cards.join('')}
     <div class="result-block"><b>Тайлбар:</b> Бага / дунд / өндөр ангиллыг онооны хүрээг 3 тэнцүү хувааж тогтоосон бөгөөд хүн амын норм биш. ${HR_DRAFT_NOTE}<br>Эх сурвалж: IPIP Big-Five Factor Markers (Goldberg, 1992).</div>`);
@@ -4693,7 +4723,7 @@ async function scoreHrBrs() {
     normal:'Хүнд нөхцөл, стрессээс сэргэх чадвар хэвийн түвшинд байна.',
     high:'Хүнд нөхцөл, стрессээс хурдан сэргэж, хэвийн байдалдаа эргэн ордог.' }[lvl];
   await hrSave([{ test_key:'hr_brs', score: mean, max_score: 5, level: lvl }]);
-  hrDone(`<h3>🛡️ Тэсвэрлэх чадварын тест — Үр дүн</h3>
+  hrDone(`${trHeadText('Тэсвэрлэх чадвар', 'Тэсвэрлэх чадвар: ' + ({ low:'бага', normal:'хэвийн', high:'өндөр' }[lvl]), 'low')}
     ${hrBar('Тэсвэрлэх чадвар', mean.toFixed(2), 1, 5, lvl, desc, 'hr_brs')}
     <div class="result-block"><b>Тайлбар:</b> Дундаж оноо 1–5. Ангилал: 3.00-аас доош бага, 3.00–4.30 хэвийн, 4.30-аас дээш өндөр (Smith ба бусад, 2013). ${HR_DRAFT_NOTE}<br>Эх сурвалж: Brief Resilience Scale (Smith ба бусад, 2008).</div>`);
 }
@@ -4709,7 +4739,7 @@ async function scoreHrLeadership() {
   const ans = hrCollect('hld_', LEAD_ITEMS.length); if (!ans) return;
   const { rows, cards } = hrScoreScales(LEAD_ITEMS, ans, LEAD_SCALES, ['asr', 'grp', 'eff']);
   await hrSave(rows);
-  hrDone(`<h3>⭐ Манлайллын хандлага — Үр дүн</h3>
+  hrDone(`${trHeadText('Манлайллын хандлага', 'Манлайлалтай холбоотой 3 хэмжүүр', 'low')}
     <p class="msub">Энэ тест нь удирдах чадварыг шууд ажиглаж хэмжээгүй, манлайлалтай холбоотой гурван хэмжүүрийн өөрийн үнэлгээ юм.</p>
     ${cards.join('')}
     <div class="result-block"><b>Тайлбар:</b> Бага / дунд / өндөр ангиллыг онооны хүрээг 3 тэнцүү хувааж тогтоосон бөгөөд хүн амын норм биш. ${HR_DRAFT_NOTE}<br>Эх сурвалж: IPIP-NEO — Assertiveness (E3), Self-Efficacy (C1) (Goldberg ба бусад, 2006); IPIP-VIA Leadership (Peterson & Seligman, 2004) — ipip.ori.org.</div>`);
@@ -5043,7 +5073,7 @@ async function scoreHrEq() {
     cards.push(hrBar(S.name, mean.toFixed(2), 1, 5, lvl, (lvl === 'low' ? S.lo : lvl === 'high' ? S.hi : 'Нөхцөл байдлаас хамааран аль алиныг илэрхийлдэг, дунд түвшинд байна.') + (s === 'rd' ? ' <i>(Энэ хэмжүүрийн найдвартай байдал харьцангуй бага тул болгоомжтой тайлбарлана.)</i>' : ''), S.key));
   }
   await hrSave(rows);
-  hrDone(`<h3>💗 Сэтгэл хөдлөлийн чадамж — Үр дүн</h3>
+  hrDone(`${trHeadText('Сэтгэл хөдлөлийн чадамж (EQ)', 'Сэтгэл хөдлөлийн 7 бүрэлдэхүүний зураглал', 'low')}${hrRadar(rows)}
     <p class="msub">Сэтгэл хөдлөлийн оюун ухаантай холбоотой 7 бүрэлдэхүүний дүр зураг (дундаж оноо 1–5). Энэ нь нийт "EQ оноо" биш бөгөөд аль нэг туйл нь "сайн", "муу" гэсэн үг биш.</p>
     ${cards.join('')}
     <div class="result-block"><b>Тайлбар:</b> Бага / дунд / өндөр ангиллыг онооны хүрээг 3 тэнцүү хувааж тогтоосон бөгөөд хүн амын норм биш. ${HR_DRAFT_NOTE}<br>Эх сурвалж: IPIP — Barchard (2001) сэтгэл хөдлөлийн оюун ухаантай холбоотой 7 хэмжүүр (ipip.ori.org).</div>`);
@@ -5126,7 +5156,7 @@ async function scoreHrTeam() {
   const ans = hrCollect('htm_', TEAM_ITEMS.length); if (!ans) return;
   const { rows, cards } = hrScoreScales(TEAM_ITEMS, ans, TEAM_SCALES, ['tw', 'coop']);
   await hrSave(rows);
-  hrDone(`<h3>🤝 Багаар ажиллах чадвар — Үр дүн</h3>
+  hrDone(`${trHeadText('Багаар ажиллах чадвар', 'Багаар ажиллахтай холбоотой 2 хэмжүүр', 'low')}
     <p class="msub">Багаар ажиллахтай холбоотой хоёр хэмжүүр. Аль нэг туйл нь "сайн", "муу" гэсэн үг биш — үүргийн онцлогоос хамаарна.</p>
     ${cards.join('')}
     <div class="result-block"><b>Тайлбар:</b> Бага / дунд / өндөр ангиллыг онооны хүрээг 3 тэнцүү хувааж тогтоосон бөгөөд хүн амын норм биш. ${HR_DRAFT_NOTE}<br>Эх сурвалж: IPIP-VIA Citizenship/Teamwork (Peterson & Seligman, 2004); IPIP-NEO Cooperation (A4) (Goldberg ба бусад, 2006) — ipip.ori.org.</div>`);
@@ -5141,7 +5171,7 @@ async function scoreHrComm() {
   const ans = hrCollect('hcm_', COMM_ITEMS.length); if (!ans) return;
   const { rows, cards } = hrScoreScales(COMM_ITEMS, ans, COMM_SCALES, ['soc', 'fr']);
   await hrSave(rows);
-  hrDone(`<h3>💬 Харилцааны чадамж — Үр дүн</h3>
+  hrDone(`${trHeadText('Харилцааны чадамж', 'Харилцаатай холбоотой 2 хэмжүүр', 'low')}
     <p class="msub">Хүмүүс хоорондын харилцаатай холбоотой хоёр хэмжүүр. Энэ нь харилцааны ур чадварыг шууд ажиглаж хэмжсэн бус, өөрийн үнэлгээ юм.</p>
     ${cards.join('')}
     <div class="result-block"><b>Тайлбар:</b> Бага / дунд / өндөр ангиллыг онооны хүрээг 3 тэнцүү хувааж тогтоосон бөгөөд хүн амын норм биш. ${HR_DRAFT_NOTE}<br>Эх сурвалж: IPIP-VIA Social Intelligence (Peterson & Seligman, 2004); IPIP-NEO Friendliness (E1) (Goldberg ба бусад, 2006) — ipip.ori.org.</div>`);
@@ -5272,12 +5302,12 @@ function hrGuideHtml(key, level, opt) {
 const HR_PREDEPLOY_ENABLED = false;
 const HR_PD_KEYS = ['hr_consent','hr_pcptsd5','hr_pcl5','hr_phq2','hr_phq9','hr_phq9_i9','hr_gad2','hr_gad7','hr_auditc','hr_k6','hr_pvt_b'];
 const HR_CARDS_ALL = [
-  { emo:'🧩', title:'Зан чанарын тест', blurb:'Зан чанарын 5 үндсэн хэмжээс — 50 асуулт, 10 минут', fn:'openHrBigFive', keys:['hr_b5_ext'] },
-  { emo:'🛡️', title:'Тэсвэрлэх чадвар', blurb:'Стресс, хүнд нөхцөлөөс сэргэх чадвар — 6 асуулт, 2 минут', fn:'openHrBrs', keys:['hr_brs'] },
-  { emo:'💗', title:'Сэтгэл хөдлөлийн чадамж (EQ)', blurb:'Сэтгэл хөдлөлийн оюун ухаантай холбоотой 7 бүрэлдэхүүн — 68 асуулт, 12 минут', fn:'openHrEq', keys:['hr_eq_ae'] },
-  { emo:'⭐', title:'Манлайллын хандлага', blurb:'Манлайлах хандлага, бүлгийг манлайлах, чадварын итгэл — 27 асуулт, 6 минут', fn:'openHrLeadership', keys:['hr_lead_asr'] },
-  { emo:'🤝', title:'Багаар ажиллах чадвар', blurb:'Багаар ажиллах хандлага, хамтын ажиллагаа — 19 асуулт, 4 минут', fn:'openHrTeam', keys:['hr_team_tw'] },
-  { emo:'💬', title:'Харилцааны чадамж', blurb:'Нийгмийн оюун ухаан, нөхөрсөг байдал — 17 асуулт, 4 минут', fn:'openHrComm', keys:['hr_comm_soc'] },
+  { emo:'🧩', title:'Зан чанарын тест', sub:'Зан чанарын 5 үндсэн хэмжээс', n:50, min:10, blurb:'Зан чанарын 5 үндсэн хэмжээс — 50 асуулт, 10 минут', fn:'openHrBigFive', keys:['hr_b5_ext'] },
+  { emo:'🛡️', title:'Тэсвэрлэх чадвар', sub:'Стресс, хэцүү үеэс сэргэх чадвар', n:6, min:2, blurb:'Стресс, хүнд нөхцөлөөс сэргэх чадвар — 6 асуулт, 2 минут', fn:'openHrBrs', keys:['hr_brs'] },
+  { emo:'💗', title:'Сэтгэл хөдлөлийн чадамж (EQ)', sub:'Сэтгэл хөдлөлтэй холбоотой 7 бүрэлдэхүүн', n:68, min:12, blurb:'Сэтгэл хөдлөлийн оюун ухаантай холбоотой 7 бүрэлдэхүүн — 68 асуулт, 12 минут', fn:'openHrEq', keys:['hr_eq_ae'] },
+  { emo:'⭐', title:'Манлайллын хандлага', sub:'Санаачилга, бүлгийг манлайлах, өөртөө итгэх итгэл', n:27, min:6, blurb:'Манлайлах хандлага, бүлгийг манлайлах, чадварын итгэл — 27 асуулт, 6 минут', fn:'openHrLeadership', keys:['hr_lead_asr'] },
+  { emo:'🤝', title:'Багаар ажиллах чадвар', sub:'Багаар ажиллах хандлага, хамтын ажиллагаа', n:19, min:4, blurb:'Багаар ажиллах хандлага, хамтын ажиллагаа — 19 асуулт, 4 минут', fn:'openHrTeam', keys:['hr_team_tw'] },
+  { emo:'💬', title:'Харилцааны чадамж', sub:'Бусдыг ойлгох, нөхөрсөг харилцах', n:17, min:4, blurb:'Нийгмийн оюун ухаан, нөхөрсөг байдал — 17 асуулт, 4 минут', fn:'openHrComm', keys:['hr_comm_soc'] },
   { pd:true, emo:'🎖️', title:'Томилолтын өмнөх үзлэг', blurb:'НҮБ-ын 5 чиглэл: PTSD, сэтгэл гутрал, түгшүүр, архи, сэтгэл зүйн дарамт + сонор сэрэмж — 10–20 минут', fn:'openHrPredeploy', keys:['hr_auditc'] },
 ];
 const HR_CARDS = HR_CARDS_ALL.filter(c => HR_PREDEPLOY_ENABLED || !c.pd);

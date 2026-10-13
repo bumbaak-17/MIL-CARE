@@ -19,6 +19,41 @@
     --blue:#0A677A; --blue-soft:rgba(10,103,122,.09);
     --brass:#A9793A; --brass-soft:rgba(169,121,58,.12);
   }
+
+  /* ===== PVT — Сонор сэрэмжийн сорил ===== */
+  .pvt-overlay{position:fixed;inset:0;z-index:1000;background:#0E1A22;display:none;flex-direction:column;
+    align-items:center;justify-content:center;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation;}
+  .pvt-overlay.open{display:flex;}
+  .pvt-bar{position:absolute;left:0;top:0;height:5px;width:0;background:var(--gold);}
+  .pvt-counter{font-family:"Consolas","Courier New",monospace;font-weight:800;font-size:clamp(64px,18vw,150px);
+    letter-spacing:4px;color:#F2C14E;min-height:1.2em;line-height:1.2;}
+  .pvt-counter.idle{color:transparent;}
+  .pvt-counter.fs{color:#E8766B;font-family:inherit;font-size:clamp(26px,6vw,44px);letter-spacing:0;}
+  .pvt-hint{position:absolute;bottom:22px;left:0;right:0;text-align:center;color:#8FA3B5;font-size:.85rem;padding:0 16px;}
+  .pvt-stop{position:absolute;top:16px;right:16px;background:transparent;color:#8FA3B5;border:1px solid #2B3D4B;
+    border-radius:100px;padding:.4rem .9rem;font-size:.8rem;cursor:pointer;}
+  .pvt-time{position:absolute;top:16px;left:16px;color:#8FA3B5;font-size:.85rem;font-weight:700;
+    border:1px solid #2B3D4B;border-radius:100px;padding:.4rem .9rem;font-variant-numeric:tabular-nums;}
+  .pvt-time b{color:#E6EDF3;}
+  .pvt-dur{display:inline-flex;align-items:center;gap:.4rem;background:var(--gold-soft);color:var(--gold-deep);
+    border-radius:100px;padding:.35rem .9rem;font-size:.88rem;font-weight:800;margin:0 0 .4rem;}
+  .pvt-steps{margin:.4rem 0 1rem;padding-left:1.2rem;line-height:1.7;font-size:.95rem;}
+  .pvt-stats{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin:1rem 0;}
+  .pvt-stat{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:.8rem .9rem;}
+  .pvt-stat span{display:block;font-size:.78rem;color:var(--sub);}
+  .pvt-stat b{font-size:1.25rem;color:var(--cream);}
+  @media (max-width:480px){.pvt-stats{grid-template-columns:1fr;}}
+  .pvt-trend-wrap{position:relative;}
+  .pvt-base-line{position:absolute;left:0;right:0;border-top:2px dashed var(--gold);pointer-events:none;}
+  .pvt-chart .year-bar{max-width:46px;}
+  .pvt-legend{display:flex;align-items:center;gap:.45rem;font-size:.75rem;font-weight:700;color:var(--gold);margin:0 0 .6rem;}
+  .pvt-legend i{display:inline-block;width:22px;border-top:2px dashed var(--gold);}
+  .pvt-compare{border-radius:10px;padding:.8rem 1rem;margin-top:.8rem;font-size:.85rem;line-height:1.55;}
+  .pvt-compare.ok{background:var(--gold-soft);color:var(--gold-deep);}
+  .pvt-compare.warn{background:var(--red-soft);color:var(--cream);}
+  .pvt-compare.info{background:var(--panel-2);color:var(--sub);}
+  .pvt-compare b{color:inherit;}
+  .pvt-compare.warn b{color:var(--red);}
   *{box-sizing:border-box;}
   body{margin:0;background:var(--bg);color:var(--cream);
     font-family:'Inter',-apple-system,sans-serif;}
@@ -976,6 +1011,15 @@
       <div id="view-sonjoo" class="view">
         <div class="page-head"><h2>Сонжоо</h2><p>Өөрийгөө болон бусдыг илүү сайн ойлгоход тусалдаг сонирхолтой зурган таавар, дүгнэлтүүд.</p></div>
 
+        <div class="section-card" style="margin-bottom:1.2rem;">
+          <p style="font-size:.85rem;color:var(--sub);margin:0 0 1.1rem;">АНУ-ын арми, НАСА-д ядаргаа, сонор сэрэмжийг хэмждэг стандарт сорилын 3 минутын товч хувилбар (PVT-B, Basner ба бусад, 2011).</p>
+          <div class="test-card" onclick="openPvtTest()">
+            <span class="test-emo">⏱️</span>
+            <div class="test-title">Сонор сэрэмжийн сорил</div>
+            <div class="test-blurb">Хариу үйлдлийн хурд — 3 минут</div>
+          </div>
+        </div>
+
         <div class="section-card">
           <div id="sonjoo-quiz-list"></div>
         </div>
@@ -1058,6 +1102,11 @@
           <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Тус бүр сард өгсөн оношилгооний тестийн дундаж дүнгээс тооцоолсон сэтгэл зүйн тогтвортой байдлын хувь. Тест өгөөгүй сар "—" гэж харагдана.</p>
           <div class="year-chart" id="year-chart"></div>
           <div id="low-months-alert" style="margin-top:1.1rem;"></div>
+        </div>
+        <div class="section-card">
+          <div class="rc-head"><div class="rc-title">⏱️ Сонор сэрэмжийн сорилын явц</div></div>
+          <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Сүүлийн 10 сорилын алдааны тоо (анхаарал алдалт + эрт дарсан). Багана нам байх тусам сайн. Тасархай шугам нь таны хувийн хэвийн үзүүлэлт.</p>
+          <div id="pvt-trend"></div>
         </div>
       </div>
 
@@ -1358,6 +1407,13 @@
 </div>
 
 <!-- TEST MODAL -->
+<div class="pvt-overlay" id="pvt-overlay">
+  <div class="pvt-bar" id="pvt-bar"></div>
+  <div class="pvt-time" id="pvt-time">Үлдсэн: <b>3:00</b></div>
+  <button class="pvt-stop" id="pvt-stop">✕ Зогсоох</button>
+  <div class="pvt-counter idle" id="pvt-counter">0000</div>
+  <div class="pvt-hint">Тоолуур гармагц <b>Space</b> товч дар эсвэл дэлгэцэнд хүр</div>
+</div>
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal-wrap">
     <button class="modal-close-x" onclick="closeModal()" aria-label="Хаах">✕</button>
@@ -1819,7 +1875,7 @@ function goto(view, pushState) {
   if (view === 'military-test') { loadOrders('military_test', 'military-test-list', 'military-test-count-sub'); }
   if (view === 'hr-portal') { loadHrResults(); }
   if (view === 'projective') { renderProjectiveMethods(); }
-  if (view === 'analytics') { loadAnalyticsSummary(); loadMonthlyAnalysis(); }
+  if (view === 'analytics') { loadAnalyticsSummary(); loadMonthlyAnalysis(); loadPvtTrend(); }
   if (view === 'org') { loadOrgStats(); loadUnitStress(); }
   if (view === 'pros') { loadPros(); }
   if (view === 'ai-chat') { loadAIChatHistory(); }
@@ -2226,7 +2282,7 @@ async function loadMonthlyAnalysis() {
   const { data: rawData, error } = await sb.from('test_results').select('score, max_score, created_at, test_key').eq('user_id', currentUser.id).order('created_at', { ascending:true }).limit(2000);
   if (error) { console.error('loadMonthlyAnalysis error:', error); return; }
   // Сэтгэл зүйн шинжтэй бус тестүүдийг (өнгө ялгах, анхаарлын сарнилт) нэгдсэн сэтгэл зүйн дүн шинжилгээнд оруулахгүй
-  const EXCLUDED_FROM_WELLNESS = ['color_vision', 'attention_scale'];
+  const EXCLUDED_FROM_WELLNESS = ['color_vision', 'attention_scale', 'pvt_b'];
   const data = (rawData || []).filter(r => !EXCLUDED_FROM_WELLNESS.includes(r.test_key));
 
   // Сар бүрийн (сүүлийн 12 сар) түлхүүрийг өнөөдрөөс тооцоолж бэлдэнэ
@@ -3889,6 +3945,267 @@ function openModal(key) {
   document.getElementById('modal-overlay').classList.add('open');
 }
 function closeModal(){ document.getElementById('modal-overlay').classList.remove('open'); }
+
+/* ================= PVT-B — СОНОР СЭРЭМЖИЙН СОРИЛ =================
+   Basner, Mollicone & Dinges (2011), Acta Astronautica 69, 949–959.
+   3 минут · завсар 1–4 сек (1 сек хариу харуулахыг оруулаад) ·
+   анхаарал алдалт ≥355 мс · <100 мс эсвэл тоолуургүй үед дарвал эрт дарсан алдаа */
+const EXTRA_TEST_TITLES = { pvt_b: 'Сонор сэрэмжийн сорил (PVT-B)' };
+const PVT = { DURATION:180000, ISI_MIN:1000, ISI_MAX:4000, FEEDBACK:1000, LAPSE:355, FALSE:100, TIMEOUT:30000 };
+let pvtState = 'idle', pvtStart = 0, pvtStim = 0, pvtTimer = null, pvtRaf = null;
+let pvtRts = [], pvtFalse = 0, pvtTimeouts = 0;
+
+function openPvtTest() {
+  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('modal-box').innerHTML = `
+    <h3>⏱️ Сонор сэрэмжийн сорил</h3>
+    <p class="msub">Ядаргаа, анхаарал төвлөрлийг хариу үйлдлийн хурдаар хэмжинэ.</p>
+    <div class="pvt-dur">⏱️ Яг 3 минут (180 секунд) үргэлжилнэ</div>
+    <ol class="pvt-steps">
+      <li>Дэлгэцийн голд <b>тоолуур</b> гэнэт гүйж эхэлнэ.</li>
+      <li>Тоолуур гармагц аль болох <b>хурдан</b> дарна: <b>Space</b> товч, хулгана эсвэл дэлгэцэнд хүрнэ.</li>
+      <li>Тоолуур гараагүй байхад <b>бүү дар</b>, энэ нь алдаанд тооцогдоно.</li>
+      <li>Чимээгүй орчинд, сорил дуустал анхаарлаа бүү сарниул. Үлдсэн хугацаа дэлгэцийн зүүн дээд буланд харагдана.</li>
+    </ol>
+    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="startPvtTest()">Сорил эхлүүлэх</button></div>
+  `;
+}
+
+function startPvtTest() {
+  closeModal();
+  pvtRts = []; pvtFalse = 0; pvtTimeouts = 0;
+  const tEl = document.getElementById('pvt-time');
+  const total = Math.round(PVT.DURATION / 1000);
+  tEl.dataset.v = ''; tEl.innerHTML = `Үлдсэн: <b>${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}</b>`;
+  document.getElementById('pvt-bar').style.width = '0%';
+  document.getElementById('pvt-overlay').classList.add('open');
+  pvtStart = performance.now();
+  pvtState = 'waiting';
+  pvtTickBar();
+  pvtSchedule(false);
+}
+
+function pvtTickBar() {
+  if (pvtState === 'idle' || pvtState === 'done') return;
+  const elapsed = performance.now() - pvtStart;
+  const p = Math.min(1, elapsed / PVT.DURATION);
+  document.getElementById('pvt-bar').style.width = (p * 100) + '%';
+  const left = Math.max(0, Math.ceil((PVT.DURATION - elapsed) / 1000));
+  const txt = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`;
+  const tEl = document.getElementById('pvt-time');
+  if (tEl.dataset.v !== txt) { tEl.dataset.v = txt; tEl.innerHTML = `Үлдсэн: <b>${txt}</b>`; }
+  requestAnimationFrame(pvtTickBar);
+}
+
+function pvtSchedule(afterFeedback) {
+  if (performance.now() - pvtStart >= PVT.DURATION) return finishPvtTest();
+  pvtState = 'waiting';
+  const c = document.getElementById('pvt-counter');
+  c.className = 'pvt-counter idle'; c.textContent = '0000';
+  const isi = PVT.ISI_MIN + Math.random() * (PVT.ISI_MAX - PVT.ISI_MIN) - (afterFeedback ? PVT.FEEDBACK : 0);
+  pvtTimer = setTimeout(pvtShow, Math.max(0, isi));
+}
+
+function pvtShow() {
+  if (performance.now() - pvtStart >= PVT.DURATION) return finishPvtTest();
+  pvtState = 'stimulus';
+  const c = document.getElementById('pvt-counter');
+  c.className = 'pvt-counter';
+  pvtStim = performance.now();
+  const loop = () => {
+    if (pvtState !== 'stimulus') return;
+    const t = performance.now() - pvtStim;
+    c.textContent = String(Math.floor(t)).padStart(4, '0');
+    // 3 минут дуусмагц хариулаагүй тоолуурыг (≥355 мс бол) анхаарал алдалтад тооцоод шууд дуусгана
+    if (performance.now() - pvtStart >= PVT.DURATION) { if (t >= PVT.LAPSE) pvtTimeouts++; return finishPvtTest(); }
+    if (t > PVT.TIMEOUT) { pvtTimeouts++; return pvtSchedule(false); }
+    pvtRaf = requestAnimationFrame(loop);
+  };
+  pvtRaf = requestAnimationFrame(loop);
+}
+
+function pvtRespond() {
+  const c = document.getElementById('pvt-counter');
+  if (pvtState === 'stimulus') {
+    cancelAnimationFrame(pvtRaf);
+    const rt = performance.now() - pvtStim;
+    c.textContent = String(Math.round(rt)).padStart(4, '0');
+    if (rt < PVT.FALSE) pvtFalse++; else pvtRts.push(rt);
+  } else if (pvtState === 'waiting') {
+    clearTimeout(pvtTimer);
+    pvtFalse++;
+    c.className = 'pvt-counter fs'; c.textContent = 'Эрт дарлаа!';
+  } else return;
+  pvtState = 'feedback';
+  pvtTimer = setTimeout(() => pvtSchedule(true), PVT.FEEDBACK);
+}
+
+function stopPvtTest() {
+  pvtState = 'idle';
+  clearTimeout(pvtTimer); cancelAnimationFrame(pvtRaf);
+  document.getElementById('pvt-overlay').classList.remove('open');
+  showToast('Сорил зогсоогдлоо. Үр дүн хадгалагдсангүй.', 'warn');
+}
+
+async function finishPvtTest() {
+  pvtState = 'done';
+  clearTimeout(pvtTimer); cancelAnimationFrame(pvtRaf);
+  document.getElementById('pvt-overlay').classList.remove('open');
+
+  const n = pvtRts.length;
+  const sorted = [...pvtRts].sort((a, b) => a - b);
+  const mean = n ? Math.round(pvtRts.reduce((a, b) => a + b, 0) / n) : null;
+  const median = n ? Math.round(n % 2 ? sorted[(n - 1) / 2] : (sorted[n / 2 - 1] + sorted[n / 2]) / 2) : null;
+  const k = Math.max(1, Math.round(n * 0.1));
+  const fast10 = n ? Math.round(sorted.slice(0, k).reduce((a, b) => a + b, 0) / k) : null;
+  const lapses = pvtRts.filter(r => r >= PVT.LAPSE).length + pvtTimeouts;
+  const errors = lapses + pvtFalse;
+  const trials = n + pvtFalse + pvtTimeouts;
+
+  // АНХААР: доорх ангиллын босго (2 ба 5 алдаа) нь стандарт норм биш, туршилтын жишээ.
+  // Алба хаагчдын өгөгдлөөр норм тогтоосны дараа солих шаардлагатай.
+  let level, levelKey, color;
+  if (errors <= 2)      { level = 'Сонор сэрэмж хэвийн';        levelKey = 'low';  color = 'var(--gold)'; }
+  else if (errors <= 5) { level = 'Бага зэргийн ядаргааны шинж'; levelKey = 'mid';  color = 'var(--brass)'; }
+  else                  { level = 'Ядаргаа өндөр байх магадлалтай'; levelKey = 'high'; color = 'var(--red)'; }
+
+  const pvtPrior = await fetchPvtHistory(PVT_BASE.WINDOW);
+  const compareHtml = pvtCompareHtml(pvtPrior, errors);
+
+  if (currentUser?.id) {
+    const { error } = await sb.from('test_results').insert({ user_id: currentUser.id, test_key: 'pvt_b', score: errors, max_score: trials, level: levelKey });
+    if (error) console.error('pvt save error:', error);
+  }
+
+  const ms = v => v != null ? v + ' мс' : '–';
+  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('modal-box').innerHTML = `
+    <h3>⏱️ Сонор сэрэмжийн сорил — Үр дүн</h3>
+    <div class="result-level" style="color:${color};">${level}</div>
+    <div class="pvt-stats">
+      <div class="pvt-stat"><span>Дундаж хариу өгөх хугацаа</span><b>${ms(mean)}</b></div>
+      <div class="pvt-stat"><span>Медиан хугацаа</span><b>${ms(median)}</b></div>
+      <div class="pvt-stat"><span>Анхаарал алдсан тоо (≥355 мс)</span><b>${lapses}</b></div>
+      <div class="pvt-stat"><span>Эрт дарсан алдаа</span><b>${pvtFalse}</b></div>
+      <div class="pvt-stat"><span>Хамгийн хурдан 10%-ийн дундаж</span><b>${ms(fast10)}</b></div>
+      <div class="pvt-stat"><span>Нийт хариулт</span><b>${n}</b></div>
+    </div>
+    ${compareHtml}
+    <div class="result-block"><b>Тайлбар:</b> Энэ сорил нь ядаргаа, сонор сэрэмжийг хэмждэг бөгөөд сэтгэцийн эмгэгийг оношлохгүй. Ангилал нь туршилтын шатны урьдчилсан үнэлгээ. Ядаргаа өндөр гарвал нойр, амралтаа анхаарч, дахин сорил өгөөрэй.</div>
+    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="openPvtTest()">Дахин өгөх</button></div>
+  `;
+}
+
+
+/* ---- PVT: хувийн хэвийн үзүүлэлттэй харьцуулах ----
+   Хувийн хэвийн үзүүлэлт = тухайн сорилоос өмнөх сүүлийн 5 хүртэлх сорилын алдааны медиан
+   (дор хаяж 3 өмнөх сорил шаардлагатай).
+   АНХААР: "хэвийнээс 3 ба түүнээс дээш алдаагаар их" гэсэн босго нь стандарт норм биш,
+   туршилтын босго. Алба хаагчдын өгөгдлөөр шалгаж тохируулах шаардлагатай. */
+const PVT_BASE = { MIN_PRIOR: 3, WINDOW: 5, ALERT_DELTA: 3 };
+
+function pvtMedian(arr) {
+  if (!arr.length) return null;
+  const s = [...arr].sort((a, b) => a - b), m = Math.floor(s.length / 2);
+  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+}
+
+// rows: хуучнаас шинэ рүү эрэмбэлсэн; idx: харьцуулах сорилын индекс
+function pvtBaselineAt(rows, idx) {
+  const prior = rows.slice(Math.max(0, idx - PVT_BASE.WINDOW), idx).map(r => r.score);
+  if (prior.length < PVT_BASE.MIN_PRIOR) return null;
+  return pvtMedian(prior);
+}
+
+async function fetchPvtHistory(limit = 10) {
+  if (!currentUser?.id) return [];
+  const { data, error } = await sb.from('test_results').select('score, max_score, created_at')
+    .eq('user_id', currentUser.id).eq('test_key', 'pvt_b')
+    .order('created_at', { ascending: false }).limit(limit);
+  if (error) { console.error('pvt history error:', error); return []; }
+  return (data || []).filter(r => typeof r.score === 'number').reverse();
+}
+
+// Шинэ үр дүнг өмнөх түүхтэй харьцуулсан HTML
+function pvtCompareHtml(prior, errors) {
+  if (!currentUser?.id) return '';
+  const rows = [...prior, { score: errors }];
+  const base = pvtBaselineAt(rows, rows.length - 1);
+  if (base === null) {
+    const need = PVT_BASE.MIN_PRIOR + 1 - rows.length;
+    return `<div class="pvt-compare info">Таны хувийн хэвийн үзүүлэлтийг тогтоохын тулд дахиад <b>${need}</b> удаа сорил өгөх шаардлагатай. Дараа нь үр дүнг тань өөрийн өмнөх үзүүлэлттэй харьцуулна.</div>`;
+  }
+  const diff = errors - base;
+  if (diff >= PVT_BASE.ALERT_DELTA) {
+    return `<div class="pvt-compare warn"><b>Хэвийн үзүүлэлтээсээ доогуур байна.</b> Энэ удаа ${errors} алдаа гарсан нь таны хэвийн түвшнээс (${base}) ${diff}-өөр их байна. Ядарсан, нойр дутсан байж магадгүй. Амарсны дараа дахин сорил өгөөрэй.</div>`;
+  }
+  return `<div class="pvt-compare ok"><b>Хэвийн үзүүлэлтийнхээ хүрээнд байна.</b> Энэ удаа ${errors} алдаа, таны хэвийн түвшин ${base}.</div>`;
+}
+
+async function loadPvtTrend() {
+  const el = document.getElementById('pvt-trend');
+  if (!el) return;
+  if (!currentUser?.id) { el.innerHTML = '<div class="pvt-compare info">Нэвтэрсний дараа таны сорилын явц энд харагдана.</div>'; return; }
+  const rows = await fetchPvtHistory(10);
+  if (!rows.length) {
+    el.innerHTML = `<div class="pvt-compare info">Та одоогоор сонор сэрэмжийн сорил өгөөгүй байна. <a href="#" onclick="goto('sonjoo');return false;" style="color:var(--gold);font-weight:700;">Сорил өгөх →</a></div>`;
+    return;
+  }
+  const maxErr = Math.max(6, ...rows.map(r => r.score));
+  const H = 130;
+  const lastIdx = rows.length - 1;
+  const base = pvtBaselineAt(rows, lastIdx);
+  const bars = rows.map(r => {
+    const cls = r.score <= 2 ? 'good' : r.score <= 5 ? 'mid' : 'low';
+    const h = Math.max(6, Math.round(r.score / maxErr * H));
+    const d = new Date(r.created_at);
+    const lbl = isNaN(d) ? '' : `${d.getMonth() + 1}/${d.getDate()}`;
+    return `<div class="year-bar-col">
+      <div class="year-bar-val">${r.score}</div>
+      <div class="year-bar ${cls}" style="height:${h}px;"></div>
+      <div class="year-bar-lbl">${lbl}</div>
+    </div>`;
+  }).join('');
+  // Тасархай шугамыг баганын суурьтай тааруулна (шошгоны өндөр ≈ 22px)
+  const legend = base === null ? '' : `<div class="pvt-legend"><i></i>Таны хэвийн түвшин: ${base} алдаа</div>`;
+  const last = rows[lastIdx].score;
+  let note;
+  if (base === null) {
+    note = `<div class="pvt-compare info">Хувийн хэвийн үзүүлэлт тогтоохын тулд дор хаяж ${PVT_BASE.MIN_PRIOR + 1} удаа сорил өгөх шаардлагатай (одоо ${rows.length}).</div>`;
+  } else if (last - base >= PVT_BASE.ALERT_DELTA) {
+    note = `<div class="low-month-card"><div class="lm-text"><b>Сүүлийн сорил: ${last} алдаа</b> — таны хэвийн түвшнээс (${base}) мэдэгдэхүйц их байна. Нойр, амралтаа анхаарч, дахин сорил өгөөрэй. Удаан хугацаанд давтагдвал мэргэжилтэнд хандаарай.</div><button onclick="goto('pros')">Зөвлөгөө авах</button></div>`;
+  } else {
+    note = `<div class="pvt-compare ok"><b>Сүүлийн сорил: ${last} алдаа</b> — таны хэвийн үзүүлэлтийн (${base}) хүрээнд байна.</div>`;
+  }
+  el.innerHTML = `${legend}<div class="pvt-trend-wrap"><div class="year-chart pvt-chart">${bars}</div></div><div style="margin-top:1.1rem;">${note}</div>`;
+  // Тасархай шугамыг баганын суурийн бодит байрлалаас тооцож зурна
+  if (base !== null) {
+    const wrap = el.querySelector('.pvt-trend-wrap');
+    const bar0 = wrap.querySelector('.year-bar');
+    const baseFromBottom = wrap.getBoundingClientRect().bottom - bar0.getBoundingClientRect().bottom;
+    const line = document.createElement('div');
+    line.className = 'pvt-base-line';
+    line.style.bottom = (baseFromBottom + Math.max(6, Math.round(base / maxErr * H)) - 1) + 'px';
+    wrap.appendChild(line);
+  }
+}
+
+(function initPvt() {
+  const ov = document.getElementById('pvt-overlay');
+  if (!ov) return;
+  ov.addEventListener('pointerdown', e => {
+    if (e.target.id === 'pvt-stop') return;
+    e.preventDefault(); pvtRespond();
+  });
+  document.getElementById('pvt-stop').addEventListener('click', e => { e.stopPropagation(); stopPvtTest(); });
+  document.addEventListener('keydown', e => {
+    if (!ov.classList.contains('open')) return;
+    if (e.code === 'Space') { e.preventDefault(); pvtRespond(); }
+    else if (e.key === 'Escape') stopPvtTest();
+  });
+})();
+
+
 
 /* Тест бөглөх явцын мөр: цонхонд 3-аас олон асуулт (.q-block) байвал дээд талд хэдэн асуултад хариулсныг харуулна */
 (function initTestProgress(){
@@ -5938,7 +6255,7 @@ function renderAdminTestResultsList() {
     <div class="comment-row" style="padding:.7rem 0;border-top:1px solid var(--line);">
       <div style="font-weight:700;font-size:.88rem;">${esc(u.user?.anon_handle) || '—'} <span style="font-weight:400;color:var(--sub);font-size:.78rem;">${esc(BRANCH_LABELS[u.user?.branch]) || ''}${u.user?.personnel_type ? ' · '+esc(ROLE_LABELS[u.user.personnel_type]||u.user.personnel_type) : ''}</span> <span style="color:var(--sub);font-size:.75rem;">(${u.results.length} тест)</span></div>
       <div style="margin-top:.4rem;">
-        ${u.results.map(r => `<div style="font-size:.82rem;color:var(--sub);padding-left:.5rem;border-left:2px solid var(--line);margin:.15rem 0;">• ${esc(TESTS[r.test_key]?.title || r.test_key)} — ${r.score}${r.max_score!=null?('/'+r.max_score):''} ${r.level?('('+esc(r.level)+')'):''} · ${timeAgo(r.created_at)}</div>`).join('')}
+        ${u.results.map(r => `<div style="font-size:.82rem;color:var(--sub);padding-left:.5rem;border-left:2px solid var(--line);margin:.15rem 0;">• ${esc(TESTS[r.test_key]?.title || EXTRA_TEST_TITLES[r.test_key] || r.test_key)} — ${r.score}${r.max_score!=null?('/'+r.max_score):''} ${r.level?('('+esc(r.level)+')'):''} · ${timeAgo(r.created_at)}</div>`).join('')}
       </div>
     </div>
   `).join('');

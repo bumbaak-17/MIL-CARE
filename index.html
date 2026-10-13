@@ -1847,11 +1847,11 @@ async function loadHrResultsInner() {
     const keyOrder = Object.keys(HR_TEST_TITLES);
     el.innerHTML = Object.values(byUser).map(u => {
       const rows = u.order.sort((a, b) => keyOrder.indexOf(a) - keyOrder.indexOf(b)).map(k => u.latest[k]);
-      const flag = rows.some(r => r.level === 'pos');
+      const flag = rows.some(hrIsFlag);
       return `
       <div class="comment-row" style="display:flex;flex-direction:column;gap:.3rem;padding:.7rem 0;border-top:1px solid var(--line);">
         <div style="font-weight:700;font-size:.88rem;">${esc(u.user?.anon_handle) || '—'} <span style="font-weight:400;color:var(--sub);font-size:.78rem;">${esc(BRANCH_LABELS?.[u.user?.branch] || u.user?.branch || '')} ${u.user?.personnel_type ? '· '+esc(ROLE_LABELS?.[u.user.personnel_type] || u.user.personnel_type) : ''}</span>${flag ? ' <span style="font-size:.72rem;font-weight:800;color:var(--red);background:var(--red-soft);border-radius:100px;padding:.1rem .5rem;margin-left:.3rem;">Анхаарах</span>' : ''}</div>
-        ${rows.map(r => `<div style="font-size:.82rem;color:${r.level === 'pos' ? 'var(--red)' : 'var(--sub)'};padding-left:.5rem;">• ${esc(HR_TEST_TITLES[r.test_key] || r.test_key)} — ${esc(hrFmtScore(r))} · ${timeAgo(r.created_at)}</div>`).join('')}
+        ${rows.map(r => `<div style="font-size:.82rem;color:${hrIsFlag(r) ? 'var(--red)' : 'var(--sub)'};padding-left:.5rem;">• ${esc(HR_TEST_TITLES[r.test_key] || r.test_key)} — ${esc(hrFmtScore(r))} · ${timeAgo(r.created_at)}</div>`).join('')}
       </div>`;
     }).join('');
   } else {
@@ -4383,9 +4383,22 @@ const HR_TEST_TITLES = {
   hr_brs:'Тэсвэрлэх чадвар (BRS)', hr_lead_asr:'Манлайллын хандлага — Манлайлах хандлага', hr_lead_eff:'Манлайллын хандлага — Чадварын итгэл',
   hr_pcl5:'Томилолтын өмнөх үзлэг — PTSD-ийн шинж тэмдэг (PCL-5)', hr_auditc:'Томилолтын өмнөх үзлэг — Архины хэрэглээ (AUDIT-C)',
   hr_pvt_b:'Томилолтын өмнөх үзлэг — Сонор сэрэмж (PVT-B)',
+  hr_consent:'Томилолтын өмнөх үзлэг — Мэдээлэл боловсруулах зөвшөөрөл',
+  hr_pcptsd5:'Томилолтын өмнөх үзлэг — PTSD богино асуулга (PC-PTSD-5)',
+  hr_phq2:'Томилолтын өмнөх үзлэг — Сэтгэл гутрал, богино (PHQ-2)', hr_phq9:'Томилолтын өмнөх үзлэг — Сэтгэл гутрал (PHQ-9)',
+  hr_phq9_i9:'⚠️ Өөрийгөө гэмтээх бодол (PHQ-9, 9-р асуулт)',
+  hr_gad2:'Томилолтын өмнөх үзлэг — Түгшүүр, богино (GAD-2)', hr_gad7:'Томилолтын өмнөх үзлэг — Түгшүүр (GAD-7)',
+  hr_k6:'Томилолтын өмнөх үзлэг — Сэтгэл зүйн дарамт (K6)',
 };
 Object.assign(EXTRA_TEST_TITLES, HR_TEST_TITLES);
-const HR_LEVEL_LABELS = { low:'Бага', mid:'Дунд', high:'Өндөр', normal:'Хэвийн', pos:'Анхаарах', neg:'Хэвийн' };
+const HR_LEVEL_LABELS = { low:'Бага', mid:'Дунд', high:'Өндөр', normal:'Хэвийн', pos:'Анхаарах', neg:'Хэвийн',
+  minimal:'Хамгийн бага', mild:'Хөнгөн', moderate:'Дунд', modsev:'Дунджаас хүнд', severe:'Хүнд', v1:'Зөвшөөрсөн' };
+/* ХН самбарт "Анхаарах" гэж тэмдэглэх эсэх: 1-р шатны богино асуулга нь зөвхөн дараагийн шатыг нээдэг тул тэмдэглэхгүй */
+function hrIsFlag(r) {
+  if (['hr_pcptsd5','hr_phq2','hr_gad2','hr_consent'].includes(r.test_key)) return false;
+  if (['hr_phq9','hr_gad7'].includes(r.test_key)) return ['moderate','modsev','severe'].includes(r.level);
+  return r.level === 'pos';
+}
 
 /* ---------- Туслах функцууд ---------- */
 function hrTri(score, min, max) { // онооны хүрээг 3 тэнцүү хувааж ангилна (норм биш)
@@ -4507,65 +4520,266 @@ async function scoreHrLeadership() {
     <div class="result-block"><b>Тайлбар:</b> Бага / дунд / өндөр ангиллыг онооны хүрээг 3 тэнцүү хувааж тогтоосон бөгөөд хүн амын норм биш. ${HR_DRAFT_NOTE}<br>Эх сурвалж: IPIP-NEO — Assertiveness (E3), Self-Efficacy (C1) (Goldberg ба бусад, 2006).</div>`);
 }
 
-/* ---------- 4) Томилолтын өмнөх үзлэг ---------- */
+/* ---------- 4) Томилолтын өмнөх үзлэг (НҮБ-ын 5 чиглэл) ----------
+   НҮБ-ын Үйл ажиллагааны дэмжлэгийн газар (2023). Review of Current Global Science and Best Practices
+   for the Prevention of PTSD in Uniformed Personnel Participating in UN Peace Operations — Хэсэг 2, VI.E:
+   PTSD, сэтгэл гутрал, түгшүүр, архины хэрэглээ, сэтгэл зүйн дарамт.
+   Хоёр шаттай бүтэц: АНУ-ын DD Form 2795 (2015)-тай адил — богино асуулга эерэг бол бүтэн асуулга.
+   • PC-PTSD-5 (Prins ба бусад, 2015/2016) → ≥3 бол PCL-5 (Weathers ба бусад, 2013)
+   • PHQ-2 (Kroenke ба бусад, 2003) → ≥3 бол PHQ-9 (Kroenke ба бусад, 2001)
+   • GAD-2 (Kroenke ба бусад, 2007) → ≥3 бол GAD-7 (Spitzer ба бусад, 2006)
+   • AUDIT-C (Bush ба бусад, 1998; Bradley ба бусад, 2007)
+   • K6 (Kessler ба бусад, 2003)
+   НҮБ-ын зарчим (Хэсэг 2, VII.A): гол арга нь эрүүл мэндийн бүртгэлийн хяналт ба эмчийн ярилцлага;
+   асуулга нь нэмэлт хэрэгсэл; шинж тэмдэг байгаа нь автоматаар явуулахгүй гэсэн үг биш. */
+
+/* Хувь хүний мэдээлэл хамгаалах тухай хуулийн дагуу зөвшөөрлийн мэдэгдэлд заавал бөглөх мэдээлэл.
+   ⚠️ Сайтыг ашиглалтад оруулахаас өмнө байгууллагынхаа бодит мэдээллээр БӨГЛӨНӨ. */
+const HR_CONSENT_CFG = {
+  org: '',        // Мэдээлэл хариуцагч байгууллагын нэр
+  contact: '',    // Холбоо барих утас / имэйл
+  retention: '',  // Хадгалах хугацаа (жишээ: "томилолт дууссанаас хойш 1 жил")
+  version: 'v1',
+};
+function hrCfg(v) { return v ? esc(v) : '<span style="color:var(--red);font-weight:700;">[тохируулаагүй]</span>'; }
+
+const YN_OPTS = ['Үгүй', 'Тийм'];
+const PCPTSD_INTRO = 'Хүмүүст заримдаа ер бусын айдас төрүүлсэн, аймшигтай эсвэл сэтгэл санааны гэмтэл учруулсан үйл явдал тохиолддог. Жишээ нь: ноцтой осол, гал түймэр; бие махбодын болон бэлгийн халдлага, хүчирхийлэл; газар хөдлөлт, үер; дайн; хэн нэгэн алагдах эсвэл хүнд гэмтэхийг нүдээр харах; ойр дотны хүн нь хүний гарт амь үрэгдэх эсвэл амиа хорлох. <b>Та ийм үйл явдал амсаж байсан уу?</b>';
+const PCPTSD_ITEMS = [
+  'тэр үйл явдлын тухай хар дарж зүүдэлсэн, эсвэл хүсээгүй байхад тэр тухай бодол орж ирсэн үү?',
+  'тэр үйл явдлын тухай бодохгүй байхыг ихэд хичээсэн, эсвэл түүнийг сануулах нөхцөл байдлаас санаатайгаар зайлсхийсэн үү?',
+  'байнга сэрэмжтэй, болгоомжтой байсан эсвэл амархан цочдог байсан уу?',
+  'хүмүүс, үйл ажиллагаа эсвэл эргэн тойрноосоо мэдрэмжгүй болсон, хөндийрсөн мэт санагдсан уу?',
+  'тэр үйл явдал эсвэл түүнээс үүдсэн асуудлын төлөө өөрийгөө эсвэл бусдыг буруутгахаа зогсоож чадахгүй, гэм буруутай мэт санагдсан уу?',
+];
+const PHQ_GAD_OPTS = ['Огт үгүй', 'Хэд хэдэн өдөр', 'Өдрийн талаас илүү', 'Бараг өдөр бүр'];
+const PHQ9_ITEMS = [
+  'Аливаа зүйл хийх сонирхол, таашаал бага байх',
+  'Сэтгэл гутрах, гунигтай байх эсвэл итгэл найдваргүй болох',
+  'Унтахад эсвэл нойроо хадгалахад бэрхшээлтэй байх, эсвэл хэт их унтах',
+  'Ядрах эсвэл эрч хүч бага байх',
+  'Хоолны дуршил муудах эсвэл хэт их идэх',
+  'Өөрийгөө муу гэж бодох, эсвэл өөрийгөө бүтэлгүй, өөрийгөө болон гэр бүлээ урам хугалсан гэж бодох',
+  'Сонин унших, зурагт үзэх гэх мэт зүйлд анхаарлаа төвлөрүүлэхэд бэрхшээлтэй байх',
+  'Бусдын анзаарахуйц хэмжээнд хөдөлгөөн, яриа удаан болох; эсвэл эсрэгээрээ ердийнхөөс хамаагүй их хөдөлж, тайван байж чадахгүй тогтворгүй болох',
+  'Үхсэн нь дээр гэх, эсвэл өөрийгөө ямар нэг байдлаар гэмтээх тухай бодол төрөх',
+];
+const GAD7_ITEMS = [
+  'Сандрах, түгших эсвэл сэтгэл тавгүй байх',
+  'Санаа зовохоо зогсоож эсвэл хянаж чадахгүй байх',
+  'Янз бүрийн зүйлд хэт их санаа зовох',
+  'Тайвшрахад бэрхшээлтэй байх',
+  'Тайван сууж чадахгүй тийм их тогтворгүй байх',
+  'Амархан уурлах, уцаарлах',
+  'Ямар нэг аймшигтай зүйл тохиолдох гэж байгаа мэт айх',
+];
+const K6_OPTS = ['Бүх хугацаанд', 'Ихэнх хугацаанд', 'Заримдаа', 'Хааяа', 'Огт үгүй'];
+const K6_VALS = [4, 3, 2, 1, 0];
+const K6_ITEMS = ['сандарсан, түгшсэн', 'итгэл найдваргүй', 'тогтворгүй, тайван сууж чадахгүй', 'юу ч баярлуулж чадахааргүй сэтгэл гутарсан', 'бүх зүйл их хүч хөдөлмөр шаардсан мэт', 'өөрийгөө үнэ цэнэгүй'];
+
+const PD_CUT = { pcptsd5: 3, pcl5: PCL_CUTOFF, phq2: 3, phq9: 10, gad2: 3, gad7: 10, k6: 13 };
+function phqBand(s) { return s <= 4 ? 'minimal' : s <= 9 ? 'mild' : s <= 14 ? 'moderate' : s <= 19 ? 'modsev' : 'severe'; }
+function gadBand(s) { return s <= 4 ? 'minimal' : s <= 9 ? 'mild' : s <= 14 ? 'moderate' : 'severe'; }
+const BAND_MN = { minimal:'Хамгийн бага', mild:'Хөнгөн', moderate:'Дунд', modsev:'Дунджаас хүнд', severe:'Хүнд' };
+
+/* --- Алхам 0: Мэдэгдэл ба зөвшөөрөл --- */
 function openHrPredeploy() {
   hrOpen(`<h3>🎖️ Томилолтын өмнөх үзлэг</h3>
-    <p class="msub">Энхийг дэмжих ажиллагаа болон бусад томилолтын өмнө бөглөнө. 3 хэсэгтэй: (1) стрессийн шинж тэмдэг — 20 асуулт, (2) архины хэрэглээ — 3 асуулт, (3) сонор сэрэмжийн сорил — 3 минут.<br><small>${HR_PRIVACY}</small></p>
-    <div class="ch-card"><div class="ch-title">1-р хэсэг. Стрессийн шинж тэмдэг</div>
-      <div class="ch-sub" style="margin:0;">Доорх нь маш их стресстэй үйл явдлын дараа хүмүүст заримдаа тохиолддог асуудлууд. Өөрт тохиолдсон хамгийн их стресстэй үйл явдлаа бодоод, <b>сүүлийн 1 сарын</b> хугацаанд асуудал бүр таныг хэр их зовоосныг сонгоно уу.</div></div>
-    <div id="mq-wrap">${PCL_ITEMS.map((q, i) => hrQBlock('hpcl_' + i, i + 1, q, PCL_OPTS)).join('')}</div>
-    <div class="ch-card"><div class="ch-title">2-р хэсэг. Архины хэрэглээ</div>
-      <div class="ch-sub" style="margin:0;"><b>1 стандарт хундага</b> = 1 лааз (355 мл) шар айраг, эсвэл 1 хундага (150 мл) дарс, эсвэл 45 мл архи.</div></div>
-    ${hrQBlock('haudg_', 'А', 'Таны хүйс (үнэлгээний босгыг тодорхойлоход ашиглана):', ['Эрэгтэй','Эмэгтэй'])}
-    ${AUDITC_ITEMS.map((it, i) => hrQBlock('haud_' + i, i + 1, it.q + (i > 0 ? ' <small style="font-weight:500;color:var(--sub);">(1-р асуултад «Огт уудаггүй» гэсэн бол хариулахгүй байж болно)</small>' : ''), it.o)).join('')}
-    ${hrActions('scoreHrPredeploy')}`);
+    <p class="msub">НҮБ-ын санал болгосон 5 чиглэлээр (PTSD, сэтгэл гутрал, түгшүүр, архины хэрэглээ, сэтгэл зүйн дарамт) хийх үзлэг, сонор сэрэмжийн сорил. 10–20 минут.</p>
+    <div class="ch-card"><div class="ch-title">🔒 Хувь хүний мэдээллийн талаарх мэдэгдэл</div>
+      <div class="ch-sub" style="margin:0;line-height:1.65;">
+        Энэ үзлэгээр <b>эрүүл мэндийн (эмзэг) мэдээлэл</b> цуглуулна. Хувь хүний мэдээлэл хамгаалах тухай хуулийн дагуу дараах зүйлийг мэдэгдэж байна:
+        <ol style="margin:.5rem 0 0 1.1rem;padding:0;">
+          <li><b>Зорилго:</b> томилолтын өмнөх эрүүл мэндийн үзлэгт эмчийн ярилцлагыг дэмжих. Үр дүнгээр дангаар нь томилох эсэхийг шийдэхгүй.</li>
+          <li><b>Хүлээн авагч:</b> эрх бүхий хүний нөөцийн мэргэжилтэн, админ. Амиа хорлох эрсдэлийн хариулт өгвөл сайтын сэтгэл зүйч, админд яаралтай мэдэгдэл очно.</li>
+          <li><b>Мэдээлэл хариуцагч:</b> ${hrCfg(HR_CONSENT_CFG.org)}, холбоо барих: ${hrCfg(HR_CONSENT_CFG.contact)}.</li>
+          <li><b>Цуглуулах мэдээлэл:</b> асуулга тус бүрийн нийт оноо, ангилал, сонор сэрэмжийн сорилын үзүүлэлт. Асуулт тус бүрийн хариултыг хадгалахгүй.</li>
+          <li><b>Хадгалах хугацаа:</b> ${hrCfg(HR_CONSENT_CFG.retention)}.</li>
+          <li><b>Олон нийтэд:</b> ил болгохгүй.</li>
+          <li><b>Гуравдагч этгээдэд:</b> хуульд зааснаас бусад тохиолдолд дамжуулахгүй.</li>
+          <li><b>Зөвшөөрлөө цуцлах:</b> дээрх холбоо барих хаягаар хандаж зөвшөөрлөө цуцалж, мэдээллээ устгуулах хүсэлт гаргаж болно.</li>
+        </ol>
+        <div style="margin-top:.6rem;">Зөвшөөрөхгүй бол онлайн үзлэгийг бөглөхгүй бөгөөд үзлэгийг эмчтэй биечлэн уулзаж хийлгэнэ.</div>
+      </div></div>
+    <label style="display:flex;gap:.6rem;align-items:flex-start;margin:1rem 0 .2rem;font-size:.95rem;cursor:pointer;">
+      <input type="checkbox" id="pd-consent" style="margin-top:.25rem;width:18px;height:18px;flex-shrink:0;">
+      <span>Би дээрх мэдэгдэлтэй танилцаж, өөрийн эрүүл мэндийн мэдээллийг дээрх зорилгоор боловсруулахыг <b>сайн дураараа зөвшөөрч</b> байна.</span></label>
+    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Татгалзах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="startHrPredeploy()">Зөвшөөрөөд үргэлжлүүлэх</button></div>`);
 }
+
+async function startHrPredeploy() {
+  if (!document.getElementById('pd-consent')?.checked) { showToast('Үргэлжлүүлэхийн тулд зөвшөөрлийн тэмдэглэгээг чагтална уу.', 'warn'); return; }
+  await hrSave([{ test_key:'hr_consent', score: 1, max_score: 1, level: HR_CONSENT_CFG.version }]);
+  const sec = (title, sub) => `<div class="ch-card"><div class="ch-title">${title}</div>${sub ? `<div class="ch-sub" style="margin:0;">${sub}</div>` : ''}</div>`;
+  hrOpen(`<h3>🎖️ Томилолтын өмнөх үзлэг</h3>
+    <p class="msub">Асуулт бүрт үнэнээр хариулна уу. Зарим асуулт таны өмнөх хариултаас хамаарч нэмэгдэнэ.</p>
+
+    ${sec('1. Стресстэй үйл явдал', '')}
+    ${hrQBlock('pdx_', '1.0', PCPTSD_INTRO, YN_OPTS)}
+    <div id="pd-pc-wrap" style="display:none;">
+      ${sec('Сүүлийн 1 сарын хугацаанд та…', '')}
+      ${PCPTSD_ITEMS.map((q, i) => hrQBlock('pdpc_' + i, '1.' + (i + 1), q, YN_OPTS)).join('')}
+    </div>
+    <div id="pd-pcl-wrap" style="display:none;">
+      ${sec('1-р хэсгийн нэмэлт асуулт', 'Доорх нь маш их стресстэй үйл явдлын дараа хүмүүст заримдаа тохиолддог асуудлууд. Өөрт тохиолдсон хамгийн их стресстэй үйл явдлаа бодоод, <b>сүүлийн 1 сарын</b> хугацаанд асуудал бүр таныг хэр их зовоосныг сонгоно уу.')}
+      ${PCL_ITEMS.map((q, i) => hrQBlock('hpcl_' + i, 'а' + (i + 1), q, PCL_OPTS)).join('')}
+    </div>
+
+    ${sec('2. Сэтгэл санаа', '<b>Сүүлийн 2 долоо хоногийн</b> хугацаанд дараах асуудлууд таныг хэр олон удаа зовоосон бэ?')}
+    ${PHQ9_ITEMS.slice(0, 2).map((q, i) => hrQBlock('pdphq_' + i, '2.' + (i + 1), q, PHQ_GAD_OPTS)).join('')}
+    <div id="pd-phq-wrap" style="display:none;">
+      ${PHQ9_ITEMS.slice(2).map((q, j) => hrQBlock('pdphq_' + (j + 2), '2.' + (j + 3), q, PHQ_GAD_OPTS)).join('')}
+    </div>
+
+    ${sec('3. Түгшүүр', '<b>Сүүлийн 2 долоо хоногийн</b> хугацаанд дараах асуудлууд таныг хэр олон удаа зовоосон бэ?')}
+    ${GAD7_ITEMS.slice(0, 2).map((q, i) => hrQBlock('pdgad_' + i, '3.' + (i + 1), q, PHQ_GAD_OPTS)).join('')}
+    <div id="pd-gad-wrap" style="display:none;">
+      ${GAD7_ITEMS.slice(2).map((q, j) => hrQBlock('pdgad_' + (j + 2), '3.' + (j + 3), q, PHQ_GAD_OPTS)).join('')}
+    </div>
+
+    ${sec('4. Архины хэрэглээ', '<b>1 стандарт хундага</b> = 1 лааз (355 мл) шар айраг, эсвэл 1 хундага (150 мл) дарс, эсвэл 45 мл архи.')}
+    ${hrQBlock('haudg_', '4.0', 'Таны хүйс (үнэлгээний босгыг тодорхойлоход ашиглана):', ['Эрэгтэй', 'Эмэгтэй'])}
+    ${hrQBlock('haud_0', '4.1', AUDITC_ITEMS[0].q, AUDITC_ITEMS[0].o)}
+    <div id="pd-aud-wrap">${AUDITC_ITEMS.slice(1).map((it, j) => hrQBlock('haud_' + (j + 1), '4.' + (j + 2), it.q, it.o)).join('')}</div>
+
+    ${sec('5. Сэтгэл зүйн ерөнхий байдал', '<b>Сүүлийн 1 сарын</b> хугацаанд та дараах мэдрэмжийг хэр олон удаа мэдэрсэн бэ?')}
+    ${K6_ITEMS.map((q, i) => hrQBlock('pdk6_' + i, '5.' + (i + 1), 'Өөрийгөө ' + q + ' гэж мэдэрсэн', K6_OPTS, K6_VALS)).join('')}
+
+    ${hrActions('scoreHrPredeploy')}`);
+  const box = document.getElementById('modal-box');
+  if (!box.__pdBound) { box.addEventListener('change', pdUpdateGates); box.__pdBound = true; }
+  pdUpdateGates();
+}
+
+/* Хоёр шаттай асуулгын нөхцөлийг шинэчилнэ (нуугдсан асуултын хариултыг цэвэрлэнэ) */
+function pdVal(name) { const el = document.querySelector(`input[name="${name}"]:checked`); return el ? Number(el.value) : null; }
+function pdSum(prefix, from, to) { let s = 0; for (let i = from; i < to; i++) { const v = pdVal(prefix + i); if (v === null) return null; s += v; } return s; }
+function pdShow(id, on) {
+  const el = document.getElementById(id); if (!el) return;
+  el.style.display = on ? '' : 'none';
+  if (!on) el.querySelectorAll('input:checked').forEach(i => { i.checked = false; });
+}
+function pdState() {
+  const exposed = pdVal('pdx_') === 1;
+  const pc = exposed ? pdSum('pdpc_', 0, 5) : null;
+  const phq2 = pdSum('pdphq_', 0, 2);
+  const gad2 = pdSum('pdgad_', 0, 2);
+  const neverDrink = pdVal('haud_0') === 0;
+  return { exposed, pc, phq2, gad2, neverDrink,
+    needPcl: exposed && pc !== null && pc >= PD_CUT.pcptsd5,
+    needPhq9: phq2 !== null && phq2 >= PD_CUT.phq2,
+    needGad7: gad2 !== null && gad2 >= PD_CUT.gad2 };
+}
+function pdUpdateGates() {
+  if (!document.getElementById('pd-pc-wrap')) return; // өөр цонх нээлттэй үед юу ч хийхгүй
+  const st = pdState();
+  pdShow('pd-pc-wrap', st.exposed);
+  pdShow('pd-pcl-wrap', st.needPcl);
+  pdShow('pd-phq-wrap', st.needPhq9);
+  pdShow('pd-gad-wrap', st.needGad7);
+  pdShow('pd-aud-wrap', !st.neverDrink);
+  if (typeof window.__tpUpdate === 'function') window.__tpUpdate();
+}
+
 async function scoreHrPredeploy() {
-  const pcl = hrCollect('hpcl_', PCL_ITEMS.length); if (!pcl) return;
-  const g = document.querySelector('input[name="haudg_"]:checked');
-  if (!g) { document.querySelector('input[name="haudg_"]').closest('.q-block').scrollIntoView({ behavior:'smooth', block:'center' }); showToast('Хүйсээ сонгоно уу.', 'warn'); return; }
-  // AUDIT-C: 1-р асуултад "Огт уудаггүй" гэвэл 2, 3-р асуулт 0 оноотой (заавал хариулахгүй)
-  const q1 = document.querySelector('input[name="haud_0"]:checked');
-  let aud;
-  if (q1 && Number(q1.value) === 0) aud = [0, 0, 0];
-  else { aud = hrCollect('haud_', AUDITC_ITEMS.length); if (!aud) return; }
+  pdUpdateGates();
+  const st = pdState();
+  const need = (name) => { if (pdVal(name) !== null) return true;
+    const blk = document.querySelector(`input[name="${name}"]`)?.closest('.q-block');
+    if (blk) blk.scrollIntoView({ behavior:'smooth', block:'center' });
+    showToast('Хариулаагүй асуулт байна. Бүх асуултад хариулна уу.', 'warn'); return false; };
+  const needAll = (prefix, from, to) => { for (let i = from; i < to; i++) if (!need(prefix + i)) return false; return true; };
 
-  const pclTotal = pcl.reduce((a, b) => a + b, 0);
-  const pclPos = pclTotal >= PCL_CUTOFF;
-  const female = Number(g.value) === 1;
-  const audTotal = aud.reduce((a, b) => a + b, 0);
+  if (!need('pdx_')) return;
+  if (st.exposed && !needAll('pdpc_', 0, 5)) return;
+  if (st.needPcl && !needAll('hpcl_', 0, PCL_ITEMS.length)) return;
+  if (!needAll('pdphq_', 0, 2)) return;
+  if (st.needPhq9 && !needAll('pdphq_', 2, 9)) return;
+  if (!needAll('pdgad_', 0, 2)) return;
+  if (st.needGad7 && !needAll('pdgad_', 2, 7)) return;
+  if (!need('haudg_') || !need('haud_0')) return;
+  if (!st.neverDrink && !needAll('haud_', 1, 3)) return;
+  if (!needAll('pdk6_', 0, 6)) return;
+
+  const pcScore = st.exposed ? st.pc : 0;
+  const pclTotal = st.needPcl ? pdSum('hpcl_', 0, PCL_ITEMS.length) : null;
+  const phq9 = st.needPhq9 ? pdSum('pdphq_', 0, 9) : null;
+  const item9 = st.needPhq9 ? pdVal('pdphq_8') : 0;
+  const gad7 = st.needGad7 ? pdSum('pdgad_', 0, 7) : null;
+  const female = pdVal('haudg_') === 1;
+  const aud = st.neverDrink ? [0, 0, 0] : [pdVal('haud_0'), pdVal('haud_1'), pdVal('haud_2')];
+  const audTotal = aud[0] + aud[1] + aud[2];
   const audCut = female ? 3 : 4;
-  const audPos = audTotal >= audCut;
-  const riskItem = pcl[15] >= 2; // 16-р асуулт: эрсдэлтэй, өөртөө хор хөнөөл учруулж болох үйлдэл
+  const k6 = pdSum('pdk6_', 0, 6);
+  const pcl16 = st.needPcl ? pdVal('hpcl_15') : 0;
 
-  await hrSave([
-    { test_key:'hr_pcl5', score: pclTotal, max_score: 80, level: pclPos ? 'pos' : 'neg' },
-    { test_key:'hr_auditc', score: audTotal, max_score: 12, level: audPos ? 'pos' : 'neg' },
-  ]);
+  const r = {
+    pc:   { pos: pcScore >= PD_CUT.pcptsd5 },
+    pcl:  pclTotal === null ? null : { pos: pclTotal >= PD_CUT.pcl5 },
+    phq:  phq9 === null ? { pos: false } : { band: phqBand(phq9), pos: phq9 >= PD_CUT.phq9 },
+    gad:  gad7 === null ? { pos: false } : { band: gadBand(gad7), pos: gad7 >= PD_CUT.gad7 },
+    aud:  { pos: audTotal >= audCut },
+    k6:   { pos: k6 >= PD_CUT.k6 },
+  };
+  const selfHarm = item9 > 0;
 
-  const pclDesc = pclPos
-    ? `Оноо ${PCL_CUTOFF}-аас дээш байгаа нь стрессийн шинж тэмдэг нэлээд илэрч байгааг харуулж байна. Энэ нь онош биш — сэтгэл зүйч, эмчтэй уулзаж нарийвчилсан үнэлгээ хийлгэхийг зөвлөж байна.`
-    : `Оноо ${PCL_CUTOFF}-аас доош, стрессийн шинж тэмдэг үзлэгийн босгоос доогуур байна.`;
-  const onlyQ1 = audPos && aud[1] === 0 && aud[2] === 0;
-  const audDesc = aud[0] === 0
+  const rows = [
+    { test_key:'hr_pcptsd5', score: pcScore, max_score: 5, level: r.pc.pos ? 'pos' : 'neg' },
+    { test_key:'hr_phq2', score: st.phq2, max_score: 6, level: st.needPhq9 ? 'pos' : 'neg' },
+    { test_key:'hr_gad2', score: st.gad2, max_score: 6, level: st.needGad7 ? 'pos' : 'neg' },
+    { test_key:'hr_auditc', score: audTotal, max_score: 12, level: r.aud.pos ? 'pos' : 'neg' },
+    { test_key:'hr_k6', score: k6, max_score: 24, level: r.k6.pos ? 'pos' : 'neg' },
+  ];
+  if (pclTotal !== null) rows.push({ test_key:'hr_pcl5', score: pclTotal, max_score: 80, level: r.pcl.pos ? 'pos' : 'neg' });
+  if (phq9 !== null) rows.push({ test_key:'hr_phq9', score: phq9, max_score: 27, level: r.phq.band });
+  if (gad7 !== null) rows.push({ test_key:'hr_gad7', score: gad7, max_score: 21, level: r.gad.band });
+  if (selfHarm) rows.push({ test_key:'hr_phq9_i9', score: item9, max_score: 3, level: 'pos' });
+  await hrSave(rows);
+  if (selfHarm) await sendSelfHarmRiskAlert();
+
+  const card = (title, score, max, pos, desc, label) => `<div class="ch-card"><div class="ch-title">${title}: ${score} / ${max} · ${label || (pos ? 'Нэмэлт үнэлгээ шаардлагатай' : 'Босгоос доош')}</div>
+      <div class="bar-row" style="margin:.5rem 0 .6rem;"><div class="bar-track"><div class="bar-fill" style="width:${Math.round(score / max * 100)}%;${pos ? 'background:var(--red);' : ''}"></div></div></div>
+      <div class="ch-sub" style="margin:0;">${desc}</div></div>`;
+
+  const ptsdCard = !st.exposed
+    ? card('1. PTSD (PC-PTSD-5)', 0, 5, false, 'Та ер бусын стресстэй үйл явдал амсаагүй гэж хариулсан.')
+    : pclTotal === null
+      ? card('1. PTSD (PC-PTSD-5)', pcScore, 5, false, `Богино асуулгын оноо ${PD_CUT.pcptsd5}-аас доош тул нэмэлт асуулга шаардлагагүй.`)
+      : card('1. PTSD (PC-PTSD-5 → PCL-5)', pclTotal, 80, r.pcl.pos, r.pcl.pos
+          ? `Богино асуулга эерэг (${pcScore}/5), нэмэлт асуулгын оноо ${PD_CUT.pcl5}-аас дээш байна. Сэтгэл зүйч, эмчийн нарийвчилсан үнэлгээ шаардлагатай. Энэ нь онош биш.`
+          : `Богино асуулга эерэг (${pcScore}/5) байсан ч нэмэлт асуулгын оноо ${PD_CUT.pcl5}-аас доош байна.`);
+  const phqCard = phq9 === null
+    ? card('2. Сэтгэл гутрал (PHQ-2)', st.phq2, 6, false, `Богино асуулгын оноо ${PD_CUT.phq2}-аас доош тул нэмэлт асуулга шаардлагагүй.`)
+    : card('2. Сэтгэл гутрал (PHQ-2 → PHQ-9)', phq9, 27, r.phq.pos, `Шинж тэмдгийн түвшин: <b>${BAND_MN[r.phq.band]}</b>. ${r.phq.pos ? `Оноо ${PD_CUT.phq9} ба түүнээс дээш тул эмчийн нарийвчилсан үнэлгээ шаардлагатай.` : `Оноо ${PD_CUT.phq9}-аас доош байна.`}`, BAND_MN[r.phq.band]);
+  const gadCard = gad7 === null
+    ? card('3. Түгшүүр (GAD-2)', st.gad2, 6, false, `Богино асуулгын оноо ${PD_CUT.gad2}-аас доош тул нэмэлт асуулга шаардлагагүй.`)
+    : card('3. Түгшүүр (GAD-2 → GAD-7)', gad7, 21, r.gad.pos, `Шинж тэмдгийн түвшин: <b>${BAND_MN[r.gad.band]}</b>. ${r.gad.pos ? `Оноо ${PD_CUT.gad7} ба түүнээс дээш тул эмчийн нарийвчилсан үнэлгээ шаардлагатай.` : `Оноо ${PD_CUT.gad7}-аас доош байна.`}`, BAND_MN[r.gad.band]);
+  const onlyQ1 = r.aud.pos && aud[1] === 0 && aud[2] === 0;
+  const audCard = card('4. Архины хэрэглээ (AUDIT-C)', audTotal, 12, r.aud.pos, st.neverDrink
     ? 'Та согтууруулах ундаа хэрэглэдэггүй гэж хариулсан.'
-    : audPos
-      ? `Оноо ${audCut} ба түүнээс дээш байгаа нь архины хэрэглээ эрүүл мэндэд эрсдэлтэй түвшинд байж болохыг харуулж байна. Хэрэглээгээ багасгах талаар мэргэжилтэнтэй зөвлөлдөхийг зөвлөж байна.${onlyQ1 ? ' Оноо зөвхөн уух давтамжаас бүрдсэн тул нэг удаад уудаг хэмжээ бага бол эрсдэл бага байж магадгүй — мэргэжилтэн нарийвчлан тодруулна.' : ''}`
-      : `Оноо ${audCut}-аас доош, эрсдэлтэй түвшнээс доогуур байна.`;
+    : r.aud.pos
+      ? `Оноо ${audCut} ба түүнээс дээш (${female ? 'эмэгтэй' : 'эрэгтэй'}) тул архины хэрэглээ эрсдэлтэй түвшинд байж болзошгүй. Эмч богино зөвлөгөө өгнө.${onlyQ1 ? ' Оноо зөвхөн уух давтамжаас бүрдсэн тул эмч хэрэглээг нарийвчлан тодруулна.' : ''}`
+      : `Оноо ${audCut}-аас доош байна.`);
+  const k6Card = card('5. Сэтгэл зүйн дарамт (K6)', k6, 24, r.k6.pos, r.k6.pos
+    ? `Оноо ${PD_CUT.k6} ба түүнээс дээш тул сэтгэл зүйн хүчтэй дарамт байж болзошгүй. Эмчийн нарийвчилсан үнэлгээ шаардлагатай.`
+    : `Оноо ${PD_CUT.k6}-аас доош байна.`);
+
+  const flagged = [r.pcl?.pos && 'PTSD', r.phq.pos && 'сэтгэл гутрал', r.gad.pos && 'түгшүүр', r.aud.pos && 'архины хэрэглээ', r.k6.pos && 'сэтгэл зүйн дарамт'].filter(Boolean);
+  const riskBlocks =
+    (selfHarm ? `<div class="low-month-card"><div class="lm-text"><b>💛 Та ганцаараа биш.</b> Та өөрийгөө гэмтээх эсвэл үхсэн нь дээр гэх бодол төрдөг гэж хариулсан. Таны хариултыг сэтгэл зүйчид яаралтай мэдэгдлээ. Яг одоо хэцүү байвал <b>103</b> руу залгах эсвэл итгэлтэй хүндээ хэлээрэй.</div><button onclick="closeModal(); goto('pros')">Сэтгэл зүйчтэй холбогдох</button></div>` : '') +
+    (pcl16 >= 2 ? `<div class="low-month-card"><div class="lm-text"><b>Анхаар:</b> Та эрсдэлтэй эсвэл өөртөө хор хөнөөл учруулж болох үйлдэл хийдэг гэж хариулсан. Сэтгэл зүйчтэй ярилцахыг зөвлөж байна.</div><button onclick="closeModal(); goto('pros')">Сэтгэл зүйчтэй холбогдох</button></div>` : '');
 
   hrOpen(`<h3>🎖️ Томилолтын өмнөх үзлэг — Үр дүн</h3>
-    <div class="ch-card"><div class="ch-title">1. Стрессийн шинж тэмдэг (PCL-5): ${pclTotal} / 80 · ${pclPos ? 'Анхаарах' : 'Хэвийн'}</div>
-      <div class="bar-row" style="margin:.5rem 0 .6rem;"><div class="bar-track"><div class="bar-fill" style="width:${Math.round(pclTotal / 80 * 100)}%;${pclPos ? 'background:var(--red);' : ''}"></div></div></div>
-      <div class="ch-sub" style="margin:0;">${pclDesc}</div></div>
-    ${riskItem ? `<div class="low-month-card"><div class="lm-text"><b>Анхаар:</b> Та эрсдэлтэй эсвэл өөртөө хор хөнөөл учруулж болох үйлдэл хийдэг гэж хариулсан байна. Сэтгэл зүйчтэй ярилцахыг зөвлөж байна. Яаралтай тусламж хэрэгтэй бол 103 руу залгана уу.</div><button onclick="closeModal(); goto('pros')">Сэтгэл зүйчтэй холбогдох</button></div>` : ''}
-    <div class="ch-card"><div class="ch-title">2. Архины хэрэглээ (AUDIT-C): ${audTotal} / 12 · ${audPos ? 'Анхаарах' : 'Хэвийн'}</div>
-      <div class="bar-row" style="margin:.5rem 0 .6rem;"><div class="bar-track"><div class="bar-fill" style="width:${Math.round(audTotal / 12 * 100)}%;${audPos ? 'background:var(--red);' : ''}"></div></div></div>
-      <div class="ch-sub" style="margin:0;">${audDesc}</div></div>
-    <div class="ch-card"><div class="ch-title">3. Сонор сэрэмжийн сорил</div>
+    ${riskBlocks}
+    <div class="result-block" style="margin:0 0 .4rem;">${flagged.length
+      ? `<b>Нэмэлт үнэлгээ шаардлагатай чиглэл:</b> ${flagged.join(', ')}. Эдгээр нь онош биш — эмч, сэтгэл зүйч таны нөхцөл байдлыг ярилцлагаар тодруулна. Шинж тэмдэг байгаа нь томилолтод явах боломжгүй гэсэн үг биш.`
+      : '<b>Бүх чиглэлээр үзлэгийн босгоос доош байна.</b> Эцсийн дүгнэлтийг эмч ярилцлагын дараа гаргана.'}</div>
+    ${ptsdCard}${phqCard}${gadCard}${audCard}${k6Card}
+    <div class="ch-card"><div class="ch-title">6. Сонор сэрэмжийн сорил</div>
       <div class="ch-sub" style="margin:0 0 .8rem;">Үзлэгийн сүүлийн хэсэг — 3 минутын хариу үйлдлийн сорил. Чимээгүй орчинд, амарсан үедээ өгнө үү.</div>
       <button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="openPvtTest('hr')">Сорил эхлүүлэх</button></div>
-    <div class="result-block"><b>Тайлбар:</b> Энэ үзлэг онош тавихгүй, зөвхөн нэмэлт үнэлгээ шаардлагатай эсэхийг тодорхойлно. PCL-5-ийн босгыг ${PCL_CUTOFF} (судалгаанд 31–33), AUDIT-C-ийн босгыг эрэгтэйд 4, эмэгтэйд 3 гэж авсан. ${HR_DRAFT_NOTE}<br>Эх сурвалж: PCL-5 (Weathers ба бусад, 2013); AUDIT-C (Bush ба бусад, 1998; Bradley ба бусад, 2007).</div>
-    <div class="modal-actions">${(pclPos || audPos) ? `<button class="modal-close" onclick="closeModal(); goto('pros')">Мэргэжилтэнтэй холбогдох</button>` : ''}<button class="modal-close" onclick="closeModal(); loadHrResults();">Хаах</button></div>`);
+    <div class="result-block"><b>Тайлбар:</b> НҮБ-ын зөвлөмжийн дагуу энэ асуулга нь эмчийн ярилцлагыг орлохгүй, зөвхөн нэмэлт хэрэгсэл. Босго: PC-PTSD-5 ≥3, PCL-5 ≥${PD_CUT.pcl5}, PHQ-2 ≥3, PHQ-9 ≥10, GAD-2 ≥3, GAD-7 ≥10, AUDIT-C эрэгтэй ≥4 / эмэгтэй ≥3, K6 ≥13. ${HR_DRAFT_NOTE}<br>Эх сурвалж: НҮБ-ын Үйл ажиллагааны дэмжлэгийн газар (2023); PC-PTSD-5 (Prins ба бусад); PCL-5 (Weathers ба бусад, 2013); PHQ-9 (Kroenke ба бусад, 2001); GAD-7 (Spitzer ба бусад, 2006); AUDIT-C (Bush ба бусад, 1998); K6 (Kessler ба бусад, 2003).</div>
+    <div class="modal-actions">${flagged.length ? `<button class="modal-close" onclick="closeModal(); goto('pros')">Мэргэжилтэнтэй холбогдох</button>` : ''}<button class="modal-close" onclick="closeModal(); loadHrResults();">Хаах</button></div>`);
 }
 
 /* ---------- Энгийн хэрэглэгчийн карт, ХН мэргэжилтний жагсаалт ---------- */
@@ -4573,11 +4787,13 @@ const HR_CARDS = [
   { emo:'🧩', title:'Зан чанарын тест', blurb:'Зан чанарын 5 үндсэн хэмжээс — 50 асуулт, 10 минут', fn:'openHrBigFive', keys:['hr_b5_ext'] },
   { emo:'🛡️', title:'Тэсвэрлэх чадвар', blurb:'Стресс, хүнд нөхцөлөөс сэргэх чадвар — 6 асуулт, 2 минут', fn:'openHrBrs', keys:['hr_brs'] },
   { emo:'⭐', title:'Манлайллын хандлага', blurb:'Манлайлах хандлага, чадварын итгэл — 20 асуулт, 5 минут', fn:'openHrLeadership', keys:['hr_lead_asr'] },
-  { emo:'🎖️', title:'Томилолтын өмнөх үзлэг', blurb:'Стрессийн шинж тэмдэг, архины хэрэглээ, сонор сэрэмж — 15 минут', fn:'openHrPredeploy', keys:['hr_pcl5'] },
+  { emo:'🎖️', title:'Томилолтын өмнөх үзлэг', blurb:'НҮБ-ын 5 чиглэл: PTSD, сэтгэл гутрал, түгшүүр, архи, сэтгэл зүйн дарамт + сонор сэрэмж — 10–20 минут', fn:'openHrPredeploy', keys:['hr_auditc'] },
 ];
 function hrFmtScore(r) {
   const sc = r.test_key === 'hr_brs' ? Number(r.score).toFixed(2) : r.score;
-  return `${sc}${r.max_score != null ? ' / ' + r.max_score : ''}${r.level ? ' · ' + (HR_LEVEL_LABELS[r.level] || r.level) : ''}`;
+  const stage1 = ['hr_pcptsd5','hr_phq2','hr_gad2'].includes(r.test_key);
+  const lbl = stage1 ? (r.level === 'pos' ? 'Эерэг → бүтэн асуулга өгсөн' : 'Сөрөг') : (HR_LEVEL_LABELS[r.level] || r.level);
+  return `${sc}${r.max_score != null ? ' / ' + r.max_score : ''}${r.level ? ' · ' + lbl : ''}`;
 }
 
 (function initPvt() {
@@ -4602,7 +4818,7 @@ function hrFmtScore(r) {
   const box = document.getElementById('modal-box');
   if (!box) return;
   function update() {
-    const blocks = box.querySelectorAll('.q-block');
+    const blocks = [...box.querySelectorAll('.q-block')].filter(b => b.offsetParent !== null); // нуугдсан асуултыг тоолохгүй
     let bar = box.querySelector(':scope > .tp-bar');
     if (blocks.length < 4) { if (bar) bar.remove(); return; }
     let done = 0;
@@ -4619,6 +4835,7 @@ function hrFmtScore(r) {
     bar.querySelector('.tp-fill').style.width = pct + '%';
   }
   box.addEventListener('change', update);
+  window.__tpUpdate = update;
   new MutationObserver(() => { if (!box.querySelector(':scope > .tp-bar') || true) update(); }).observe(box, { childList: true });
 })();
 

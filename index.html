@@ -1799,44 +1799,80 @@ async function loadIdentityList() {
 
 /* ================= ХҮНИЙ НӨӨЦ: хэрэглэгчид тест өгөх, ХН мэргэжилтэн/админ үр дүн харах ================= */
 async function loadHrResults() {
+  try { await loadHrResultsInner(); }
+  catch (e) {
+    console.error('loadHrResults failed:', e);
+    const c = document.getElementById('hr-portal-content');
+    if (c) c.innerHTML = `<div class="section-card"><p style="font-size:.85rem;color:var(--red);margin:0;">Хүний нөөцийн хэсгийг ачаалахад алдаа гарлаа: ${esc(e && e.message || String(e))}</p></div>`;
+  }
+}
+async function loadHrResultsInner() {
   const subtitle = document.getElementById('hr-portal-subtitle');
   const content = document.getElementById('hr-portal-content');
   if (!content) return;
+  const cardsHtml = `<div class="test-grid">${HR_CARDS.map(c => `
+      <div class="test-card" onclick="${c.fn}()">
+        <span class="test-emo">${c.emo}</span>
+        <div class="test-title">${c.title}</div>
+        <div class="test-blurb">${c.blurb}</div>
+        <div class="test-blurb" id="hr-last-${c.keys[0]}" style="font-weight:700;color:var(--gold);margin:0;"></div>
+      </div>`).join('')}</div>`;
 
   if (isAdmin || myHrId) {
     // ХН мэргэжилтэн / админ горим: бөглөсөн хүмүүсийн дэлгэрэнгүй жагсаалт
     subtitle.textContent = 'Хүний нөөцийн чиглэлийн тестүүдийг бөглөсөн хүмүүсийн жагсаалт, дэлгэрэнгүй үр дүн.';
     content.innerHTML = `
       <div class="section-card">
-        <p style="font-size:.85rem;color:var(--sub);margin:0;">Хүний нөөцийн чиглэлийн тестүүд (авьяс, чадварчлага, удирдлагын чадвар гэх мэт) одоогоор боловсруулагдаж байгаа тул жагсаалт хоосон байна. Тестүүд идэвхжсэний дараа энд бөглөсөн хүмүүсийн дэлгэрэнгүй үр дүн автоматаар харагдана.</p>
+        <div class="section-head"><h3>📋 Тест бөглөсөн хүмүүсийн жагсаалт</h3></div>
+        <p style="font-size:.8rem;color:var(--sub);margin:0 0 .8rem;">Тест тус бүрийн хамгийн сүүлийн үр дүн. "Анхаарах" гэсэн үр дүн онош биш — мэргэжилтний нэмэлт үнэлгээ шаардлагатайг илтгэнэ.</p>
+        <div id="hr-results-list"></div>
       </div>
       <div class="section-card">
-        <div class="section-head"><h3>📋 Тест бөглөсөн хүмүүсийн жагсаалт</h3></div>
-        <div id="hr-results-list"></div>
+        <div class="section-head"><h3>🗂️ Тестүүд</h3></div>
+        <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Алба хаагчдад харагдах тестүүд. Эндээс урьдчилан харж болно (бөглөвөл таны бүртгэлд хадгалагдана).</p>
+        ${cardsHtml}
       </div>
     `;
     const el = document.getElementById('hr-results-list');
     el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div>';
     const { data, error } = await sb.from('test_results').select('*, users(anon_handle, branch, personnel_type)')
-      .like('test_key', 'hr_%').order('created_at', { ascending:false }).limit(500);
-    if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Жагсаалт татахад алдаа гарлаа: ' + error.message + '</div>'; console.error('loadHrResults error:', error); return; }
+      .like('test_key', 'hr_%').order('created_at', { ascending:false }).limit(1000);
+    if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Жагсаалт татахад алдаа гарлаа: ' + esc(error.message) + '</div>'; console.error('loadHrResults error:', error); return; }
     if (!data || data.length===0) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор хүний нөөцийн чиглэлийн тест өгсөн хүн алга.</div>'; return; }
     const byUser = {};
-    data.forEach(r => { (byUser[r.user_id] ||= { user: r.users, results: [] }).results.push(r); });
-    el.innerHTML = Object.values(byUser).map(u => `
+    data.forEach(r => {   // эрэмбэ нь шинээс хуучин тул тест бүрийн эхний мөр нь хамгийн сүүлийнх
+      const u = (byUser[r.user_id] ||= { user: r.users, latest: {}, order: [] });
+      if (!u.latest[r.test_key]) { u.latest[r.test_key] = r; u.order.push(r.test_key); }
+    });
+    const keyOrder = Object.keys(HR_TEST_TITLES);
+    el.innerHTML = Object.values(byUser).map(u => {
+      const rows = u.order.sort((a, b) => keyOrder.indexOf(a) - keyOrder.indexOf(b)).map(k => u.latest[k]);
+      const flag = rows.some(r => r.level === 'pos');
+      return `
       <div class="comment-row" style="display:flex;flex-direction:column;gap:.3rem;padding:.7rem 0;border-top:1px solid var(--line);">
-        <div style="font-weight:700;font-size:.88rem;">${esc(u.user?.anon_handle) || '—'} <span style="font-weight:400;color:var(--sub);font-size:.78rem;">${esc(u.user?.branch) || ''} ${u.user?.personnel_type ? '· '+esc(u.user.personnel_type) : ''}</span></div>
-        ${u.results.map(r => `<div style="font-size:.82rem;color:var(--sub);padding-left:.5rem;">• ${r.test_key} — ${r.score}/${r.max_score} (${r.level || ''}) · ${timeAgo(r.created_at)}</div>`).join('')}
-      </div>
-    `).join('');
+        <div style="font-weight:700;font-size:.88rem;">${esc(u.user?.anon_handle) || '—'} <span style="font-weight:400;color:var(--sub);font-size:.78rem;">${esc(BRANCH_LABELS?.[u.user?.branch] || u.user?.branch || '')} ${u.user?.personnel_type ? '· '+esc(ROLE_LABELS?.[u.user.personnel_type] || u.user.personnel_type) : ''}</span>${flag ? ' <span style="font-size:.72rem;font-weight:800;color:var(--red);background:var(--red-soft);border-radius:100px;padding:.1rem .5rem;margin-left:.3rem;">Анхаарах</span>' : ''}</div>
+        ${rows.map(r => `<div style="font-size:.82rem;color:${r.level === 'pos' ? 'var(--red)' : 'var(--sub)'};padding-left:.5rem;">• ${esc(HR_TEST_TITLES[r.test_key] || r.test_key)} — ${esc(hrFmtScore(r))} · ${timeAgo(r.created_at)}</div>`).join('')}
+      </div>`;
+    }).join('');
   } else {
-    // Энгийн хэрэглэгчийн горим: бөглөх боломжтой тестүүдийн жагсаалт
-    subtitle.textContent = 'Ажилд орох, цэргийн албанд татагдах, энхийг дэмжих ажиллагаанд явах гэх мэт үед бөглөдөг хүний нөөцийн чиглэлийн тестүүд. Таны хариултыг зөвхөн эрх бүхий хүний нөөцийн мэргэжилтэн, админ л харна.';
+    // Энгийн хэрэглэгчийн горим: бөглөх боломжтой тестүүд
+    subtitle.textContent = 'Ажилд орох, цэргийн албанд татагдах, энхийг дэмжих ажиллагаанд явах гэх мэт үед бөглөдөг хүний нөөцийн чиглэлийн тестүүд.';
     content.innerHTML = `
       <div class="section-card">
-        <p style="font-size:.85rem;color:var(--sub);margin:0;">Хүний нөөцийн чиглэлийн тестүүд одоогоор боловсруулагдаж байна. Тестүүд идэвхжмэгц энд гарч ирж, шууд эндээс бөглөх боломжтой болно.</p>
+        <p style="font-size:.85rem;color:var(--sub);margin:0 0 1.1rem;">🔒 Таны хариулт болон үр дүн танд болон эрх бүхий хүний нөөцийн мэргэжилтэн, админд л харагдана. Үнэн зөв хариулах нь танд тохирох дэмжлэг, үүргийг тодорхойлоход тусална.</p>
+        ${cardsHtml}
       </div>
     `;
+    if (!currentUser?.id) return;
+    const { data, error } = await sb.from('test_results').select('test_key, created_at')
+      .eq('user_id', currentUser.id).in('test_key', HR_CARDS.map(c => c.keys[0])).order('created_at', { ascending:false }).limit(200);
+    if (error) { console.error('hr own results error:', error); return; }
+    const seen = new Set();
+    (data || []).forEach(r => {
+      if (seen.has(r.test_key)) return; seen.add(r.test_key);
+      const tag = document.getElementById('hr-last-' + r.test_key);
+      if (tag) tag.textContent = '✓ Сүүлд бөглөсөн: ' + timeAgo(r.created_at);
+    });
   }
 }
 
@@ -2283,7 +2319,7 @@ async function loadMonthlyAnalysis() {
   if (error) { console.error('loadMonthlyAnalysis error:', error); return; }
   // Сэтгэл зүйн шинжтэй бус тестүүдийг (өнгө ялгах, анхаарлын сарнилт) нэгдсэн сэтгэл зүйн дүн шинжилгээнд оруулахгүй
   const EXCLUDED_FROM_WELLNESS = ['color_vision', 'attention_scale', 'pvt_b'];
-  const data = (rawData || []).filter(r => !EXCLUDED_FROM_WELLNESS.includes(r.test_key));
+  const data = (rawData || []).filter(r => !EXCLUDED_FROM_WELLNESS.includes(r.test_key) && !String(r.test_key).startsWith('hr_'));
 
   // Сар бүрийн (сүүлийн 12 сар) түлхүүрийг өнөөдрөөс тооцоолж бэлдэнэ
   const nowP = getUbParts();
@@ -3954,12 +3990,14 @@ const EXTRA_TEST_TITLES = { pvt_b: 'Сонор сэрэмжийн сорил (PV
 const PVT = { DURATION:180000, ISI_MIN:1000, ISI_MAX:4000, FEEDBACK:1000, LAPSE:355, FALSE:100, TIMEOUT:30000 };
 let pvtState = 'idle', pvtStart = 0, pvtStim = 0, pvtTimer = null, pvtRaf = null;
 let pvtRts = [], pvtFalse = 0, pvtTimeouts = 0;
+let pvtMode = 'self'; // 'self' = Сонжоо, 'hr' = Томилолтын өмнөх үзлэг
 
-function openPvtTest() {
+function openPvtTest(mode) {
+  pvtMode = mode === 'hr' ? 'hr' : 'self';
   document.getElementById('modal-overlay').classList.add('open');
   document.getElementById('modal-box').innerHTML = `
     <h3>⏱️ Сонор сэрэмжийн сорил</h3>
-    <p class="msub">Ядаргаа, анхаарал төвлөрлийг хариу үйлдлийн хурдаар хэмжинэ.</p>
+    <p class="msub">Ядаргаа, анхаарал төвлөрлийг хариу үйлдлийн хурдаар хэмжинэ.${pvtMode === 'hr' ? '<br><small>Томилолтын өмнөх үзлэгийн хэсэг тул үр дүн эрх бүхий хүний нөөцийн мэргэжилтэнд харагдана.</small>' : ''}</p>
     <div class="pvt-dur">⏱️ Яг 3 минут (180 секунд) үргэлжилнэ</div>
     <ol class="pvt-steps">
       <li>Дэлгэцийн голд <b>тоолуур</b> гэнэт гүйж эхэлнэ.</li>
@@ -4073,7 +4111,7 @@ async function finishPvtTest() {
   const compareHtml = pvtCompareHtml(pvtPrior, errors);
 
   if (currentUser?.id) {
-    const { error } = await sb.from('test_results').insert({ user_id: currentUser.id, test_key: 'pvt_b', score: errors, max_score: trials, level: levelKey });
+    const { error } = await sb.from('test_results').insert({ user_id: currentUser.id, test_key: pvtMode === 'hr' ? 'hr_pvt_b' : 'pvt_b', score: errors, max_score: trials, level: levelKey });
     if (error) console.error('pvt save error:', error);
   }
 
@@ -4092,7 +4130,7 @@ async function finishPvtTest() {
     </div>
     ${compareHtml}
     <div class="result-block"><b>Тайлбар:</b> Энэ сорил нь ядаргаа, сонор сэрэмжийг хэмждэг бөгөөд сэтгэцийн эмгэгийг оношлохгүй. Ангилал нь туршилтын шатны урьдчилсан үнэлгээ. Ядаргаа өндөр гарвал нойр, амралтаа анхаарч, дахин сорил өгөөрэй.</div>
-    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="openPvtTest()">Дахин өгөх</button></div>
+    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="openPvtTest('${pvtMode}')">Дахин өгөх</button></div>
   `;
 }
 
@@ -4120,7 +4158,7 @@ function pvtBaselineAt(rows, idx) {
 async function fetchPvtHistory(limit = 10) {
   if (!currentUser?.id) return [];
   const { data, error } = await sb.from('test_results').select('score, max_score, created_at')
-    .eq('user_id', currentUser.id).eq('test_key', 'pvt_b')
+    .eq('user_id', currentUser.id).in('test_key', ['pvt_b', 'hr_pvt_b'])
     .order('created_at', { ascending: false }).limit(limit);
   if (error) { console.error('pvt history error:', error); return []; }
   return (data || []).filter(r => typeof r.score === 'number').reverse();
@@ -4188,6 +4226,358 @@ async function loadPvtTrend() {
     line.style.bottom = (baseFromBottom + Math.max(6, Math.round(base / maxErr * H)) - 1) + 'px';
     wrap.appendChild(line);
   }
+}
+
+
+/* ======================================================================
+   ХҮНИЙ НӨӨЦИЙН ТЕСТҮҮД
+   1) Зан чанарын тест — IPIP Big-Five Factor Markers, 50 асуулт
+      (Goldberg, 1992; ipip.ori.org — нийтийн хүртээл / public domain)
+   2) Тэсвэрлэх чадвар — Brief Resilience Scale (BRS), 6 асуулт
+      (Smith ба бусад, 2008; ангилал: Smith ба бусад, 2013)
+   3) Манлайллын хандлага — IPIP-NEO E3 Assertiveness (α=.84) + C1 Self-Efficacy (α=.78)
+      (Goldberg ба бусад, 2006; нийтийн хүртээл)
+   4) Томилолтын өмнөх үзлэг — PCL-5 (Weathers ба бусад, 2013; АНУ-ын PTSD-ийн үндэсний төв)
+      + AUDIT-C (Bush ба бусад, 1998; Bradley ба бусад, 2007) + Сонор сэрэмжийн сорил (PVT-B)
+   АНХААР: Монгол орчуулга нь буцаан орчуулга (back-translation) болон Монгол
+   алба хаагчдын түүвэр дээрх баталгаажуулалт хийгдээгүй, урьдчилсан хувилбар.
+   ====================================================================== */
+
+const IPIP_OPTS = ['Огт тохирохгүй', 'Бага зэрэг тохирохгүй', 'Тохирох ч үгүй, тохирохгүй ч үгүй', 'Бага зэрэг тохирно', 'Бүрэн тохирно'];
+const IPIP_INSTR = 'Доорх өгүүлбэр бүр таныг хэр зөв тодорхойлж байгааг сонгоно уу. Ирээдүйд ямар байхыг хүсэж буйгаа биш, одоо ерөнхийдөө ямар байгаагаа, өөртэйгөө ижил хүйс, ойролцоо насны бусад хүмүүстэй харьцуулан үнэнээр нь үнэлнэ үү.';
+
+/* f: 1=Нийтэч, 2=Найрсаг, 3=Хариуцлагатай, 4=Сэтгэл хөдлөлийн тогтвортой, 5=Оюун ухаан/төсөөлөл; k: +1 / -1 */
+const B5_ITEMS = [
+  ['Цугларалт, үдэшлэгийн үеэр хамгийн хөгжилтэй, идэвхтэй нь байдаг.',1,1],
+  ['Бусдын төлөө бараг санаа зовдоггүй.',2,-1],
+  ['Үргэлж бэлтгэлтэй байдаг.',3,1],
+  ['Амархан стресст ордог.',4,-1],
+  ['Үгийн баялаг сантай.',5,1],
+  ['Тийм ч их ярьдаггүй.',1,-1],
+  ['Хүмүүсийг сонирхдог.',2,1],
+  ['Эд зүйлсээ хаа сайгүй орхидог.',3,-1],
+  ['Ихэнх үед тайван байдаг.',4,1],
+  ['Хийсвэр санааг ойлгоход хэцүү байдаг.',5,-1],
+  ['Хүмүүсийн дунд өөрийгөө чөлөөтэй мэдэрдэг.',1,1],
+  ['Хүмүүсийг доромжилдог.',2,-1],
+  ['Нарийн зүйлд анхаарал хандуулдаг.',3,1],
+  ['Аливаа зүйлд санаа зовдог.',4,-1],
+  ['Төсөөлөл сайтай.',5,1],
+  ['Анзаарагдахгүй, хойгуур байхыг илүүд үздэг.',1,-1],
+  ['Бусдын сэтгэлийг ойлгож, өрөвддөг.',2,1],
+  ['Аливаа зүйлийг замбараагүй болгодог.',3,-1],
+  ['Гуниглах нь ховор.',4,1],
+  ['Хийсвэр санаа сонирхдоггүй.',5,-1],
+  ['Яриа өрнүүлж эхэлдэг.',1,1],
+  ['Бусдын асуудлыг сонирхдоггүй.',2,-1],
+  ['Хийх ёстой ажлаа хойш тавилгүй шууд хийдэг.',3,1],
+  ['Амархан тайван байдлаа алддаг.',4,-1],
+  ['Гайхалтай санаа гаргадаг.',5,1],
+  ['Хэлэх зүйл цөөн байдаг.',1,-1],
+  ['Зөөлөн сэтгэлтэй.',2,1],
+  ['Эд зүйлсийг байранд нь буцааж тавихаа байнга мартдаг.',3,-1],
+  ['Амархан бухимддаг.',4,-1],
+  ['Төсөөлөл муутай.',5,-1],
+  ['Цугларалтын үеэр олон янзын хүнтэй ярилцдаг.',1,1],
+  ['Бусдыг тийм ч их сонирхдоггүй.',2,-1],
+  ['Эмх цэгцтэй байх дуртай.',3,1],
+  ['Сэтгэл санаа маань их өөрчлөгддөг.',4,-1],
+  ['Аливааг хурдан ойлгодог.',5,1],
+  ['Өөртөө анхаарал татах дургүй.',1,-1],
+  ['Бусдад цаг гаргадаг.',2,1],
+  ['Үүрэг хариуцлагаасаа зайлсхийдэг.',3,-1],
+  ['Сэтгэл санаа маань байнга савладаг.',4,-1],
+  ['Хэцүү, ховор үг хэрэглэдэг.',5,1],
+  ['Олны анхаарлын төвд байхаас татгалздаггүй.',1,1],
+  ['Бусдын сэтгэл хөдлөлийг мэдэрдэг.',2,1],
+  ['Хуваарийн дагуу ажилладаг.',3,1],
+  ['Амархан уцаардаг.',4,-1],
+  ['Аливаа зүйлийн талаар эргэцүүлэн бодоход цаг гаргадаг.',5,1],
+  ['Танихгүй хүмүүсийн дунд дуу цөөтэй байдаг.',1,-1],
+  ['Хүмүүсийг өөртэйгөө тайван, чөлөөтэй байлгадаг.',2,1],
+  ['Ажилдаа өндөр шаардлага тавьдаг, нямбай.',3,1],
+  ['Байнга гунигладаг.',4,-1],
+  ['Санаа ихтэй.',5,1],
+];
+const B5_FACTORS = {
+  1: { key:'hr_b5_ext', name:'Нийтэч байдал', hi:'Хүмүүстэй харилцах, багаар ажиллах, олны өмнө гарахдаа идэвхтэй, эрч хүчтэй.', lo:'Даруу, тайван; бие даан, нам гүм орчинд ажиллахыг илүүд үздэг.' },
+  2: { key:'hr_b5_agr', name:'Найрсаг байдал', hi:'Бусдад туслах, ойлгох, хамтран ажиллахад бэлэн; зөрчлөөс зайлсхийдэг.', lo:'Шулуун шударга, өрсөлдөх чадвартай; шийдвэр гаргахдаа сэтгэл хөдлөлөөс илүү үндэслэлийг баримталдаг.' },
+  3: { key:'hr_b5_con', name:'Хариуцлагатай байдал', hi:'Зохион байгуулалттай, нягт нямбай, үүргээ цаг тухайд нь биелүүлдэг.', lo:'Уян хатан, тухайн нөхцөлд тохируулан ажилладаг; төлөвлөгөө, дэг журамд бага баригддаг.' },
+  4: { key:'hr_b5_emo', name:'Сэтгэл хөдлөлийн тогтвортой байдал', hi:'Стресст тайван, сэтгэл санаа тогтвортой; дарамт дор ч тэнцвэрээ хадгалдаг.', lo:'Стресс, бухимдлыг илүү хүчтэй мэдэрдэг; сэтгэл санааны хэлбэлзэл ихтэй байж болно.' },
+  5: { key:'hr_b5_int', name:'Оюун ухаан, төсөөлөл', hi:'Шинэ санаа, хийсвэр асуудал сонирхдог; бүтээлч, сониуч.', lo:'Практик, бодит зүйлд төвлөрдөг; туршигдсан арга барилыг илүүд үздэг.' },
+};
+
+const BRS_OPTS = ['Огт санал нийлэхгүй', 'Санал нийлэхгүй', 'Хөндлөнгийн', 'Санал нийлнэ', 'Бүрэн санал нийлнэ'];
+const BRS_ITEMS = [
+  ['Хүнд үеийн дараа би хурдан сэргэдэг.', 1],
+  ['Стресстэй үйл явдлыг даван туулах нь надад хэцүү байдаг.', -1],
+  ['Стресстэй үйл явдлаас сэргэхэд надад удаан хугацаа шаардагддаггүй.', 1],
+  ['Муу зүйл тохиолдоход хэвийн байдалдаа эргэн орох нь надад хэцүү байдаг.', -1],
+  ['Хүнд хэцүү үеийг би ихэвчлэн төдийлөн бэрхшээлгүй даван туулдаг.', 1],
+  ['Амьдралын бүтэлгүйтлээс сэргэхэд надад удаан хугацаа шаардагддаг.', -1],
+];
+
+/* s: 'asr' = Манлайлах хандлага (E3), 'eff' = Чадварын итгэл (C1) */
+const LEAD_ITEMS = [
+  ['Удирдлагыг өөртөө авдаг.','asr',1],
+  ['Даалгавраа амжилттай гүйцэтгэдэг.','eff',1],
+  ['Бусад хүн эхлээд удирдахыг хүлээдэг.','asr',-1],
+  ['Нөхцөл байдлыг буруу үнэлдэг.','eff',-1],
+  ['Бусдыг удирдахыг хичээдэг.','asr',1],
+  ['Хийж буй зүйлдээ бусдаас илүү сайн байдаг.','eff',1],
+  ['Анзаарагдахгүй, хойгуур байхыг илүүд үздэг.','asr',-1],
+  ['Аливааг ойлгодоггүй.','eff',-1],
+  ['Бусдыг ятгаж, ямар нэг зүйл хийлгэж чаддаг.','asr',1],
+  ['Ажлаа саадгүй, жигд гүйцэтгэдэг.','eff',1],
+  ['Хэлэх зүйл цөөн байдаг.','asr',-1],
+  ['Хувь нэмэр оруулах зүйл бага байдаг.','eff',-1],
+  ['Бусдад нөлөөлөхийг эрмэлздэг.','asr',1],
+  ['Байр суурьдаа итгэлтэй байдаг.','eff',1],
+  ['Өөртөө анхаарал татах дургүй.','asr',-1],
+  ['Аливаагийн үр дагаврыг харж чаддаггүй.','eff',-1],
+  ['Нөхцөл байдлыг хяналтдаа авдаг.','asr',1],
+  ['Сайн шийдэл олдог.','eff',1],
+  ['Санал бодлоо хэлэлгүй дотроо хадгалдаг.','asr',-1],
+  ['Ажлыг хэрхэн бүтээхээ мэддэг.','eff',1],
+];
+const LEAD_SCALES = {
+  asr: { key:'hr_lead_asr', name:'Манлайлах хандлага', hi:'Санаачилга гаргаж, хариуцлагыг өөртөө авах, бусдыг чиглүүлэх хандлага өндөр.', lo:'Удирдах үүргээс илүүтэй гүйцэтгэх, дэмжих үүргийг илүүд үздэг.' },
+  eff: { key:'hr_lead_eff', name:'Чадварын итгэл', hi:'Даалгаврыг амжилттай гүйцэтгэх, асуудлыг шийдэх чадвартаа итгэлтэй.', lo:'Өөрийн чадварт эргэлздэг; дэмжлэг, туршлага хуримтлуулснаар нэмэгдэх боломжтой.' },
+};
+
+const PCL_OPTS = ['Огт үгүй', 'Бага зэрэг', 'Дунд зэрэг', 'Нэлээд их', 'Маш их'];
+const PCL_ITEMS = [
+  'Стресстэй үйл явдлын тухай давтагдсан, сэтгэл зовоосон, хүсээгүй дурсамж төрөх',
+  'Стресстэй үйл явдлын тухай давтагдсан, сэтгэл зовоосон зүүд зүүдлэх',
+  'Стресстэй үйл явдал яг одоо дахин болж байгаа мэт гэнэт мэдрэх эсвэл үйлдэх (тэр үед буцаж очоод, дахин амсаж буй мэт)',
+  'Стресстэй үйл явдлыг сануулах зүйл тохиолдоход маш их сэтгэл тавгүйрхэх',
+  'Стресстэй үйл явдлыг сануулах зүйл тохиолдоход бие махбодын хүчтэй хариу урвал гарах (жишээ нь: зүрх хүчтэй цохилох, амьсгал давчдах, хөлрөх)',
+  'Стресстэй үйл явдалтай холбоотой дурсамж, бодол, мэдрэмжээс зайлсхийх',
+  'Стресстэй үйл явдлыг сануулах гадны зүйлсээс зайлсхийх (жишээ нь: хүмүүс, газар, яриа, үйл ажиллагаа, эд зүйл, нөхцөл байдал)',
+  'Стресстэй үйл явдлын чухал хэсгийг санахад бэрхшээлтэй байх',
+  'Өөрийнхөө, бусдын эсвэл ертөнцийн талаар хүчтэй сөрөг итгэл үнэмшилтэй болох (жишээ нь: «Би муу хүн», «Надад ноцтой асуудал бий», «Хэнд ч итгэж болохгүй», «Ертөнц бүхэлдээ аюултай» гэх мэт бодол)',
+  'Стресстэй үйл явдал эсвэл түүний дараа болсон зүйлд өөрийгөө эсвэл бусдыг буруутгах',
+  'Айдас, аймшиг, уур, гэм буруу, ичгүүр зэрэг хүчтэй сөрөг мэдрэмж төрөх',
+  'Өмнө нь таалагддаг байсан үйл ажиллагааг сонирхохоо болих',
+  'Бусад хүмүүсээс хөндийрсөн, тасарсан мэт мэдрэмж төрөх',
+  'Эерэг мэдрэмж төрөхөд бэрхшээлтэй байх (жишээ нь: баярлаж чадахгүй байх, ойр дотны хүмүүстээ хайр мэдрэхгүй байх)',
+  'Уцаарлах, уураа гэнэт гаргах, түрэмгий үйлдэл хийх',
+  'Хэт их эрсдэл хүлээх эсвэл өөртөө хор хөнөөл учруулж болох зүйл хийх',
+  'Хэт сэрэмжтэй, байнга болгоомжилж, бэлэн байдалд байх',
+  'Амархан цочих, огцом давхийх',
+  'Анхаарлаа төвлөрүүлэхэд бэрхшээлтэй байх',
+  'Унтахад эсвэл нойроо хадгалахад бэрхшээлтэй байх',
+];
+const PCL_CUTOFF = 33; // Судалгаанд 31–33-ыг санал болгодог; энд хуурамч эерэг дүнг багасгахын тулд 33
+
+const AUDITC_ITEMS = [
+  { q:'Та согтууруулах ундаа хэр олон уудаг вэ?', o:['Огт уудаггүй','Сард нэг ба түүнээс цөөн','Сард 2–4 удаа','Долоо хоногт 2–3 удаа','Долоо хоногт 4 ба түүнээс олон удаа'] },
+  { q:'Уух үедээ ихэвчлэн хэдэн стандарт хундага уудаг вэ?', o:['1–2','3–4','5–6','7–9','10 ба түүнээс дээш'] },
+  { q:'Нэг удаад 6 ба түүнээс дээш стандарт хундага хэр олон уудаг вэ?', o:['Хэзээ ч үгүй','Сард нэгээс цөөн','Сард нэг удаа','Долоо хоногт нэг удаа','Өдөр бүр эсвэл бараг өдөр бүр'] },
+];
+
+/* ХН мэргэжилтэн, админы жагсаалтад харагдах нэрс */
+const HR_TEST_TITLES = {
+  hr_b5_ext:'Зан чанар — Нийтэч байдал', hr_b5_agr:'Зан чанар — Найрсаг байдал', hr_b5_con:'Зан чанар — Хариуцлагатай байдал',
+  hr_b5_emo:'Зан чанар — Сэтгэл хөдлөлийн тогтвортой байдал', hr_b5_int:'Зан чанар — Оюун ухаан, төсөөлөл',
+  hr_brs:'Тэсвэрлэх чадвар (BRS)', hr_lead_asr:'Манлайллын хандлага — Манлайлах хандлага', hr_lead_eff:'Манлайллын хандлага — Чадварын итгэл',
+  hr_pcl5:'Томилолтын өмнөх үзлэг — PTSD-ийн шинж тэмдэг (PCL-5)', hr_auditc:'Томилолтын өмнөх үзлэг — Архины хэрэглээ (AUDIT-C)',
+  hr_pvt_b:'Томилолтын өмнөх үзлэг — Сонор сэрэмж (PVT-B)',
+};
+Object.assign(EXTRA_TEST_TITLES, HR_TEST_TITLES);
+const HR_LEVEL_LABELS = { low:'Бага', mid:'Дунд', high:'Өндөр', normal:'Хэвийн', pos:'Анхаарах', neg:'Хэвийн' };
+
+/* ---------- Туслах функцууд ---------- */
+function hrTri(score, min, max) { // онооны хүрээг 3 тэнцүү хувааж ангилна (норм биш)
+  const t = (score - min) / (max - min);
+  return t < 1/3 ? 'low' : t < 2/3 ? 'mid' : 'high';
+}
+function hrQBlock(name, idx, text, opts, values) {
+  return `<div class="q-block"><div class="q-text">${idx}. ${text}</div>
+    <div class="q-opts">${opts.map((o, v) => `<label><input type="radio" name="${name}" value="${values ? values[v] : v}"> ${o}</label>`).join('')}</div></div>`;
+}
+function hrCollect(prefix, n) { // хариултууд эсвэл null (дутуу бол эхний хариулаагүй асуулт руу гүйлгэнэ)
+  const vals = [];
+  for (let i = 0; i < n; i++) {
+    const sel = document.querySelector(`input[name="${prefix}${i}"]:checked`);
+    if (!sel) {
+      const blk = document.querySelector(`input[name="${prefix}${i}"]`)?.closest('.q-block');
+      if (blk) blk.scrollIntoView({ behavior:'smooth', block:'center' });
+      showToast(`${i + 1}-р асуултад хариулаагүй байна. Бүх асуултад хариулна уу.`, 'warn');
+      return null;
+    }
+    vals.push(Number(sel.value));
+  }
+  return vals;
+}
+async function hrSave(rows) {
+  if (!currentUser?.id) return;
+  const { error } = await sb.from('test_results').insert(rows.map(r => ({ user_id: currentUser.id, ...r })));
+  if (error) { console.error('hr save error:', error); showToast('Үр дүнг хадгалахад алдаа гарлаа.', 'warn'); }
+}
+function hrBar(label, score, min, max, level, desc) {
+  const pct = Math.round((score - min) / (max - min) * 100);
+  return `<div class="ch-card">
+    <div class="ch-title">${label}: ${score} <span style="font-weight:600;color:var(--sub);font-size:.85rem;">(${min}–${max}) · ${HR_LEVEL_LABELS[level]}</span></div>
+    <div class="bar-row" style="margin:.5rem 0 .6rem;"><div class="bar-track"><div class="bar-fill" style="width:${pct}%;"></div></div></div>
+    <div class="ch-sub" style="margin:0;">${desc}</div></div>`;
+}
+const HR_PRIVACY = 'Таны хариулт болон үр дүн танд болон эрх бүхий хүний нөөцийн мэргэжилтэн, админд харагдана.';
+const HR_DRAFT_NOTE = 'Монгол орчуулга нь урьдчилсан хувилбар бөгөөд Монгол алба хаагчдын дунд баталгаажуулалт хийгдээгүй. Үр дүнг шийдвэр гаргах цорын ганц үндэслэл болгохгүй, мэргэжилтний ярилцлагатай хослуулна.';
+function hrActions(scoreFn) {
+  return `<div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="${scoreFn}()">Дүн харах</button></div>`;
+}
+function hrOpen(html) {
+  document.getElementById('modal-overlay').classList.add('open');
+  const box = document.getElementById('modal-box');
+  box.innerHTML = html;
+  box.scrollTop = 0; box.parentElement && (box.parentElement.scrollTop = 0);
+}
+function hrDone(html) {
+  hrOpen(html + `<div class="modal-actions"><button class="modal-close" onclick="closeModal(); loadHrResults();">Хаах</button></div>`);
+}
+
+/* ---------- 1) Зан чанарын тест ---------- */
+function openHrBigFive() {
+  hrOpen(`<h3>🧩 Зан чанарын тест</h3>
+    <p class="msub">50 асуулт · 10 минут орчим. ${IPIP_INSTR}<br><small>${HR_PRIVACY}</small></p>
+    <div id="mq-wrap">${B5_ITEMS.map((it, i) => hrQBlock('hb5_' + i, i + 1, it[0], IPIP_OPTS)).join('')}</div>
+    ${hrActions('scoreHrBigFive')}`);
+}
+async function scoreHrBigFive() {
+  const ans = hrCollect('hb5_', B5_ITEMS.length); if (!ans) return;
+  const sums = { 1:0, 2:0, 3:0, 4:0, 5:0 };
+  B5_ITEMS.forEach((it, i) => { const v = ans[i] + 1; sums[it[1]] += it[2] === 1 ? v : 6 - v; });
+  const rows = [], cards = [];
+  for (const f of [1,2,3,4,5]) {
+    const F = B5_FACTORS[f], s = sums[f], lvl = hrTri(s, 10, 50);
+    rows.push({ test_key: F.key, score: s, max_score: 50, level: lvl });
+    cards.push(hrBar(F.name, s, 10, 50, lvl, (lvl === 'low' ? F.lo : lvl === 'high' ? F.hi : 'Хоёр туйлын хооронд, нөхцөл байдлаас хамаарч аль алиныг илэрхийлдэг.')));
+  }
+  await hrSave(rows);
+  hrDone(`<h3>🧩 Зан чанарын тест — Үр дүн</h3>
+    <p class="msub">Зан чанарын таван үндсэн хэмжээс (оноо 10–50). Аль нэг туйл нь "сайн", "муу" гэсэн үг биш — албан тушаал, үүргийн онцлогоос хамаарч өөр өөр давуу тал болдог.</p>
+    ${cards.join('')}
+    <div class="result-block"><b>Тайлбар:</b> Бага / дунд / өндөр ангиллыг онооны хүрээг 3 тэнцүү хувааж тогтоосон бөгөөд хүн амын норм биш. ${HR_DRAFT_NOTE}<br>Эх сурвалж: IPIP Big-Five Factor Markers (Goldberg, 1992).</div>`);
+}
+
+/* ---------- 2) Тэсвэрлэх чадвар (BRS) ---------- */
+function openHrBrs() {
+  hrOpen(`<h3>🛡️ Тэсвэрлэх чадварын тест</h3>
+    <p class="msub">6 асуулт · 2 минут. Өгүүлбэр бүртэй хэр санал нийлж байгаагаа сонгоно уу.<br><small>${HR_PRIVACY}</small></p>
+    <div id="mq-wrap">${BRS_ITEMS.map((it, i) => hrQBlock('hbrs_' + i, i + 1, it[0], BRS_OPTS)).join('')}</div>
+    ${hrActions('scoreHrBrs')}`);
+}
+async function scoreHrBrs() {
+  const ans = hrCollect('hbrs_', BRS_ITEMS.length); if (!ans) return;
+  const total = BRS_ITEMS.reduce((s, it, i) => { const v = ans[i] + 1; return s + (it[1] === 1 ? v : 6 - v); }, 0);
+  const mean = Math.round(total / BRS_ITEMS.length * 100) / 100;
+  // Smith ба бусад (2013): 1.00–2.99 бага, 3.00–4.30 хэвийн, 4.31–5.00 өндөр
+  const lvl = mean < 3 ? 'low' : mean <= 4.3 ? 'normal' : 'high';
+  const desc = { low:'Хүнд нөхцөл, стрессээс сэргэхэд харьцангуй удаан хугацаа шаардагддаг. Стресс зохицуулах дадал, нийгмийн дэмжлэгийг бэхжүүлэх нь тустай.',
+    normal:'Хүнд нөхцөл, стрессээс сэргэх чадвар хэвийн түвшинд байна.',
+    high:'Хүнд нөхцөл, стрессээс хурдан сэргэж, хэвийн байдалдаа эргэн ордог.' }[lvl];
+  await hrSave([{ test_key:'hr_brs', score: mean, max_score: 5, level: lvl }]);
+  hrDone(`<h3>🛡️ Тэсвэрлэх чадварын тест — Үр дүн</h3>
+    ${hrBar('Тэсвэрлэх чадвар', mean.toFixed(2), 1, 5, lvl, desc)}
+    <div class="result-block"><b>Тайлбар:</b> Дундаж оноо 1–5. Ангилал: 3.00-аас доош бага, 3.00–4.30 хэвийн, 4.30-аас дээш өндөр (Smith ба бусад, 2013). ${HR_DRAFT_NOTE}<br>Эх сурвалж: Brief Resilience Scale (Smith ба бусад, 2008).</div>`);
+}
+
+/* ---------- 3) Манлайллын хандлага ---------- */
+function openHrLeadership() {
+  hrOpen(`<h3>⭐ Манлайллын хандлагын тест</h3>
+    <p class="msub">20 асуулт · 5 минут. ${IPIP_INSTR}<br><small>${HR_PRIVACY}</small></p>
+    <div id="mq-wrap">${LEAD_ITEMS.map((it, i) => hrQBlock('hld_' + i, i + 1, it[0], IPIP_OPTS)).join('')}</div>
+    ${hrActions('scoreHrLeadership')}`);
+}
+async function scoreHrLeadership() {
+  const ans = hrCollect('hld_', LEAD_ITEMS.length); if (!ans) return;
+  const sums = { asr:0, eff:0 };
+  LEAD_ITEMS.forEach((it, i) => { const v = ans[i] + 1; sums[it[1]] += it[2] === 1 ? v : 6 - v; });
+  const rows = [], cards = [];
+  for (const s of ['asr','eff']) {
+    const S = LEAD_SCALES[s], lvl = hrTri(sums[s], 10, 50);
+    rows.push({ test_key: S.key, score: sums[s], max_score: 50, level: lvl });
+    cards.push(hrBar(S.name, sums[s], 10, 50, lvl, lvl === 'low' ? S.lo : lvl === 'high' ? S.hi : 'Нөхцөл байдлаас хамааран аль алиныг илэрхийлдэг, дунд түвшинд байна.'));
+  }
+  await hrSave(rows);
+  hrDone(`<h3>⭐ Манлайллын хандлага — Үр дүн</h3>
+    <p class="msub">Энэ тест нь удирдах чадварыг шууд биш, манлайллын хөгжилтэй холбоотой хоёр хувь хүний шинжийг хэмждэг.</p>
+    ${cards.join('')}
+    <div class="result-block"><b>Тайлбар:</b> Бага / дунд / өндөр ангиллыг онооны хүрээг 3 тэнцүү хувааж тогтоосон бөгөөд хүн амын норм биш. ${HR_DRAFT_NOTE}<br>Эх сурвалж: IPIP-NEO — Assertiveness (E3), Self-Efficacy (C1) (Goldberg ба бусад, 2006).</div>`);
+}
+
+/* ---------- 4) Томилолтын өмнөх үзлэг ---------- */
+function openHrPredeploy() {
+  hrOpen(`<h3>🎖️ Томилолтын өмнөх үзлэг</h3>
+    <p class="msub">Энхийг дэмжих ажиллагаа болон бусад томилолтын өмнө бөглөнө. 3 хэсэгтэй: (1) стрессийн шинж тэмдэг — 20 асуулт, (2) архины хэрэглээ — 3 асуулт, (3) сонор сэрэмжийн сорил — 3 минут.<br><small>${HR_PRIVACY}</small></p>
+    <div class="ch-card"><div class="ch-title">1-р хэсэг. Стрессийн шинж тэмдэг</div>
+      <div class="ch-sub" style="margin:0;">Доорх нь маш их стресстэй үйл явдлын дараа хүмүүст заримдаа тохиолддог асуудлууд. Өөрт тохиолдсон хамгийн их стресстэй үйл явдлаа бодоод, <b>сүүлийн 1 сарын</b> хугацаанд асуудал бүр таныг хэр их зовоосныг сонгоно уу.</div></div>
+    <div id="mq-wrap">${PCL_ITEMS.map((q, i) => hrQBlock('hpcl_' + i, i + 1, q, PCL_OPTS)).join('')}</div>
+    <div class="ch-card"><div class="ch-title">2-р хэсэг. Архины хэрэглээ</div>
+      <div class="ch-sub" style="margin:0;"><b>1 стандарт хундага</b> = 1 лааз (355 мл) шар айраг, эсвэл 1 хундага (150 мл) дарс, эсвэл 45 мл архи.</div></div>
+    ${hrQBlock('haudg_', 'А', 'Таны хүйс (үнэлгээний босгыг тодорхойлоход ашиглана):', ['Эрэгтэй','Эмэгтэй'])}
+    ${AUDITC_ITEMS.map((it, i) => hrQBlock('haud_' + i, i + 1, it.q + (i > 0 ? ' <small style="font-weight:500;color:var(--sub);">(1-р асуултад «Огт уудаггүй» гэсэн бол хариулахгүй байж болно)</small>' : ''), it.o)).join('')}
+    ${hrActions('scoreHrPredeploy')}`);
+}
+async function scoreHrPredeploy() {
+  const pcl = hrCollect('hpcl_', PCL_ITEMS.length); if (!pcl) return;
+  const g = document.querySelector('input[name="haudg_"]:checked');
+  if (!g) { document.querySelector('input[name="haudg_"]').closest('.q-block').scrollIntoView({ behavior:'smooth', block:'center' }); showToast('Хүйсээ сонгоно уу.', 'warn'); return; }
+  // AUDIT-C: 1-р асуултад "Огт уудаггүй" гэвэл 2, 3-р асуулт 0 оноотой (заавал хариулахгүй)
+  const q1 = document.querySelector('input[name="haud_0"]:checked');
+  let aud;
+  if (q1 && Number(q1.value) === 0) aud = [0, 0, 0];
+  else { aud = hrCollect('haud_', AUDITC_ITEMS.length); if (!aud) return; }
+
+  const pclTotal = pcl.reduce((a, b) => a + b, 0);
+  const pclPos = pclTotal >= PCL_CUTOFF;
+  const female = Number(g.value) === 1;
+  const audTotal = aud.reduce((a, b) => a + b, 0);
+  const audCut = female ? 3 : 4;
+  const audPos = audTotal >= audCut;
+  const riskItem = pcl[15] >= 2; // 16-р асуулт: эрсдэлтэй, өөртөө хор хөнөөл учруулж болох үйлдэл
+
+  await hrSave([
+    { test_key:'hr_pcl5', score: pclTotal, max_score: 80, level: pclPos ? 'pos' : 'neg' },
+    { test_key:'hr_auditc', score: audTotal, max_score: 12, level: audPos ? 'pos' : 'neg' },
+  ]);
+
+  const pclDesc = pclPos
+    ? `Оноо ${PCL_CUTOFF}-аас дээш байгаа нь стрессийн шинж тэмдэг нэлээд илэрч байгааг харуулж байна. Энэ нь онош биш — сэтгэл зүйч, эмчтэй уулзаж нарийвчилсан үнэлгээ хийлгэхийг зөвлөж байна.`
+    : `Оноо ${PCL_CUTOFF}-аас доош, стрессийн шинж тэмдэг үзлэгийн босгоос доогуур байна.`;
+  const onlyQ1 = audPos && aud[1] === 0 && aud[2] === 0;
+  const audDesc = aud[0] === 0
+    ? 'Та согтууруулах ундаа хэрэглэдэггүй гэж хариулсан.'
+    : audPos
+      ? `Оноо ${audCut} ба түүнээс дээш байгаа нь архины хэрэглээ эрүүл мэндэд эрсдэлтэй түвшинд байж болохыг харуулж байна. Хэрэглээгээ багасгах талаар мэргэжилтэнтэй зөвлөлдөхийг зөвлөж байна.${onlyQ1 ? ' Оноо зөвхөн уух давтамжаас бүрдсэн тул нэг удаад уудаг хэмжээ бага бол эрсдэл бага байж магадгүй — мэргэжилтэн нарийвчлан тодруулна.' : ''}`
+      : `Оноо ${audCut}-аас доош, эрсдэлтэй түвшнээс доогуур байна.`;
+
+  hrOpen(`<h3>🎖️ Томилолтын өмнөх үзлэг — Үр дүн</h3>
+    <div class="ch-card"><div class="ch-title">1. Стрессийн шинж тэмдэг (PCL-5): ${pclTotal} / 80 · ${pclPos ? 'Анхаарах' : 'Хэвийн'}</div>
+      <div class="bar-row" style="margin:.5rem 0 .6rem;"><div class="bar-track"><div class="bar-fill" style="width:${Math.round(pclTotal / 80 * 100)}%;${pclPos ? 'background:var(--red);' : ''}"></div></div></div>
+      <div class="ch-sub" style="margin:0;">${pclDesc}</div></div>
+    ${riskItem ? `<div class="low-month-card"><div class="lm-text"><b>Анхаар:</b> Та эрсдэлтэй эсвэл өөртөө хор хөнөөл учруулж болох үйлдэл хийдэг гэж хариулсан байна. Сэтгэл зүйчтэй ярилцахыг зөвлөж байна. Яаралтай тусламж хэрэгтэй бол 103 руу залгана уу.</div><button onclick="closeModal(); goto('pros')">Сэтгэл зүйчтэй холбогдох</button></div>` : ''}
+    <div class="ch-card"><div class="ch-title">2. Архины хэрэглээ (AUDIT-C): ${audTotal} / 12 · ${audPos ? 'Анхаарах' : 'Хэвийн'}</div>
+      <div class="bar-row" style="margin:.5rem 0 .6rem;"><div class="bar-track"><div class="bar-fill" style="width:${Math.round(audTotal / 12 * 100)}%;${audPos ? 'background:var(--red);' : ''}"></div></div></div>
+      <div class="ch-sub" style="margin:0;">${audDesc}</div></div>
+    <div class="ch-card"><div class="ch-title">3. Сонор сэрэмжийн сорил</div>
+      <div class="ch-sub" style="margin:0 0 .8rem;">Үзлэгийн сүүлийн хэсэг — 3 минутын хариу үйлдлийн сорил. Чимээгүй орчинд, амарсан үедээ өгнө үү.</div>
+      <button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="openPvtTest('hr')">Сорил эхлүүлэх</button></div>
+    <div class="result-block"><b>Тайлбар:</b> Энэ үзлэг онош тавихгүй, зөвхөн нэмэлт үнэлгээ шаардлагатай эсэхийг тодорхойлно. PCL-5-ийн босгыг ${PCL_CUTOFF} (судалгаанд 31–33), AUDIT-C-ийн босгыг эрэгтэйд 4, эмэгтэйд 3 гэж авсан. ${HR_DRAFT_NOTE}<br>Эх сурвалж: PCL-5 (Weathers ба бусад, 2013); AUDIT-C (Bush ба бусад, 1998; Bradley ба бусад, 2007).</div>
+    <div class="modal-actions">${(pclPos || audPos) ? `<button class="modal-close" onclick="closeModal(); goto('pros')">Мэргэжилтэнтэй холбогдох</button>` : ''}<button class="modal-close" onclick="closeModal(); loadHrResults();">Хаах</button></div>`);
+}
+
+/* ---------- Энгийн хэрэглэгчийн карт, ХН мэргэжилтний жагсаалт ---------- */
+const HR_CARDS = [
+  { emo:'🧩', title:'Зан чанарын тест', blurb:'Зан чанарын 5 үндсэн хэмжээс — 50 асуулт, 10 минут', fn:'openHrBigFive', keys:['hr_b5_ext'] },
+  { emo:'🛡️', title:'Тэсвэрлэх чадвар', blurb:'Стресс, хүнд нөхцөлөөс сэргэх чадвар — 6 асуулт, 2 минут', fn:'openHrBrs', keys:['hr_brs'] },
+  { emo:'⭐', title:'Манлайллын хандлага', blurb:'Манлайлах хандлага, чадварын итгэл — 20 асуулт, 5 минут', fn:'openHrLeadership', keys:['hr_lead_asr'] },
+  { emo:'🎖️', title:'Томилолтын өмнөх үзлэг', blurb:'Стрессийн шинж тэмдэг, архины хэрэглээ, сонор сэрэмж — 15 минут', fn:'openHrPredeploy', keys:['hr_pcl5'] },
+];
+function hrFmtScore(r) {
+  const sc = r.test_key === 'hr_brs' ? Number(r.score).toFixed(2) : r.score;
+  return `${sc}${r.max_score != null ? ' / ' + r.max_score : ''}${r.level ? ' · ' + (HR_LEVEL_LABELS[r.level] || r.level) : ''}`;
 }
 
 (function initPvt() {

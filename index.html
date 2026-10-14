@@ -79,11 +79,7 @@
   .navitem:hover{background:var(--panel-2);}
   .navitem.active{background:var(--gold-soft);color:var(--gold);}
 
-  .sos-btn{margin-top:auto;display:flex;align-items:center;gap:.7rem;background:var(--red-soft);
     border:1px solid rgba(192,69,58,.4);border-radius:10px;padding:.7rem .85rem;cursor:pointer;}
-  .sos-btn svg{width:19px;height:19px;color:var(--gold);flex-shrink:0;}
-  .sos-btn .t1{font-size:.65rem;font-weight:800;color:var(--gold);letter-spacing:.03em;}
-  .sos-btn .t2{font-size:1.1rem;font-weight:800;color:var(--gold);}
 
   /* ---------- MAIN ---------- */
   .main{padding:0 0 3rem;}
@@ -838,7 +834,6 @@
       <li class="navitem" data-view="attention"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>Анхаарал шалгах тест</li>
       <li class="navitem" data-view="projective"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19c-4-3-8-6-8-10a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 4-4 7-8 10-.5.4-1.5.4-2 0Z"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/></svg>Хувь хүнийг тодорхойлох проектив аргууд</li>
       <li class="navitem" data-view="pros"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>Сэтгэл зүйч<span id="pros-nav-badge" class="nav-badge" style="display:none;">0</span></li>
-      <li class="navitem" data-view="ai-chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><circle cx="9" cy="11" r="1"/><circle cx="13" cy="11" r="1"/><circle cx="17" cy="11" r="1"/></svg>AI Туслах</li>
       <li class="navitem" data-view="analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>Миний сэтгэл зүй</li>
 
       <div class="navgroup-label">БАЙГУУЛЛАГА</div>
@@ -854,10 +849,6 @@
       <li class="navitem" data-view="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>Миний профайл</li>
     </ul>
 
-    <div class="sos-btn" onclick="goto('pros')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13 1 .36 1.94.68 2.85a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.23-1.25a2 2 0 0 1 2.11-.45c.91.32 1.85.55 2.85.68A2 2 0 0 1 22 16.92z"/></svg>
-      <div><div class="t1">ЯАРАЛТАЙ ТУСЛАМЖ</div><div class="t2" style="font-size:.9rem">Сэтгэл зүйчтэй холбогдох</div></div>
-    </div>
   </aside>
   <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
@@ -889,7 +880,7 @@
           <p class="m-hero-sub">Богино тестээр өөрийн байдлаа үнэлж, нэрээ нууцлан мэргэжлийн сэтгэл зүйчтэй холбогдоорой.</p>
           <button class="m-btn-primary" onclick="goto('tests')">Тест эхлүүлэх <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
           <button class="m-btn-secondary" onclick="goto('pros')">Сэтгэл зүйчтэй ярилцах</button>
-          <div class="m-checks"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>3-18 минут</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Нэр нууцлагдана</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>AI Туслах</span></div>
+          <div class="m-checks"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>3-18 минут</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Нэр нууцлагдана</span></div>
         </section>
         <div class="hero">
           <div class="hero-ripple" id="hero-ripple"></div>
@@ -1142,21 +1133,6 @@
         </div>
       </div>
 
-      <!-- ================= AI ТУСЛАХ ================= -->
-      <div id="view-ai-chat" class="view">
-        <div class="page-head"><h2>🤖 AI Туслах</h2><p>Сэтгэл зүйн асуудлаараа хиймэл оюун ухаантай ямар ч цагт ярилцаарай. Энэ бол мэргэжлийн сэтгэл зүйчийг орлохгүй — ноцтой асуудал бол "Сэтгэл зүйч" хэсгээр мэргэжилтэнтэй холбогдоно уу.</p></div>
-        <div class="section-card">
-          <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.8rem;padding:.7rem .9rem;background:rgba(216,188,138,.12);border-radius:10px;font-size:.8rem;color:var(--sub);">
-            ⚠️ Хэрэв та амиа хорлох бодолтой байгаа, эсвэл яаралтай дэмжлэг хэрэгтэй байвал шууд <a href="#" onclick="goto('pros');return false" style="color:#0A677A;font-weight:600;text-decoration:underline">мэргэжилтэнтэй холбогдоно уу</a>.
-          </div>
-          <div id="ai-chat-messages" style="height:420px;overflow-y:auto;border:1px solid var(--line);border-radius:12px;padding:.9rem;margin-bottom:.8rem;background:var(--panel-2);"></div>
-          <div style="display:flex;gap:.6rem;">
-            <input type="text" id="ai-chat-input" placeholder="Мессежээ бичих..." onkeydown="if(event.key==='Enter'){sendAIChatMessage();}" style="flex:1;border:1px solid var(--line);border-radius:10px;padding:.7rem .9rem;font-family:inherit;font-size:.9rem;background:#fff;color:var(--cream);">
-            <button class="connect-btn" style="width:auto;padding:.7rem 1.3rem;" id="ai-chat-send-btn" onclick="sendAIChatMessage()">Илгээх</button>
-          </div>
-        </div>
-      </div>
-
       <!-- ================= PROS ================= -->
       <div id="view-pros" class="view">
         <div class="page-head"><h2>Сэтгэл зүйч</h2><p>Мэргэжилтэн хайж, текст эсвэл видео зөвлөгөө товлоорой.</p></div>
@@ -1352,13 +1328,6 @@
             </div>
           </div>
           <div id="admin-other-sections">
-          <div class="section-card">
-            <div class="section-head collapsible" onclick="toggleAdminSection('ai-chat')"><h3>🤖 AI Туслахын түүх (зөвхөн админ)</h3><span class="collapse-arrow" id="ai-chat-arrow">▾</span></div>
-            <div class="collapsible-body" id="ai-chat-body">
-              <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Хэрэглэгчид AI Туслахтай хийсэн харилцан яриа. Эрсдэлтэй агуулга илэрвэл мэргэжилтэнтэй холбогдоорой.</p>
-              <div id="admin-ai-chat-threads"></div>
-            </div>
-          </div>
           <div class="section-card">
             <div class="section-head collapsible" onclick="toggleAdminSection('pro-chat')"><h3>💬 Мэргэжилтний чат (зөвхөн админ)</h3><span class="collapse-arrow" id="pro-chat-arrow">▾</span></div>
             <div class="collapsible-body" id="pro-chat-body">
@@ -1974,6 +1943,7 @@ document.getElementById('sidebar-backdrop').addEventListener('click', () => docu
 
 
 function goto(view, pushState) {
+  if (!document.getElementById('view-' + view)) view = 'home'; // хасагдсан/буруу хэсэг рүү орвол нүүр хуудас
   if ((view === 'psy-corner' || view === 'group-exercise' || view === 'orders' || view === 'guides' || view === 'military-test') && !(isAdmin || myProId)) {
     showToast('Энэ хэсэг зөвхөн админ болон бүртгэлтэй сэтгэл зүйчдэд нээлттэй.', 'error');
     view = 'home';
@@ -1999,7 +1969,6 @@ function goto(view, pushState) {
   if (view === 'analytics') { loadAnalyticsSummary(); loadMonthlyAnalysis(); loadPvtTrend(); }
   if (view === 'org') { loadOrgStats(); loadUnitStress(); }
   if (view === 'pros') { loadPros(); }
-  if (view === 'ai-chat') { loadAIChatHistory(); }
   if (view === 'proportal') { loadProPortal(); }
   // Хөтчийн "Буцах" товч ажиллахын тулд history-д хуудсаа бүртгэнэ
   if (pushState !== false) {
@@ -7976,73 +7945,6 @@ async function sendChatMessage() {
   refreshUserUnreadReplies();
 }
 
-/* ================= AI ТУСЛАХ (Сэтгэл зүйн дэмжлэг үзүүлдэг чат-бот) ================= */
-let aiChatHistoryCache = [];
-
-function renderAIChatMessages(showTyping) {
-  const el = document.getElementById('ai-chat-messages');
-  if (!el) return;
-  if (!aiChatHistoryCache.length && !showTyping) {
-    el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;text-align:center;padding:2rem 0;">Сайн байна уу 👋 Би танд сэтгэл зүйн талаар туслах AI туслах байна. Юугаараа туслах вэ?</div>';
-    return;
-  }
-  el.innerHTML = aiChatHistoryCache.map(m => `
-    <div style="display:flex;justify-content:${m.role === 'user' ? 'flex-end' : 'flex-start'};margin-bottom:.6rem;">
-      <div style="max-width:78%;padding:.6rem .85rem;border-radius:14px;font-size:.87rem;line-height:1.45;white-space:pre-wrap;
-        background:${m.role === 'user' ? 'var(--gold)' : '#fff'};
-        color:${m.role === 'user' ? '#fff' : 'var(--cream)'};
-        border:1px solid var(--line);">${esc(m.content)}</div>
-    </div>`).join('') + (showTyping ? `
-    <div style="display:flex;justify-content:flex-start;margin-bottom:.6rem;">
-      <div style="padding:.6rem .85rem;border-radius:14px;font-size:.87rem;background:#fff;border:1px solid var(--line);color:var(--sub);">бичиж байна...</div>
-    </div>` : '');
-  el.scrollTop = el.scrollHeight;
-}
-
-async function loadAIChatHistory() {
-  if (!currentUser?.id) return;
-  const { data, error } = await sb.from('ai_chat_messages')
-    .select('role, content, created_at')
-    .eq('user_id', currentUser.id)
-    .order('created_at', { ascending: true })
-    .limit(200);
-  if (error) { console.error('loadAIChatHistory error:', error); return; }
-  aiChatHistoryCache = data || [];
-  renderAIChatMessages(false);
-}
-
-async function sendAIChatMessage() {
-  const input = document.getElementById('ai-chat-input');
-  const sendBtn = document.getElementById('ai-chat-send-btn');
-  const message = input.value.trim();
-  if (!message || !currentUser?.id) return;
-  input.value = '';
-  sendBtn.disabled = true;
-
-  // Хэрэглэгчийн мессежийг шууд дэлгэцэнд, мөн санд хадгална
-  aiChatHistoryCache.push({ role: 'user', content: message, created_at: new Date().toISOString() });
-  renderAIChatMessages(true);
-  const { error: insErr } = await sb.from('ai_chat_messages').insert({ user_id: currentUser.id, role: 'user', content: message });
-  if (insErr) console.error('ai_chat_messages insert (user) error:', insErr);
-
-  try {
-    // Supabase Edge Function руу дуудна (backend дээр AI API түлхүүрийг нууцаар хадгалдаг)
-    const { data, error } = await sb.functions.invoke('ai-chat', {
-      body: { message, history: aiChatHistoryCache.slice(-20) },
-    });
-    if (error) throw error;
-    const reply = data?.reply || 'Уучлаарай, одоогоор хариу өгч чадсангүй. Дахин оролдоно уу.';
-    aiChatHistoryCache.push({ role: 'assistant', content: reply, created_at: new Date().toISOString() });
-    const { error: insErr2 } = await sb.from('ai_chat_messages').insert({ user_id: currentUser.id, role: 'assistant', content: reply });
-    if (insErr2) console.error('ai_chat_messages insert (assistant) error:', insErr2);
-  } catch (e) {
-    console.error('AI chat error:', e);
-    aiChatHistoryCache.push({ role: 'assistant', content: 'Уучлаарай, AI туслахтай холбогдоход алдаа гарлаа. Түр хүлээгээд дахин оролдоно уу, эсвэл "Сэтгэл зүйч" хэсгээр мэргэжилтэнтэй холбогдоно уу.', created_at: new Date().toISOString() });
-  }
-  renderAIChatMessages(false);
-  sendBtn.disabled = false;
-}
-
 function subscribeChatRealtime() {
   if (chatRealtimeChannel) { sb.removeChannel(chatRealtimeChannel); chatRealtimeChannel = null; }
   chatRealtimeChannel = sb.channel('chat-' + currentChatProId + '-' + currentUser.id)
@@ -8550,66 +8452,6 @@ async function loadAdminChatThreads() {
   }).join('');
 }
 
-/* ================= АДМИН: AI Туслахын түүх (зөвхөн унших) ================= */
-async function loadAdminAIChatThreads() {
-  const el = document.getElementById('admin-ai-chat-threads');
-  if (!el) return;
-  el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div>';
-  const { data, error } = await sb.from('ai_chat_messages')
-    .select('user_id, role, content, created_at, users(branch)')
-    .order('created_at', { ascending: false })
-    .limit(2000);
-  if (error) {
-    console.error('loadAdminAIChatThreads error:', error);
-    el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж чадсангүй (ai_chat_messages хүснэгт үүсээгүй байж болзошгүй).</div>';
-    return;
-  }
-  if (!data || data.length === 0) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор хэн ч AI Туслахтай ярилцаагүй байна.</div>'; return; }
-
-  const byUser = {};
-  data.forEach(m => {
-    if (!byUser[m.user_id]) byUser[m.user_id] = { count: 0, last: m, branch: m.users?.branch };
-    byUser[m.user_id].count++;
-  });
-  const list = Object.entries(byUser).sort((a,b) => new Date(b[1].last.created_at) - new Date(a[1].last.created_at));
-
-  el.innerHTML = list.map(([uid, info]) => {
-    const branchLabel = BRANCH_LABELS[info.branch] || 'Тодорхойгүй анги';
-    const preview = (info.last.content || '').slice(0, 60);
-    return `<div class="unit-row" style="cursor:pointer;" onclick="openAdminAIChatView('${uid}')">
-      <div class="unit-name">Anonymous ${uid.slice(0,8)}… (${branchLabel})</div>
-      <div style="color:var(--sub);font-size:.78rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${info.last.role === 'user' ? '👤' : '🤖'} ${esc(preview)}</div>
-      <div style="color:var(--sub);font-size:.75rem;">${info.count} мессеж</div>
-    </div>`;
-  }).join('');
-}
-
-async function openAdminAIChatView(uid) {
-  document.getElementById('modal-overlay').classList.add('open');
-  document.getElementById('modal-box').innerHTML = '<h3>🤖 AI Туслахын түүх</h3><div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div>';
-  const { data, error } = await sb.from('ai_chat_messages')
-    .select('role, content, created_at')
-    .eq('user_id', uid)
-    .order('created_at', { ascending: true });
-  if (error || !data) {
-    document.getElementById('modal-box').innerHTML = '<h3>🤖 AI Туслахын түүх</h3><p>Ачаалж чадсангүй.</p><div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button></div>';
-    return;
-  }
-  document.getElementById('modal-box').innerHTML = `
-    <h3>🤖 AI Туслахын түүх — Anonymous ${uid.slice(0,8)}…</h3>
-    <div style="max-height:420px;overflow-y:auto;border:1px solid var(--line);border-radius:12px;padding:.9rem;margin:.8rem 0;background:var(--panel-2);">
-      ${data.map(m => `
-        <div style="display:flex;justify-content:${m.role === 'user' ? 'flex-end' : 'flex-start'};margin-bottom:.6rem;">
-          <div style="max-width:78%;padding:.55rem .8rem;border-radius:12px;font-size:.84rem;white-space:pre-wrap;
-            background:${m.role === 'user' ? 'var(--gold)' : '#fff'};
-            color:${m.role === 'user' ? '#fff' : 'var(--cream)'};
-            border:1px solid var(--line);">${esc(m.content)}</div>
-        </div>`).join('')}
-    </div>
-    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button></div>
-  `;
-}
-
 function openAdminChat(uid, proId, proName) {
   currentAdminChatUserId = uid;
   currentAdminChatProId = proId;
@@ -8860,7 +8702,6 @@ async function init() {
     populateTestBranchStatsSelect();
     loadRegisteredUsers();
     loadAdminChatThreads();
-    loadAdminAIChatThreads();
     loadAdminPosts();
     loadAdminComments();
     loadAdminHrList();

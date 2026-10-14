@@ -745,6 +745,37 @@
 .hb-radar{padding-bottom:6px}
 .hr-last{font-size:.78rem;font-weight:700;color:var(--gold);min-height:1em;margin:.2rem 0 .4rem}
 </style>
+<style id="tp-css">
+.tp-chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+.tp-chip{border:1px solid #D6E1E0;background:#fff;color:#2C3F45;border-radius:20px;padding:7px 14px;font:600 .85rem Inter,sans-serif;cursor:pointer}
+.tp-chip.on{background:#0D3B46;color:#fff;border-color:#0D3B46}
+.tp-chip:focus-visible,.tp-card:focus-visible{outline:3px solid #F2B544;outline-offset:2px}
+.tp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.tp-card{display:flex;flex-direction:column;text-align:left;background:#fff;border:1px solid #E1E9E8;border-radius:16px;overflow:hidden;padding:0;cursor:pointer;font:inherit;color:inherit;transition:transform .15s,box-shadow .15s}
+.tp-card:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(13,59,70,.10)}
+.tp-art svg{display:block;width:100%;height:auto;aspect-ratio:16/9}
+.tp-body{padding:12px 16px 16px;display:flex;flex-direction:column;gap:4px;flex:1}
+.tp-cat{font-size:.75rem;font-weight:700}
+.tp-body h4{margin:0;font-size:1.02rem;color:#0D3B46}
+.tp-body p{margin:0;font-size:.85rem;color:#4A5A60;line-height:1.5;flex:1}
+.tp-min{display:inline-flex;align-items:center;gap:5px;font-size:.78rem;color:#5A6B70;margin-top:6px}.tp-min svg{width:14px;height:14px}
+.tp-home{margin-bottom:1.2rem}.tp-all{font-size:.85rem;font-weight:700;color:#0A677A;text-decoration:none}
+.tp-modal .tp-hero{border-radius:14px;overflow:hidden;margin:-.2rem 0 14px}.tp-hero svg{display:block;width:100%;height:210px}
+.tp-h{font-size:1.35rem;color:#0D3B46;margin:0 0 6px}.tp-why{margin:0;color:#2C3F45;line-height:1.65;font-size:.93rem}
+.tp-sh{margin:18px 0 8px;color:#0D3B46;font-size:1rem}
+.tp-steps{list-style:none;margin:0;padding:0}
+.tp-steps li{display:flex;gap:14px;align-items:flex-start;padding:10px 0;border-bottom:1px solid #E3ECEB}.tp-steps li:last-child{border-bottom:0}
+.tp-ic{position:relative;flex:0 0 44px;height:44px;border-radius:12px;background:#EDF3F2;display:grid;place-items:center}
+.tp-ic svg{width:24px;height:24px}.tp-ic b{position:absolute;top:-6px;left:-6px;width:20px;height:20px;border-radius:50%;background:#0D3B46;color:#fff;font-size:.7rem;display:grid;place-items:center}
+.tp-steps strong{display:block;font-size:.94rem;color:#14262C}.tp-steps p{margin:2px 0 0;font-size:.86rem;color:#4A5A60;line-height:1.5}
+.tp-note{margin-top:14px;font-size:.82rem;color:#5A6B70;background:#F6F8F8;border-radius:10px;padding:10px 12px;line-height:1.55}
+.tp-breath{display:flex;flex-direction:column;align-items:center;gap:12px;margin:16px 0 4px;padding:16px;background:#EDF3F2;border-radius:14px}
+.tp-ring{width:110px;height:110px;border-radius:50%;background:radial-gradient(circle,#0A677A 0,#4E9C9A 60%,#CFE6E1 100%);display:grid;place-items:center;transform:scale(.7);transition:transform 4s ease-in-out}
+.tp-ring.in{transform:scale(1.15)}.tp-ring.out{transform:scale(.7)}
+.tp-ring span{color:#fff;font-weight:700;font-size:.82rem;text-align:center;padding:0 8px;transform:scale(1)}
+@media (max-width:560px){.tp-grid{grid-template-columns:1fr}.tp-grid-home .tp-card:nth-child(n+2) .tp-art{display:none}}
+@media (prefers-reduced-motion:reduce){.tp-card{transition:none}.tp-ring{transition:none!important}}
+</style>
 </head>
 <body>
 
@@ -800,6 +831,7 @@
       <li class="navitem active" data-view="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Нүүр хуудас</li>
       <li class="navitem" data-view="diary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>Өнөөдөр би...</li>
       <li class="navitem" data-view="tests"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/></svg>Сэтгэл зүйн тестүүд</li>
+      <li class="navitem" data-view="tips"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.5 1 2.5h6c0-1 .2-1.7 1-2.5A6 6 0 0 0 12 3z"/></svg>Сэтгэл зүйн зөвлөмж</li>
       <li class="navitem" data-view="memory"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 2A3.5 3.5 0 0 0 6 5.5v.55a2.5 2.5 0 0 0-1.96 3.7A2.5 2.5 0 0 0 3 12v1a2.5 2.5 0 0 0 1.5 2.29V17a3 3 0 0 0 3 3v0a2 2 0 0 0 2-2V5.5A3.5 3.5 0 0 0 9.5 2Z"/><path d="M14.5 2A3.5 3.5 0 0 1 18 5.5v.55a2.5 2.5 0 0 1 1.96 3.7A2.5 2.5 0 0 1 21 12v1a2.5 2.5 0 0 1-1.5 2.29V17a3 3 0 0 1-3 3v0a2 2 0 0 1-2-2V5.5A3.5 3.5 0 0 1 14.5 2Z"/></svg>Ой санамж, анхаарал хөгжүүлэх дасгал</li>
       <li class="navitem" data-view="sonjoo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><circle cx="17.5" cy="6.5" r="3.5"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 17.5h7"/></svg>Сонжоо</li>
       <li class="navitem" data-view="attention"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>Анхаарал шалгах тест</li>
@@ -900,6 +932,11 @@
           <button class="qa-btn" onclick="openSymptomGuide()">Эхлэх <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
         </div>
 
+        <div class="section-card tp-home">
+          <div class="section-head"><h3>Өнөөдрийн зөвлөмж</h3><a href="#" onclick="goto('tips');return false;" class="tp-all">Бүх зөвлөмж</a></div>
+          <div class="tp-grid tp-grid-home" id="home-tips"></div>
+        </div>
+
         <div class="quick-grid">
           <div class="quick-card" data-goto="tests"><div class="quick-icon">🧠</div><div class="quick-title">Сэтгэл зүйгээ үнэлэх</div><div class="quick-sub">Тест бөглөх</div></div>
           <div class="quick-card" data-goto="diary"><div class="quick-icon">💬</div><div class="quick-title">Мэдрэмжээ хуваалцах</div><div class="quick-sub">Нэрээ нуулцан бичих</div></div>
@@ -964,6 +1001,12 @@
       </div>
 
       <!-- ================= TESTS ================= -->
+      <div id="view-tips" class="view">
+        <div class="page-head"><h2>Сэтгэл зүйн зөвлөмж</h2><p>Стресс, нойр, сэтгэл санаа, харилцаанд тустай, өдөр тутамдаа хэрэглэх энгийн аргууд. Картыг дарж алхам алхмаар хараарай.</p></div>
+        <div class="tp-chips" id="tp-chips"></div>
+        <div class="tp-grid" id="tp-grid"></div>
+      </div>
+
       <div id="view-tests" class="view">
         <div class="page-head"><h2>Сэтгэл зүйн тестүүд</h2><p>Олон улсын стандартад нийцсэн богино тестүүд. </p></div>
         <div class="test-grid" id="test-grid-full"></div>
@@ -1051,15 +1094,6 @@
       <div id="view-sonjoo" class="view">
         <div class="page-head"><h2>Сонжоо</h2><p>Өөрийгөө болон бусдыг илүү сайн ойлгоход тусалдаг сонирхолтой зурган таавар, дүгнэлтүүд.</p></div>
 
-        <div class="section-card" style="margin-bottom:1.2rem;">
-          <p style="font-size:.85rem;color:var(--sub);margin:0 0 1.1rem;">АНУ-ын арми, НАСА-д ядаргаа, сонор сэрэмжийг хэмждэг стандарт сорилын 3 минутын товч хувилбар (PVT-B, Basner ба бусад, 2011).</p>
-          <div class="test-card" onclick="openPvtTest()">
-            <span class="test-emo">⏱️</span>
-            <div class="test-title">Сонор сэрэмжийн сорил</div>
-            <div class="test-blurb">Хариу үйлдлийн хурд — 3 минут</div>
-          </div>
-        </div>
-
         <div class="section-card">
           <div id="sonjoo-quiz-list"></div>
         </div>
@@ -1069,6 +1103,15 @@
         <div class="page-head"><h2>Анхаарал шалгах тест</h2><p>Ажиглах чадвар, анхаарлаа шалгаарай.</p></div>
 
         <div class="attention-grid">
+          <div class="section-card">
+            <p style="font-size:.85rem;color:var(--sub);margin:0 0 1.1rem;">Ядаргаа, сонор сэрэмжийг хэмждэг олон улсын стандарт сорилын 3 минутын товч хувилбар (PVT-B, Basner ба бусад, 2011).</p>
+            <div class="test-card" onclick="openPvtTest()">
+              <span class="test-emo">⏱️</span>
+              <div class="test-title">Сонор сэрэмжийн сорил</div>
+              <div class="test-blurb">Хариу үйлдлийн хурд — 3 минут</div>
+            </div>
+          </div>
+
           <div class="section-card">
             <p style="font-size:.85rem;color:var(--sub);margin:0 0 1.1rem;">Насанд хүрсэн хүний анхаарал хэр сарнидгийг хэмжих 24 асуулттай стандарт тест (Др. Голдберг).</p>
             <div class="test-card" onclick="openAttentionScaleTest()">
@@ -1953,6 +1996,8 @@ function goto(view, pushState) {
   if (view === 'memory') { renderMemLifeExList(); }
   if (view === 'iqtest') { renderIqChecklist(); }
   if (view === 'sonjoo') { renderSonjooQuizzes(); }
+  if (view === 'tips') { renderTips(); }
+  if (view === 'home') { renderHomeTips(); }
   if (view === 'group-exercise') { renderGroupExercises(); }
   if (view === 'orders') { loadOrders('tushaal', 'orders-list', 'orders-count-sub'); }
   if (view === 'guides') { loadOrders('guide', 'guides-list', 'guides-count-sub'); }
@@ -4201,7 +4246,7 @@ const EXTRA_TEST_TITLES = { pvt_b: 'Сонор сэрэмжийн сорил (PV
 const PVT = { DURATION:180000, ISI_MIN:1000, ISI_MAX:4000, FEEDBACK:1000, LAPSE:355, FALSE:100, TIMEOUT:30000 };
 let pvtState = 'idle', pvtStart = 0, pvtStim = 0, pvtTimer = null, pvtRaf = null;
 let pvtRts = [], pvtFalse = 0, pvtTimeouts = 0;
-let pvtMode = 'self'; // 'self' = Сонжоо, 'hr' = Томилолтын өмнөх үзлэг
+let pvtMode = 'self'; // 'self' = Анхаарал шалгах тест, 'hr' = Томилолтын өмнөх үзлэг
 
 function openPvtTest(mode) {
   pvtMode = mode === 'hr' ? 'hr' : 'self';
@@ -4397,7 +4442,7 @@ async function loadPvtTrend() {
   if (!currentUser?.id) { el.innerHTML = '<div class="pvt-compare info">Нэвтэрсний дараа таны сорилын явц энд харагдана.</div>'; return; }
   const rows = await fetchPvtHistory(10);
   if (!rows.length) {
-    el.innerHTML = `<div class="pvt-compare info">Та одоогоор сонор сэрэмжийн сорил өгөөгүй байна. <a href="#" onclick="goto('sonjoo');return false;" style="color:var(--gold);font-weight:700;">Сорил өгөх →</a></div>`;
+    el.innerHTML = `<div class="pvt-compare info">Та одоогоор сонор сэрэмжийн сорил өгөөгүй байна. <a href="#" onclick="goto('attention');return false;" style="color:var(--gold);font-weight:700;">Сорил өгөх →</a></div>`;
     return;
   }
   const maxErr = Math.max(6, ...rows.map(r => r.score));
@@ -5809,6 +5854,168 @@ function printPsyReport() {
   w.document.close();
 }
 
+/* ================= СЭТГЭЛ ЗҮЙН ЗӨВЛӨМЖ (зурагт карт) =================
+   Агуулга нь сайтын тестүүдийн нотолгоонд суурилсан зөвлөмжүүдээс (ДЭМБ, CBT, CBT-I, PFA) энгийн хэлбэрээр.
+   Зургууд нь Mil-Care-д зориулж кодоор зурсан эх бүтээл (зохиогчийн эрхийн асуудалгүй). */
+const TP_C = { deep:'#0D3B46', teal:'#0A677A', mint:'#CFE6E1', mist:'#EDF3F2', sand:'#F3E7D3', sun:'#F2B544', coral:'#E58B6D', skin:'#E9B98F', hair:'#2E2A28', sage:'#7FB59B', night:'#1E3550', lav:'#B9B4E0', white:'#FFFFFF' };
+/* Энгийн хүний дүрс: x,y = хөлний доод цэг */
+function tpPerson(x, y, o = {}) {
+  const c = o.shirt || TP_C.teal, s = o.scale || 1, arm = o.arm || 'down';
+  const arms = arm === 'up' ? `<path d="M-14 -58 L-30 -86 M14 -58 L30 -86" stroke="${c}" stroke-width="9" stroke-linecap="round"/>`
+    : arm === 'chest' ? `<path d="M-14 -58 Q-6 -46 2 -60 M14 -58 Q6 -46 -2 -60" stroke="${c}" stroke-width="9" stroke-linecap="round" fill="none"/>`
+    : arm === 'wave' ? `<path d="M-14 -58 L-24 -34 M14 -58 L30 -84" stroke="${c}" stroke-width="9" stroke-linecap="round"/>`
+    : arm === 'write' ? `<path d="M-14 -58 L-6 -36 L14 -38 M14 -58 L22 -40" stroke="${c}" stroke-width="9" stroke-linecap="round" fill="none"/>`
+    : `<path d="M-14 -58 L-22 -30 M14 -58 L22 -30" stroke="${c}" stroke-width="9" stroke-linecap="round"/>`;
+  const legs = o.sit ? `<path d="M-8 -26 L-8 -14 L14 -14 L14 0 M8 -26 L8 -14 L28 -14 L28 0" stroke="${TP_C.deep}" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`
+    : `<path d="M-7 -26 L-9 0 M7 -26 L9 0" stroke="${TP_C.deep}" stroke-width="9" stroke-linecap="round"/>`;
+  const face = o.eyes === 'closed' ? `<path d="M-7 -82 q3 3 6 0 M3 -82 q3 3 6 0" stroke="${TP_C.deep}" stroke-width="2" fill="none" stroke-linecap="round"/>`
+    : `<circle cx="-5" cy="-82" r="1.8" fill="${TP_C.deep}"/><circle cx="5" cy="-82" r="1.8" fill="${TP_C.deep}"/>`;
+  const mouth = o.mouth === 'o' ? `<ellipse cx="0" cy="-74" rx="3" ry="3.5" fill="${TP_C.deep}"/>` : o.mouth === 'flat' ? `<path d="M-4 -74 h8" stroke="${TP_C.deep}" stroke-width="2" stroke-linecap="round"/>` : `<path d="M-5 -75 q5 5 10 0" stroke="${TP_C.deep}" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+  return `<g transform="translate(${x} ${y}) scale(${s})">${legs}<rect x="-16" y="-64" width="32" height="42" rx="13" fill="${c}"/>${arms}
+    <circle cx="0" cy="-82" r="16" fill="${TP_C.skin}"/><path d="M-16 -86 q2 -16 16 -16 q14 0 16 14 q-10 -6 -32 2z" fill="${o.hairc || TP_C.hair}"/>${face}${mouth}</g>`;
+}
+function tpSvg(bg, inner, label) { return `<svg viewBox="0 0 320 180" role="img" aria-label="${label}" preserveAspectRatio="xMidYMid slice"><rect width="320" height="180" fill="${bg}"/>${inner}</svg>`; }
+const TP_SCENES = {
+  breath: () => tpSvg(TP_C.mist, `<circle cx="215" cy="88" r="62" fill="${TP_C.mint}"/><circle cx="215" cy="88" r="44" fill="#B5DAD2"/><circle cx="215" cy="88" r="26" fill="${TP_C.teal}" opacity=".85"/>
+    <text x="215" y="93" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">4 · 6</text>
+    <path d="M70 70 q20 -14 40 0" stroke="${TP_C.teal}" stroke-width="3" fill="none" stroke-linecap="round" opacity=".6"/><path d="M64 56 q26 -18 52 0" stroke="${TP_C.teal}" stroke-width="3" fill="none" stroke-linecap="round" opacity=".35"/>
+    <rect x="0" y="160" width="320" height="20" fill="#DCEBE7"/>${tpPerson(90, 165, { eyes:'closed', arm:'chest', sit:false })}`, 'Удаан амьсгалж буй хүн'),
+  ground: () => tpSvg('#EEF2F8', `<rect x="0" y="150" width="320" height="30" fill="#D9E3EF"/>
+    ${[['👁',162,'5'],['✋',198,'4'],['👂',234,'3'],['👃',270,'2'],['👅',306,'1']].map(([e,x,n]) => `<circle cx="${x - 8}" cy="54" r="16" fill="#fff"/><text x="${x - 8}" y="60" text-anchor="middle" font-size="15">${e}</text><text x="${x - 8}" y="88" text-anchor="middle" font-size="16" font-weight="800" fill="${TP_C.deep}">${n}</text>`).join('')}
+    <text x="226" y="122" text-anchor="middle" font-size="11" font-weight="700" fill="${TP_C.teal}">хар · мэдэр · сонс · үнэрт · амт</text>${tpPerson(90, 160, { arm:'down' })}`, 'Мэдрэхүйгээрээ одоо цагт буцаж ирэх'),
+  muscle: () => tpSvg('#F4EFE6', `<rect x="0" y="152" width="320" height="28" fill="#E8DDCB"/>
+    <rect x="150" y="120" width="140" height="34" rx="14" fill="${TP_C.sand}"/><path d="M210 60 q14 -18 28 0 M224 42 v-14 M202 46 l-10 -10 M246 46 l10 -10" stroke="${TP_C.coral}" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <text x="224" y="96" text-anchor="middle" font-size="12" font-weight="700" fill="${TP_C.deep}">чангал 5 сек → сулла</text>${tpPerson(92, 156, { arm:'up', eyes:'closed', mouth:'flat' })}`, 'Булчингаа чангалж сулруулах'),
+  sleep: () => tpSvg(TP_C.night, `<circle cx="262" cy="42" r="20" fill="#F6E7B0"/><circle cx="272" cy="36" r="18" fill="${TP_C.night}"/>
+    ${[[40,30],[90,52],[160,24],[210,70],[120,90]].map(([x,y]) => `<circle cx="${x}" cy="${y}" r="1.8" fill="#fff" opacity=".8"/>`).join('')}
+    <rect x="40" y="118" width="240" height="40" rx="10" fill="#3B5878"/><rect x="40" y="104" width="64" height="30" rx="12" fill="#E7ECF4"/><rect x="96" y="112" width="184" height="30" rx="12" fill="${TP_C.lav}"/>
+    <circle cx="80" cy="112" r="15" fill="${TP_C.skin}"/><path d="M73 112 q3 3 6 0 M83 112 q3 3 6 0" stroke="${TP_C.deep}" stroke-width="2" fill="none"/>
+    <text x="118" y="96" font-size="18" font-weight="800" fill="#fff" opacity=".85">z</text><text x="134" y="80" font-size="14" font-weight="800" fill="#fff" opacity=".6">z</text>
+    <rect x="40" y="158" width="10" height="16" fill="#3B5878"/><rect x="270" y="158" width="10" height="16" fill="#3B5878"/>`, 'Тайван унтаж буй хүн'),
+  worry: () => tpSvg('#F3F0F8', `<rect x="0" y="152" width="320" height="28" fill="#E4DEEF"/>
+    <rect x="168" y="36" width="122" height="96" rx="10" fill="#fff" stroke="#CFC8E3" stroke-width="2"/><path d="M229 44 v80" stroke="#CFC8E3" stroke-width="2"/>
+    <text x="198" y="58" text-anchor="middle" font-size="10" font-weight="700" fill="${TP_C.teal}">Чадна</text><text x="260" y="58" text-anchor="middle" font-size="10" font-weight="700" fill="#8A6FB0">Чадахгүй</text>
+    ${[72,88,104].map(y => `<path d="M182 ${y} h32 M244 ${y} h32" stroke="#D8D2E8" stroke-width="4" stroke-linecap="round"/>`).join('')}
+    <circle cx="198" cy="72" r="5" fill="${TP_C.teal}"/>${tpPerson(96, 156, { arm:'write' })}`, 'Санаа зовнилоо хоёр ангилж бичих'),
+  move: () => tpSvg('#EAF4EE', `<circle cx="262" cy="44" r="22" fill="${TP_C.sun}"/><path d="M0 150 q80 -30 160 -6 q80 24 160 -10 v46 H0z" fill="#CFE5D6"/>
+    <path d="M200 126 l10 -40 l10 40z M236 134 l8 -30 l8 30z" fill="${TP_C.sage}"/><rect x="208" y="126" width="4" height="10" fill="#8B6B4A"/>
+    ${tpPerson(110, 160, { arm:'wave', shirt:TP_C.coral })}<path d="M140 100 l14 -6 l-4 12" stroke="${TP_C.teal}" stroke-width="3" fill="none" stroke-linecap="round"/>`, 'Гадаа алхаж буй хүн'),
+  anger: () => tpSvg('#FBEFEA', `<rect x="0" y="152" width="320" height="28" fill="#F1DED6"/>
+    <rect x="178" y="40" width="104" height="44" rx="22" fill="${TP_C.coral}"/><text x="230" y="68" text-anchor="middle" font-size="16" font-weight="800" fill="#fff">ЗОГС</text>
+    <path d="M190 104 h80" stroke="${TP_C.teal}" stroke-width="4" stroke-dasharray="2 10" stroke-linecap="round"/><text x="230" y="130" text-anchor="middle" font-size="12" font-weight="700" fill="${TP_C.deep}">1 … 10</text>
+    ${tpPerson(96, 156, { arm:'chest', mouth:'flat' })}`, 'Уурлахаасаа өмнө зогсох'),
+  support: () => tpSvg('#EEF3F7', `<rect x="0" y="152" width="320" height="28" fill="#DCE6EE"/>
+    <path d="M150 64 q10 -16 20 0 q10 -16 20 0 q0 14 -20 26 q-20 -12 -20 -26z" fill="${TP_C.coral}"/>
+    ${tpPerson(110, 156, { arm:'down', shirt:TP_C.teal })}${tpPerson(222, 156, { arm:'wave', shirt:'#8A6FB0', hairc:'#5B3A2A' })}
+    <path d="M128 120 q48 22 76 0" stroke="${TP_C.deep}" stroke-width="3" fill="none" stroke-dasharray="4 6"/>`, 'Хоёр хүн ярилцаж буй'),
+  burnout: () => tpSvg('#F6F1E8', `<rect x="0" y="152" width="320" height="28" fill="#EADFCB"/>
+    <rect x="178" y="34" width="44" height="76" rx="8" fill="#fff" stroke="${TP_C.deep}" stroke-width="3"/><rect x="186" y="74" width="28" height="28" rx="3" fill="${TP_C.sage}"/><rect x="186" y="58" width="28" height="12" rx="3" fill="${TP_C.sage}" opacity=".6"/><rect x="194" y="28" width="12" height="8" rx="2" fill="${TP_C.deep}"/>
+    <text x="250" y="70" font-size="12" font-weight="700" fill="${TP_C.deep}">Ажил</text><text x="250" y="96" font-size="12" font-weight="700" fill="${TP_C.teal}">Амралт</text>
+    <path d="M228 66 h16 M228 92 h16" stroke="${TP_C.deep}" stroke-width="2"/>${tpPerson(96, 156, { sit:true, eyes:'closed' })}`, 'Эрч хүчээ цэнэглэх'),
+  grat: () => tpSvg('#FFF6E6', `<rect x="0" y="152" width="320" height="28" fill="#F5E6C8"/>
+    <rect x="170" y="40" width="112" height="92" rx="8" fill="#fff" stroke="#EBD5A6" stroke-width="2"/>
+    ${[1,2,3].map(i => `<circle cx="186" cy="${52 + i * 20}" r="7" fill="${TP_C.sun}"/><text x="186" y="${56 + i * 20}" text-anchor="middle" font-size="9" font-weight="800" fill="#fff">${i}</text><path d="M200 ${52 + i * 20} h66" stroke="#EADFC9" stroke-width="5" stroke-linecap="round"/>`).join('')}
+    ${tpPerson(96, 156, { arm:'write', shirt:TP_C.sage })}`, 'Талархах гурван зүйлээ бичих'),
+};
+/* Алхмын жижиг дүрсүүд (24×24) */
+const TP_IC = {
+  nose:'<path d="M12 4c-1 5-4 8-4 11a4 4 0 0 0 8 0c0-3-3-6-4-11z"/>', mouth:'<path d="M5 12q7 6 14 0"/><path d="M5 12q7-3 14 0"/>', timer:'<circle cx="12" cy="13" r="7"/><path d="M12 13V9M10 3h4"/>',
+  repeat:'<path d="M4 10a8 8 0 0 1 14-4l2 2M20 14a8 8 0 0 1-14 4l-2-2"/><path d="M20 4v4h-4M4 20v-4h4"/>', eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>',
+  hand:'<path d="M8 13V5a1.5 1.5 0 0 1 3 0v6M11 11V4a1.5 1.5 0 0 1 3 0v7M14 11V6a1.5 1.5 0 0 1 3 0v8a6 6 0 0 1-6 6h-1a5 5 0 0 1-4-2l-3-4a1.5 1.5 0 0 1 2-2l2 2"/>',
+  ear:'<path d="M7 9a5 5 0 0 1 10 0c0 4-4 4-4 8a2.5 2.5 0 0 1-5 0"/><path d="M10 10a2 2 0 0 1 4 0"/>', smell:'<path d="M6 8q2-3 0-6M12 8q2-3 0-6M18 8q2-3 0-6"/><path d="M4 12h16l-2 8H6z"/>',
+  taste:'<path d="M8 3h8v6a4 4 0 0 1-8 0z"/><path d="M12 13v8M8 21h8"/>', muscle:'<path d="M4 14c2-6 6-8 9-6l3-3 2 2-3 3c2 3 0 7-6 9z"/>', moon:'<path d="M20 14A8 8 0 1 1 10 4a6 6 0 0 0 10 10z"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>', phone:'<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>', cup:'<path d="M4 8h12v6a5 5 0 0 1-10 0z"/><path d="M16 10h2a2 2 0 0 1 0 4h-2"/>',
+  bed:'<path d="M3 18V8M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="2"/>', pen:'<path d="M4 20l4-1 11-11-3-3L5 16z"/>', list:'<path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/>',
+  walk:'<circle cx="13" cy="4" r="2"/><path d="M10 21l2-6-3-3 1-4 4 3 3 1M9 13l-3 2"/>', people:'<circle cx="8" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M2 20a6 6 0 0 1 12 0M14 20a4.5 4.5 0 0 1 8 0"/>',
+  heart:'<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>', pause:'<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M5 19l1.5-1.5M17.5 6.5L19 5"/>', check:'<path d="M4 12l5 5L20 6"/>',
+  calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>', chat:'<path d="M4 5h16v10H9l-5 4z"/>', battery:'<rect x="2" y="7" width="17" height="10" rx="2"/><path d="M22 11v2"/><rect x="5" y="10" width="6" height="4" fill="currentColor"/>',
+  shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>', star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>', phonecall:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>',
+};
+function tpIcon(k) { return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${TP_IC[k] || TP_IC.check}</svg>`; }
+const TIPS = [
+  { id:'breath', cat:'stress', title:'Удаан амьсгалын дасгал', short:'Сэтгэл түгшиж, бухимдсан үед биеэ 2 минутад тайвшруулах.', min:2, interactive:true,
+    why:'Амьсгаагаа удаан гаргахад зүрхний цохилт удааширч, бие "аюулгүй байна" гэсэн дохио авдаг. Хаана ч, хэнд ч мэдэгдэлгүй хийж болно.',
+    steps:[['nose','Хамраараа 4 секунд амьсгаа ав','Гэдэс тань бага зэрэг түрэгдэх ёстой, мөр бүү өргө.'],['mouth','Амаараа 6 секунд аажмаар гарга','Лаа үлээх гэж байгаа мэт уруулаа бага зэрэг жимийж гаргана.'],['repeat','5–10 удаа давт','Нийтдээ 1–2 минут. Толгой эргэвэл хэвийн амьсгалдаа шилжээрэй.'],['timer','Өдөрт 2–3 удаа дадлага хий','Тайван үедээ сурсан арга стресстэй үед илүү сайн ажилладаг.']] },
+  { id:'ground', cat:'stress', title:'5-4-3-2-1 дасгал', short:'Айдас, түгшүүр, хүнд дурсамж хүчтэй болоход одоо цагтаа буцаж ирэх.', min:3,
+    why:'Мэдрэхүйгээ ээлжлэн ашиглахад анхаарал санаа зовнилоос салж, одоогийн бодит орчин руу шилждэг.',
+    steps:[['eye','Харагдаж буй 5 зүйлийг нэрлэ','Эргэн тойрноо хараад чимээгүй эсвэл чангаар нэрлэ.'],['hand','Мэдрэгдэж буй 4 зүйл','Хувцас, сандал, ширээ, хөлийн доорх шал…'],['ear','Сонсогдож буй 3 дуу','Алсын машин, сэнс, өөрийн амьсгал…'],['smell','Үнэртэж буй 2 зүйл','Мэдрэгдэхгүй бол дуртай үнэрээ санаарай.'],['taste','Амтлагдаж буй 1 зүйл','Ус балгах эсвэл амандаа байгаа амтыг мэдэр.']] },
+  { id:'muscle', cat:'stress', title:'Булчин сулруулах дасгал', short:'Биед хуримтлагдсан хурцадмал байдлыг 10 минутад тайлах.', min:10,
+    why:'Стрессийн үед булчин өөрийн мэдэлгүй чангардаг. Зориуд чангалж, дараа нь сулруулахад бие тайвширч, нойр хүрэхэд ч тусалдаг.',
+    steps:[['muscle','Нэг хэсгийн булчингаа 5 секунд чангал','Гараа нударга болгох, мөрөө чих рүү өргөх гэх мэт.'],['pause','10 секунд бүрэн сулла','Сулрах мэдрэмжийг анзаар.'],['repeat','Хөлөөс толгой хүртэл ээлжлэн','Хөл, гуя, гэдэс, гар, мөр, нүүр.'],['moon','Унтахын өмнө хийвэл илүү үр дүнтэй','Өвдөж буй хэсгийг хүчээр бүү чангал.']] },
+  { id:'sleep', cat:'sleep', title:'Сайн нойрны 6 дүрэм', short:'Нойргүйдэл, шөнө сэрэх, өглөө ядарч босохоос сэргийлэх.', min:5,
+    why:'Нойрны дэглэм нь сэтгэл санаа, анхаарал, дархлааны үндэс. Эдгээр дүрэм нь нойргүйдлийн эмчилгээний гол хэсэг юм.',
+    steps:[['clock','Өдөр бүр нэг цагт бос','Амралтын өдөр ч 1 цагаас илүү өөрчлөхгүй.'],['bed','Орондоо зөвхөн унт','Орон дээр утас, ажил, кино үзэхгүй.'],['timer','20 минутад унтаж чадахгүй бол бос','Бүдэг гэрэлд тайван зүйл хийгээд нойр хүрэхэд буцаж хэвт.'],['cup','Үдээс хойш кофе, энергийн ундаа уухгүй','Архи ч нойрны чанарыг муутгадаг.'],['phone','Унтахаас 1 цагийн өмнө дэлгэцээ унтраа','Гэрэл, мэдээ тархийг сэргээдэг.'],['sun','Өглөө гэрэлд гар, өдөр бага унт','Өдрийн нойр 20–30 минутаас хэтрэхгүй.']] },
+  { id:'worry', cat:'mood', title:'Санаа зовнилоо цэгцлэх', short:'Нэг бодол толгойд эргэлдээд салахгүй байхад.', min:15,
+    why:'Санаа зовнилыг цаасан дээр буулгахад тархи "мартчих вий" гэж барьж байхаа больдог. Өөрчилж чадах, чадахгүйгээр ангилах нь хүчээ зөв зүйлд зарцуулахад тусална.',
+    steps:[['pen','Санаа зовоож буй бүхнээ бич','Жижиг, том гэлгүй бүгдийг нь.'],['list','"Өөрчилж чадна" ба "Чадахгүй" гэж хоёр хуваа','Чадах зүйлд нэг жижиг алхам төлөвлө.'],['clock','Өдөрт 15 минутын "санаа зовох цаг" тогтоо','Бусад үед бодол төрвөл "цагтаа бодъё" гэж хойшлуул.'],['check','Бодлоо баримтаар шалга','"Үүнийг юу баталж байна, юу үгүйсгэж байна?" гэж өөрөөсөө асуу.']] },
+  { id:'move', cat:'mood', title:'Жижиг алхмаар эхлэх', short:'Юу ч хийх хүсэлгүй, сэтгэл санаа унасан үед.', min:20,
+    why:'Сэтгэл санаа сайжрахыг хүлээхээс илүү эхлээд жижиг зүйл хийх нь сэтгэл санааг сайжруулдаг. Энэ бол сэтгэл гутралын үед хамгийн нотолгоотой аргуудын нэг.',
+    steps:[['list','Өнөөдөр хийх 1–2 жижиг зүйл сонго','Богино алхалт, найз руу залгах, дуртай хоол хийх.'],['walk','20–30 минут гадаа алх','Өглөөний гэрэл ялангуяа тустай.'],['people','Нэг хүнтэй уулз эсвэл ярь','Богино ч гэсэн харилцаа сэтгэл санааг дэмждэг.'],['check','Хийсэн бүрээ тэмдэглэ','Жижиг амжилт ч тоологдоно.']] },
+  { id:'anger', cat:'relation', title:'Уураа зохицуулах', short:'Огцом үг хэлж, хожим харамсахаас сэргийлэх.', min:2,
+    why:'Уур хүрэх үед бодох чадвар түр буурдаг. Хэдхэн секунд зогсоход хариу үйлдлээ сонгох боломж гардаг.',
+    steps:[['pause','Эхний шинжийг тань','Зүрх хүчтэй цохилох, дуу чангарах, нударга зангидах.'],['timer','Зогсоод 10 хүртэл тоол','Шаардлагатай бол тухайн газраас түр гар.'],['nose','Удаан амьсгал ав','4 секунд авч, 6 секунд гарга.'],['chat','"Би…" гэж эхэлж ярь','"Би … үед бухимдаж байна, учир нь …" гэж тайван хэл.']] },
+  { id:'support', cat:'relation', title:'Хэцүү үед дэмжлэг хүсэх', short:'Ганцаараа даах гэж хичээхгүй байх, хэнд хэрхэн хандах.', min:5,
+    why:'Ойр дотны хүмүүсийн дэмжлэг бол хэцүү үеийг даван туулах хамгийн хүчтэй хамгаалалт. Тусламж хүсэх нь сул дорой байдал биш.',
+    steps:[['people','Итгэмжит 1–2 хүнээ тодорхойл','Найз, гэр бүл, хамт ажиллагч.'],['chat','Энгийнээр эхэл','"Сүүлийн үед надад хэцүү байна, ярилцаж болох уу?"'],['heart','Бусдыг ч асуу','"Чи сайн уу?" гэх энгийн асуулт хүний амь аварч болно.'],['phonecall','Яаралтай үед 103','Өөрийгөө гэмтээх бодол төрвөл шууд залга.']] },
+  { id:'burnout', cat:'work', title:'Ажлаас халшрахаас сэргийлэх', short:'Ядаргаа хуримтлагдаж, ажилдаа дургүй болж эхэлсэн үед.', min:10,
+    why:'Ажлын ачаалал ба амралтын тэнцвэр алдагдахад ядаргаа хуримтлагддаг. Жижиг дадлууд энэ тэнцвэрийг сэргээнэ.',
+    steps:[['list','Ажлаа "чухал" ба "яаралтай"-гаар эрэмбэл','Заавал биш ажлыг хойшлуул эсвэл хуваарил.'],['battery','Ажлын дараа "унтраах" цаг тогтоо','Тодорхой цагаас хойш ажлын мессеж шалгахгүй.'],['heart','Өдөрт 20–30 минут өөртөө зарцуул','Ажилтай огт холбоогүй зүйл.'],['chat','Ачааллаа удирдлагатайгаа ярь','Санал болгох хэлбэрээр, тодорхой.']] },
+  { id:'grat', cat:'mood', title:'Талархлын тэмдэглэл', short:'Өдөр бүр 3 минут — сэтгэл ханамжаа нэмэгдүүлэх.', min:3,
+    why:'Сайн зүйлсийг ухамсартайгаар тэмдэглэх нь сэтгэл ханамжийг нэмэгдүүлж, сөрөг бодлыг тэнцвэржүүлдэг нь судалгаагаар батлагдсан.',
+    steps:[['moon','Унтахын өмнө 3 минут гарга','Өдөр бүр нэг цагт.'],['pen','Сайн болсон 3 зүйл бич','Жижиг ч хамаагүй: халуун цай, найзын мессеж.'],['star','"Яагаад болсон бэ?" гэж нэм','Өөрийн оролцоог анзаар.'],['calendar','2 долоо хоног тасралтгүй хий','Өөрчлөлтийг дараа нь эргэж уншаарай.']] },
+];
+const TIP_CATS = [['all','Бүгд'],['stress','Стресс, түгшүүр'],['sleep','Нойр'],['mood','Сэтгэл санаа'],['relation','Харилцаа'],['work','Ажил']];
+const TIP_TONE = { stress:'#0A677A', sleep:'#3B5878', mood:'#3F7A5E', relation:'#B4553A', work:'#9A5F0E' };
+function tipCard(t) {
+  const cat = TIP_CATS.find(c => c[0] === t.cat)[1];
+  return `<button class="tp-card" onclick="openTip('${t.id}')" aria-label="${t.title}">
+    <div class="tp-art">${TP_SCENES[t.id]()}</div>
+    <div class="tp-body"><span class="tp-cat" style="color:${TIP_TONE[t.cat]}">${cat}</span>
+      <h4>${t.title}</h4><p>${t.short}</p><span class="tp-min">${tpIcon('clock')}${t.min} минут</span></div></button>`;
+}
+let tipFilter = 'all';
+function renderTips() {
+  const chips = document.getElementById('tp-chips'), grid = document.getElementById('tp-grid');
+  if (!grid) return;
+  chips.innerHTML = TIP_CATS.map(([k, l]) => `<button class="tp-chip${tipFilter === k ? ' on' : ''}" onclick="tipFilter='${k}';renderTips()">${l}</button>`).join('');
+  grid.innerHTML = TIPS.filter(t => tipFilter === 'all' || t.cat === tipFilter).map(tipCard).join('');
+}
+function renderHomeTips() {
+  const el = document.getElementById('home-tips'); if (!el) return;
+  const d = Math.floor(Date.now() / 864e5), pick = [0, 1, 2].map(i => TIPS[(d + i * 3) % TIPS.length]);
+  el.innerHTML = pick.map(tipCard).join('');
+}
+let tpBreathTimer = null;
+function openTip(id) {
+  const t = TIPS.find(x => x.id === id); if (!t) return;
+  hrOpen(`<div class="tp-modal">
+    <div class="tp-hero">${TP_SCENES[t.id]()}</div>
+    <h3 class="tp-h">${t.title}</h3><p class="tp-why">${t.why}</p>
+    ${t.interactive ? `<div class="tp-breath"><div class="tp-ring" id="tp-ring"><span id="tp-phase">Бэлэн үү?</span></div>
+      <button class="connect-btn" style="width:auto;padding:.55rem 1.3rem" id="tp-bbtn" onclick="tpBreath()">Дасгал эхлүүлэх</button></div>` : ''}
+    <h4 class="tp-sh">Хэрхэн хийх вэ</h4>
+    <ol class="tp-steps">${t.steps.map(([ic, h, d], i) => `<li><span class="tp-ic" style="color:${TIP_TONE[t.cat]}">${tpIcon(ic)}<b>${i + 1}</b></span><div><strong>${h}</strong><p>${d}</p></div></li>`).join('')}</ol>
+    <div class="tp-note">Эдгээр нь өөрийгөө дэмжих аргууд. Байдал тань 2 долоо хоногоос удаан үргэлжилж, өдөр тутмын амьдралд саад болж байвал сэтгэл зүйчтэй уулзаарай. Яаралтай үед 103.</div>
+  </div><div class="modal-actions"><button class="modal-close" onclick="tpStop();closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem" onclick="tpStop();closeModal();goto('tests')">Тест бөглөх</button></div>`);
+}
+function tpStop() { if (tpBreathTimer) { clearTimeout(tpBreathTimer); tpBreathTimer = null; } }
+function tpBreath() {
+  const ring = document.getElementById('tp-ring'), ph = document.getElementById('tp-phase'), btn = document.getElementById('tp-bbtn');
+  if (!ring) return; tpStop();
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let round = 0; btn.textContent = 'Дахин эхлүүлэх';
+  const step = () => {
+    if (!document.getElementById('tp-ring') || !document.getElementById('modal-overlay').classList.contains('open')) return tpStop();
+    if (round >= 6) { ph.textContent = 'Сайн байна!'; ring.className = 'tp-ring'; return; }
+    ring.style.transitionDuration = reduce ? '0s' : '4s'; ring.className = 'tp-ring in'; ph.textContent = 'Амьсгаа ав… 4';
+    tpBreathTimer = setTimeout(() => { ring.style.transitionDuration = reduce ? '0s' : '6s'; ring.className = 'tp-ring out'; ph.textContent = 'Аажмаар гарга… 6';
+      tpBreathTimer = setTimeout(() => { round++; step(); }, 6000); }, 4000);
+  };
+  step();
+}
+
+try { renderHomeTips(); } catch (e) { console.error(e); }
 (function initPvt() {
   const ov = document.getElementById('pvt-overlay');
   if (!ov) return;

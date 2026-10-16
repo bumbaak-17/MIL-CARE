@@ -9,6 +9,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <style>
+  html:not(.fb-on) .fb-only{display:none !important;}
+  html.fb-on .g-only{display:none !important;}
   :root{
     /* Дизайны токен: гүн, итгэлтэй "signal navy" үндсэн өнгө, хүрлийн акцент,
        монгол кирилл (Өө/Үү-г оролцуулаад) бүрэн дэмждэг Inter фонт */
@@ -788,16 +790,16 @@
 
     <div id="ob-step-auth">
       <p class="ob-step-title">1. Нэвтрэх</p>
-      <p class="ob-step-sub">Аюулгүй, найдвартай байлгах үүднээс баталгаажсан Google эсвэл Facebook бүртгэлээр нэвтэрнэ.</p>
+      <p class="ob-step-sub g-only">Аюулгүй, найдвартай байлгах үүднээс баталгаажсан Google бүртгэлээр нэвтэрнэ.</p><p class="ob-step-sub fb-only">Аюулгүй, найдвартай байлгах үүднээс баталгаажсан Google эсвэл Facebook бүртгэлээр нэвтэрнэ.</p>
       <button type="button" onclick="obGoogleAuth()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:.6rem;border:1px solid var(--line);border-radius:12px;padding:.8rem .9rem;background:#fff;color:#3c4043;font-family:inherit;font-size:.97rem;font-weight:600;cursor:pointer;margin-bottom:.6rem;">
         <svg width="19" height="19" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.9-2.26 5.36-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
         Google (Gmail) бүртгэлээр нэвтрэх
       </button>
-      <button type="button" onclick="obFacebookAuth()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:.6rem;border:1px solid #1877F2;border-radius:12px;padding:.8rem .9rem;background:#1877F2;color:#fff;font-family:inherit;font-size:.97rem;font-weight:600;cursor:pointer;margin-bottom:1rem;">
+      <button type="button" class="fb-only" onclick="obFacebookAuth()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:.6rem;border:1px solid #1877F2;border-radius:12px;padding:.8rem .9rem;background:#1877F2;color:#fff;font-family:inherit;font-size:.97rem;font-weight:600;cursor:pointer;margin-bottom:1rem;">
         <svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#fff"/><path fill="#1877F2" d="M13.4 24v-8.4h2.8l.4-3.3h-3.2v-2.1c0-.95.27-1.6 1.63-1.6h1.74V5.65a23 23 0 0 0-2.54-.13c-2.52 0-4.24 1.54-4.24 4.36v2.42H7.17v3.3H10V24z"/></svg>
         Facebook бүртгэлээр нэвтрэх
       </button>
-      <p style="font-size:.76rem;color:var(--sub);text-align:center;margin:0;">Дараа удаа нэвтрэхдээ анх сонгосон товчоо (Google эсвэл Facebook) дарна уу — өөр товч дарвал тусдаа шинэ бүртгэл үүсч болно.</p>
+      <p class="g-only" style="font-size:.76rem;color:var(--sub);text-align:center;margin:0;">Нэвтэрсэн бүртгэл тань автоматаар хадгалагдана — дараа удаа нэвтрэхэд мөн адил товч дарахад л хангалттай.</p><p class="fb-only" style="font-size:.76rem;color:var(--sub);text-align:center;margin:0;">Дараа удаа нэвтрэхдээ анх сонгосон товчоо (Google эсвэл Facebook) дарна уу — өөр товч дарвал тусдаа шинэ бүртгэл үүсч болно.</p>
       <div id="ob-auth-msg" style="font-size:.82rem;margin-top:.9rem;text-align:center;"></div>
     </div>
 
@@ -1207,7 +1209,7 @@
 
         <div class="section-card" id="admin-login-card">
           <div class="section-head"><h3>Админ эрх</h3></div>
-          <p style="font-size:.85rem;color:var(--sub);margin:0;">Танд админ эрх байхгүй байна. Хэрэв та MIL-CARE-ийн админ мөн бол, өөрийн Google эсвэл Facebook бүртгэлээр нэвтэрсэн эсэхээ шалгаад дахин оролдоно уу — эрх нь автоматаар танигдана.</p>
+          <p style="font-size:.85rem;color:var(--sub);margin:0;">Танд админ эрх байхгүй байна. Хэрэв та MIL-CARE-ийн админ мөн бол, өөрийн <span class="g-only">Google</span><span class="fb-only">Google эсвэл Facebook</span> бүртгэлээр нэвтэрсэн эсэхээ шалгаад дахин оролдоно уу — эрх нь автоматаар танигдана.</p>
         </div>
 
         <div id="admin-panel" style="display:none;">
@@ -1585,7 +1587,7 @@ function renderAuthSection() {
   if (!el || !currentUser) return;
   el.innerHTML = `
     <div class="section-head"><h3>🔐 Нэвтэрсэн бүртгэл</h3></div>
-    <p style="font-size:.85rem;color:var(--sub);margin:0 0 1rem;">Та <b>${esc(currentUser.email || OAUTH_NAMES[currentUser.provider] || '—')}</b> ${currentUser.email && OAUTH_NAMES[currentUser.provider] ? '(' + OAUTH_NAMES[currentUser.provider] + ') ' : ''}бүртгэлээр нэвтэрсэн байна. Өөр утас, компьютер дээрээс ч мөн адил ${OAUTH_NAMES[currentUser.provider] || 'Google эсвэл Facebook'} товч дараад, энэ бүртгэлээрээ шууд нэвтэрч, өгөгдлөө үргэлжлүүлэн ашиглах боломжтой.</p>
+    <p style="font-size:.85rem;color:var(--sub);margin:0 0 1rem;">Та <b>${esc(currentUser.email || OAUTH_NAMES[currentUser.provider] || '—')}</b> ${currentUser.email && OAUTH_NAMES[currentUser.provider] ? '(' + OAUTH_NAMES[currentUser.provider] + ') ' : ''}бүртгэлээр нэвтэрсэн байна. Өөр утас, компьютер дээрээс ч мөн адил ${OAUTH_NAMES[currentUser.provider] || (FACEBOOK_LOGIN_ENABLED ? 'Google эсвэл Facebook' : 'Google')} товч дараад, энэ бүртгэлээрээ шууд нэвтэрч, өгөгдлөө үргэлжлүүлэн ашиглах боломжтой.</p>
     <button class="modal-close" onclick="confirmLogout()">Гарах</button>
   `;
 }
@@ -1682,6 +1684,9 @@ function obGotoBranchStep() {
   renderObBranch();
 }
 
+/* Facebook нэвтрэлт: Meta аппыг Live болгосны дараа true болгоно */
+const FACEBOOK_LOGIN_ENABLED = false;
+if (FACEBOOK_LOGIN_ENABLED) document.documentElement.classList.add('fb-on');
 const OAUTH_NAMES = { google:'Google', facebook:'Facebook' };
 async function obOAuth(provider) {
   const name = OAUTH_NAMES[provider] || provider;
@@ -1695,7 +1700,7 @@ async function obOAuth(provider) {
   // Амжилттай бол хөтөч тухайн үйлчилгээ рүү шилжинэ; буцаж ирэхэд session автоматаар тогтоно
 }
 function obGoogleAuth() { return obOAuth('google'); }
-function obFacebookAuth() { return obOAuth('facebook'); }
+function obFacebookAuth() { if (!FACEBOOK_LOGIN_ENABLED) return; return obOAuth('facebook'); }
 
 function renderObBranch() {
   const el = document.getElementById('ob-branch-grid');

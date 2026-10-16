@@ -788,12 +788,16 @@
 
     <div id="ob-step-auth">
       <p class="ob-step-title">1. Нэвтрэх</p>
-      <p class="ob-step-sub">Аюулгүй, найдвартай байлгах үүднээс зөвхөн баталгаажсан Google бүртгэлээр нэвтэрнэ.</p>
-      <button type="button" onclick="obGoogleAuth()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:.6rem;border:1px solid var(--line);border-radius:12px;padding:.8rem .9rem;background:#fff;color:#3c4043;font-family:inherit;font-size:.97rem;font-weight:600;cursor:pointer;margin-bottom:1rem;">
+      <p class="ob-step-sub">Аюулгүй, найдвартай байлгах үүднээс баталгаажсан Google эсвэл Facebook бүртгэлээр нэвтэрнэ.</p>
+      <button type="button" onclick="obGoogleAuth()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:.6rem;border:1px solid var(--line);border-radius:12px;padding:.8rem .9rem;background:#fff;color:#3c4043;font-family:inherit;font-size:.97rem;font-weight:600;cursor:pointer;margin-bottom:.6rem;">
         <svg width="19" height="19" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.9-2.26 5.36-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
         Google (Gmail) бүртгэлээр нэвтрэх
       </button>
-      <p style="font-size:.76rem;color:var(--sub);text-align:center;margin:0;">Нэвтэрсэн имэйл хаяг тань автоматаар хадгалагдана — дараа удаа нэвтрэхэд мөн адил товч дарахад л хангалттай.</p>
+      <button type="button" onclick="obFacebookAuth()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:.6rem;border:1px solid #1877F2;border-radius:12px;padding:.8rem .9rem;background:#1877F2;color:#fff;font-family:inherit;font-size:.97rem;font-weight:600;cursor:pointer;margin-bottom:1rem;">
+        <svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#fff"/><path fill="#1877F2" d="M13.4 24v-8.4h2.8l.4-3.3h-3.2v-2.1c0-.95.27-1.6 1.63-1.6h1.74V5.65a23 23 0 0 0-2.54-.13c-2.52 0-4.24 1.54-4.24 4.36v2.42H7.17v3.3H10V24z"/></svg>
+        Facebook бүртгэлээр нэвтрэх
+      </button>
+      <p style="font-size:.76rem;color:var(--sub);text-align:center;margin:0;">Дараа удаа нэвтрэхдээ анх сонгосон товчоо (Google эсвэл Facebook) дарна уу — өөр товч дарвал тусдаа шинэ бүртгэл үүсч болно.</p>
       <div id="ob-auth-msg" style="font-size:.82rem;margin-top:.9rem;text-align:center;"></div>
     </div>
 
@@ -1203,7 +1207,7 @@
 
         <div class="section-card" id="admin-login-card">
           <div class="section-head"><h3>Админ эрх</h3></div>
-          <p style="font-size:.85rem;color:var(--sub);margin:0;">Танд админ эрх байхгүй байна. Хэрэв та MIL-CARE-ийн админ мөн бол, өөрийн Google бүртгэлээр нэвтэрсэн эсэхээ шалгаад дахин оролдоно уу — эрх нь автоматаар танигдана.</p>
+          <p style="font-size:.85rem;color:var(--sub);margin:0;">Танд админ эрх байхгүй байна. Хэрэв та MIL-CARE-ийн админ мөн бол, өөрийн Google эсвэл Facebook бүртгэлээр нэвтэрсэн эсэхээ шалгаад дахин оролдоно уу — эрх нь автоматаар танигдана.</p>
         </div>
 
         <div id="admin-panel" style="display:none;">
@@ -1211,7 +1215,7 @@
           <div class="section-card" id="admin-registered-users-section" style="display:none;">
             <button class="modal-close" style="margin-bottom:1rem;" onclick="hideAdminUsersView()">← Буцах</button>
             <div class="section-head"><h3>📧 Хэрэглэгч (зөвхөн админ)</h3></div>
-            <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Имэйл/нууц үгээр бүртгүүлсэн хэрэглэгчдийн жагсаалт.</p>
+            <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Google болон Facebook бүртгэлээр нэвтэрсэн хэрэглэгчдийн жагсаалт — нэвтэрсэн аргаар нь тус тусад нь ангилсан.</p>
             <div id="registered-users-list"></div>
           </div>
           <div class="section-card" id="admin-test-results-section" style="display:none;">
@@ -1555,22 +1559,23 @@ async function ensureUser() {
   }
   const uid = session.user.id;
   const userEmail = session.user.email || null;
-  const userIsAnon = !userEmail; // имэйлээр баталгаажаагүй бол нэрээ нуусан гэж үзнэ
+  const userIsAnon = (typeof session.user.is_anonymous === 'boolean') ? session.user.is_anonymous : !userEmail; // Google/Facebook-ээр нэвтэрсэн бол байнгын бүртгэл
+  const userProvider = (session.user.app_metadata && session.user.app_metadata.provider) || null;
 
   // 2. Тухайн auth хэрэглэгчид харгалзах users мөр байгаа эсэхийг шалгах
   const { data: existing, error: selErr } = await sb.from('users').select('*').eq('id', uid).maybeSingle();
   if (selErr) { console.error('users select error:', selErr); }
 
   if (existing) {
-    currentUser = { id: uid, handle: existing.anon_handle, branch: existing.branch, personnel_type: existing.personnel_type, createdAt: existing.created_at, email: userEmail, isAnonymous: userIsAnon };
+    currentUser = { id: uid, handle: existing.anon_handle, branch: existing.branch, personnel_type: existing.personnel_type, createdAt: existing.created_at, email: userEmail, provider: userProvider, isAnonymous: userIsAnon };
     return;
   }
 
   // 3. Байхгүй бол шинэ, нэрээ нуусан профайл үүсгэх (id нь auth.uid()-тэй яг адилхан)
   const handle = randomHandle();
   const { data: inserted, error: insErr } = await sb.from('users').insert({ id: uid, anon_handle: handle }).select().single();
-  if (insErr) { console.error('users insert error:', insErr); currentUser = { id: uid, handle, email: userEmail, isAnonymous: userIsAnon }; return; }
-  currentUser = { id: uid, handle: inserted.anon_handle, branch: inserted.branch, personnel_type: inserted.personnel_type, createdAt: inserted.created_at, email: userEmail, isAnonymous: userIsAnon };
+  if (insErr) { console.error('users insert error:', insErr); currentUser = { id: uid, handle, email: userEmail, provider: userProvider, isAnonymous: userIsAnon }; return; }
+  currentUser = { id: uid, handle: inserted.anon_handle, branch: inserted.branch, personnel_type: inserted.personnel_type, createdAt: inserted.created_at, email: userEmail, provider: userProvider, isAnonymous: userIsAnon };
 }
 /* ================= ИМЭЙЛ БҮРТГЭЛ (олон төхөөрөмж дээр өгөгдлөө үргэлжлүүлэн ашиглах) =================
    Anonymous хэрэглэгч имэйл/нууц үг холбовол (updateUser) яг ижил user_id хэвээр үлдэж,
@@ -1580,7 +1585,7 @@ function renderAuthSection() {
   if (!el || !currentUser) return;
   el.innerHTML = `
     <div class="section-head"><h3>🔐 Нэвтэрсэн бүртгэл</h3></div>
-    <p style="font-size:.85rem;color:var(--sub);margin:0 0 1rem;">Та <b>${currentUser.email || '—'}</b> бүртгэлээр нэвтэрсэн байна. Өөр утас, компьютер дээрээс ч мөн адил Google товч дараад, энэ бүртгэлээрээ шууд нэвтэрч, өгөгдлөө үргэлжлүүлэн ашиглах боломжтой.</p>
+    <p style="font-size:.85rem;color:var(--sub);margin:0 0 1rem;">Та <b>${esc(currentUser.email || OAUTH_NAMES[currentUser.provider] || '—')}</b> ${currentUser.email && OAUTH_NAMES[currentUser.provider] ? '(' + OAUTH_NAMES[currentUser.provider] + ') ' : ''}бүртгэлээр нэвтэрсэн байна. Өөр утас, компьютер дээрээс ч мөн адил ${OAUTH_NAMES[currentUser.provider] || 'Google эсвэл Facebook'} товч дараад, энэ бүртгэлээрээ шууд нэвтэрч, өгөгдлөө үргэлжлүүлэн ашиглах боломжтой.</p>
     <button class="modal-close" onclick="confirmLogout()">Гарах</button>
   `;
 }
@@ -1641,7 +1646,7 @@ function togglePwVisibility(inputId, btn) {
   else { input.type = 'password'; btn.textContent = '👁️'; }
 }
 
-// Google руу шилжихийн өмнө, хоосон (branch/personnel_type тохируулаагүй) anonymous
+// Google/Facebook руу шилжихийн өмнө, хоосон (branch/personnel_type тохируулаагүй) anonymous
 // хэрэглэгчийн мөрийг устгаж, дата санд хэрэггүй "orphan" мөр хуримтлагдахаас сэргийлнэ.
 async function cleanupEmptyAnonBeforeSwitch() {
   if (!currentUser?.id || currentUser.isAnonymous === false) return;
@@ -1677,17 +1682,20 @@ function obGotoBranchStep() {
   renderObBranch();
 }
 
-async function obGoogleAuth() {
+const OAUTH_NAMES = { google:'Google', facebook:'Facebook' };
+async function obOAuth(provider) {
+  const name = OAUTH_NAMES[provider] || provider;
   const msg = document.getElementById('ob-auth-msg');
-  msg.style.color = 'var(--sub)'; msg.textContent = 'Google руу шилжиж байна...';
+  msg.style.color = 'var(--sub)'; msg.textContent = name + ' руу шилжиж байна...';
   await cleanupEmptyAnonBeforeSwitch();
-  const { error } = await sb.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo: location.origin + location.pathname }
-  });
-  if (error) { msg.style.color = 'var(--red)'; msg.textContent = 'Google-ээр нэвтрэхэд алдаа гарлаа: ' + error.message; }
-  // Амжилттай бол хөтөч Google руу шилжинэ; буцаж ирэхэд session автоматаар тогтоно
+  const opts = { redirectTo: location.origin + location.pathname };
+  if (provider === 'facebook') opts.scopes = 'email';
+  const { error } = await sb.auth.signInWithOAuth({ provider, options: opts });
+  if (error) { msg.style.color = 'var(--red)'; msg.textContent = name + '-ээр нэвтрэхэд алдаа гарлаа: ' + error.message; }
+  // Амжилттай бол хөтөч тухайн үйлчилгээ рүү шилжинэ; буцаж ирэхэд session автоматаар тогтоно
 }
+function obGoogleAuth() { return obOAuth('google'); }
+function obFacebookAuth() { return obOAuth('facebook'); }
 
 function renderObBranch() {
   const el = document.getElementById('ob-branch-grid');
@@ -1789,7 +1797,7 @@ async function loadProfilePage() {
   if (logoutNote) {
     logoutNote.textContent = currentUser.isAnonymous !== false
       ? 'Та имэйлээр бүртгүүлээгүй байна. Гарвал энэ төхөөрөмж дээрх түүхдээ дахин хандах боломжгүй болохыг анхаарна уу.'
-      : `Та ${currentUser.email} имэйлээр гарна. Дараа нь энэ имэйлээрээ дахин нэвтэрч болно.`;
+      : `Та ${currentUser.email || OAUTH_NAMES[currentUser.provider] || ''} бүртгэлээсээ гарна. Дараа нь ${OAUTH_NAMES[currentUser.provider] || 'мөн адил'} товчоор дахин нэвтэрч болно.`;
   }
   document.getElementById('profile-branch-badge').textContent = BRANCH_LABELS[currentUser.branch] || 'Тодорхойгүй';
   document.getElementById('profile-role-badge').textContent = ROLE_LABELS[currentUser.personnel_type] || 'Тодорхойгүй';
@@ -8518,43 +8526,66 @@ function closeAdminChat() {
 }
 
 /* ================= Бүртгэлтэй хэрэглэгчдийн жагсаалт (зөвхөн админ, RPC-ээр) ================= */
+let regUsersCache = [], regUsersFilter = 'all';
+const REG_PROV = {
+  google:   { name:'Google',   col:'#3c4043', bg:'#F1F3F4' },
+  facebook: { name:'Facebook', col:'#fff',    bg:'#1877F2' },
+  email:    { name:'Имэйл',    col:'#063F4A', bg:'rgba(10,103,122,.12)' },
+  unknown:  { name:'Тодорхойгүй', col:'#5C6A82', bg:'#EEF2F8' },
+};
 async function loadRegisteredUsers() {
   const el = document.getElementById('registered-users-list');
   if (!el) return;
   el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div>';
-  const { data, error } = await sb.rpc('get_registered_users');
+  let { data, error } = await sb.rpc('get_registered_users_v2');
+  let hasProvider = !error;
+  if (error) { // шинэ SQL функц хараахан үүсээгүй бол хуучин функцээр (нэвтрэх аргагүйгээр) харуулна
+    console.warn('get_registered_users_v2 unavailable, falling back:', error.message);
+    ({ data, error } = await sb.rpc('get_registered_users'));
+  }
   if (error) {
     console.error('get_registered_users error:', error);
     el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Жагсаалтыг ачаалж чадсангүй (SQL функц тохируулагдаагүй байж болзошгүй).</div>';
     return;
   }
-  if (!data || !data.length) {
-    el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор имэйлээр бүртгэлтэй хэрэглэгч алга.</div>';
-    return;
+  regUsersCache = (data || []).map(u => ({ ...u, provider: hasProvider ? (REG_PROV[u.provider] ? u.provider : 'unknown') : 'unknown' }));
+  regUsersHasProvider = hasProvider;
+  renderRegisteredUsers();
+}
+let regUsersHasProvider = false;
+function setRegUsersFilter(f) { regUsersFilter = f; renderRegisteredUsers(); }
+function renderRegisteredUsers() {
+  const el = document.getElementById('registered-users-list');
+  if (!el) return;
+  const all = regUsersCache;
+  if (!all.length) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор бүртгэлтэй хэрэглэгч алга.</div>'; return; }
+  const cnt = k => all.filter(u => u.provider === k).length;
+  const groups = ['google', 'facebook', 'email', 'unknown'].filter(k => cnt(k));
+  const tab = (k, label, n) => `<button onclick="setRegUsersFilter('${k}')" style="border:1px solid ${regUsersFilter === k ? 'var(--gold)' : 'var(--line)'};background:${regUsersFilter === k ? 'var(--gold)' : '#fff'};color:${regUsersFilter === k ? '#fff' : 'var(--cream)'};border-radius:99px;padding:.4rem .9rem;font-family:inherit;font-size:.82rem;font-weight:700;cursor:pointer;">${label} <span style="opacity:.75">${n}</span></button>`;
+  const badge = k => { const p = REG_PROV[k]; return `<span style="display:inline-block;border-radius:99px;padding:.15rem .6rem;font-size:.74rem;font-weight:700;background:${p.bg};color:${p.col};${k === 'google' ? 'border:1px solid #DADCE0;' : ''}">${p.name}</span>`; };
+  const table = list => `<table style="width:100%;border-collapse:collapse;font-size:.83rem;">
+      <thead><tr style="border-bottom:1px solid var(--line);text-align:left;">
+        <th style="padding:.5rem .4rem;">Имэйл</th><th style="padding:.5rem .4rem;">Нэвтэрсэн арга</th><th style="padding:.5rem .4rem;">Нэрээ нуусан ID</th>
+        <th style="padding:.5rem .4rem;">Цэргийн төрөл</th><th style="padding:.5rem .4rem;">Бүртгүүлсэн огноо</th></tr></thead>
+      <tbody>${list.map(u => `<tr style="border-bottom:1px solid var(--line);">
+        <td style="padding:.5rem .4rem;font-weight:700;">${esc(u.email) || '<span style="color:var(--sub);font-weight:400">(имэйлгүй)</span>'}</td>
+        <td style="padding:.5rem .4rem;">${badge(u.provider)}</td>
+        <td style="padding:.5rem .4rem;color:var(--sub);">${esc(u.anon_handle) || '—'}</td>
+        <td style="padding:.5rem .4rem;color:var(--sub);">${BRANCH_LABELS[u.branch] || '—'}</td>
+        <td style="padding:.5rem .4rem;color:var(--sub);">${formatUbFull(u.registered_at)}</td></tr>`).join('')}</tbody></table>`;
+  const summary = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.7rem;margin:0 0 1rem;">
+      ${[['Нийт', all.length, 'var(--cream)'], ['Google', cnt('google'), '#3c4043'], ['Facebook', cnt('facebook'), '#1877F2']].map(([l, n, c]) => `<div style="border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;background:#fff;"><div style="font-size:.75rem;color:var(--sub);font-weight:700;">${l}</div><div style="font-size:1.5rem;font-weight:800;color:${c};">${n.toLocaleString('mn-MN')}</div></div>`).join('')}</div>`;
+  const tabs = `<div style="display:flex;gap:.5rem;flex-wrap:wrap;margin:0 0 1rem;">${tab('all', 'Бүгд', all.length)}${groups.map(k => tab(k, REG_PROV[k].name, cnt(k))).join('')}</div>`;
+  let body;
+  if (!regUsersHasProvider) {
+    body = table(all);
+  } else if (regUsersFilter === 'all') {
+    body = groups.map(k => `<h4 style="margin:1rem 0 .5rem;font-size:.95rem;display:flex;align-items:center;gap:.5rem;">${badge(k)} <span>${REG_PROV[k].name}-ээр нэвтэрсэн — ${cnt(k)}</span></h4>${table(all.filter(u => u.provider === k))}`).join('');
+  } else {
+    body = table(all.filter(u => u.provider === regUsersFilter));
   }
-  el.innerHTML = `
-    <table style="width:100%;border-collapse:collapse;font-size:.83rem;">
-      <thead>
-        <tr style="border-bottom:1px solid var(--line);text-align:left;">
-          <th style="padding:.5rem .4rem;">Имэйл</th>
-          <th style="padding:.5rem .4rem;">Нэрээ нуусан ID</th>
-          <th style="padding:.5rem .4rem;">Цэргийн төрөл</th>
-          <th style="padding:.5rem .4rem;">Бүртгүүлсэн огноо</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${data.map(u => `
-          <tr style="border-bottom:1px solid var(--line);">
-            <td style="padding:.5rem .4rem;font-weight:700;">${esc(u.email)}</td>
-            <td style="padding:.5rem .4rem;color:var(--sub);">${esc(u.anon_handle) || '—'}</td>
-            <td style="padding:.5rem .4rem;color:var(--sub);">${BRANCH_LABELS[u.branch] || '—'}</td>
-            <td style="padding:.5rem .4rem;color:var(--sub);">${formatUbFull(u.registered_at)}</td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
-    <div class="privacy-note" style="margin-top:.9rem;">Энэ жагсаалт зөвхөн баталгаажсан админд харагдана.</div>
-  `;
+  el.innerHTML = (regUsersHasProvider ? summary + tabs : `<div class="privacy-note" style="margin-bottom:.9rem;">Нэвтэрсэн аргаар (Google / Facebook) ангилахын тулд Supabase дээр <b>get_registered_users_v2</b> SQL функцийг нэмнэ үү.</div>`) + body +
+    `<div class="privacy-note" style="margin-top:.9rem;">Энэ жагсаалт зөвхөн баталгаажсан админд харагдана.</div>`;
 }
 
 async function loadCompositionStats() {

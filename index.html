@@ -1669,6 +1669,8 @@ async function ensureUser() {
     return;
   }
 
+  // 3a. Google/Facebook-ээр нэвтрээгүй (нэргүй) session бол users мөр үүсгэхгүй — нэвтрэх дэлгэц л харагдана
+  if (userIsAnon) { currentUser = { id: uid, handle: '', email: userEmail, provider: userProvider, isAnonymous: true }; return; }
   // 3. Байхгүй бол шинэ, нэрээ нуусан профайл үүсгэх (id нь auth.uid()-тэй яг адилхан)
   const handle = randomHandle();
   const { data: inserted, error: insErr } = await sb.from('users').insert({ id: uid, anon_handle: handle }).select().single();

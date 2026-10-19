@@ -1278,7 +1278,7 @@
         </div>
         <div class="section-card">
           <div class="rc-head"><div class="rc-title">сүүлийн 12 сарын сэтгэл зүйн байдал</div></div>
-          <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Тус бүр сард өгсөн оношилгооний тестийн дундаж дүнгээс тооцоолсон сэтгэл зүйн тогтвортой байдлын хувь. Тест өгөөгүй сар "—" гэж харагдана.</p>
+          <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Тухайн сард бөглөсөн сэтгэл зүйн тестүүдийн үр дүнг тест бүрийн өөрийн шалгуурын дагуу хувь болгож дундажласан сэтгэл зүйн тогтвортой байдлын үзүүлэлт: 70%-иас дээш хэвийн, 50–69% анхаарах, 50%-иас доош мэргэжилтэнтэй ярилцах түвшин. Тест өгөөгүй сар "—" гэж харагдана.</p>
           <div class="year-chart" id="year-chart"></div>
           <div id="low-months-alert" style="margin-top:1.1rem;"></div>
         </div>
@@ -2495,6 +2495,33 @@ async function loadAnalyticsSummary() {
   }
 }
 
+/* Тестийн нэг үр дүнг "сэтгэл зүйн тогтвортой байдлын хувь" (0–100, өндөр нь сайн) болгоно.
+   Тест бүрийн өөрийн шалгуурын түвшинд тулгуурлана: хэвийн (low) → 70–100%, анхаарах (medium) → 50–69%,
+   өндөр анхаарал (high) → 0–49%. Түвшин дотор оноо хаана байгаагаар нь нарийвчилна.
+   Ихэнх тестэд оноо өндөр байх тусам муу; сэтгэл ханамж, эрүүл мэндийн өөрийн үнэлгээ зэрэгт эсрэгээрээ —
+   энэ чиглэлийг шалгуурын дарааллаас автоматаар тодорхойлно. */
+const WELL_BAND = { low:[70,100], medium:[50,69], high:[0,49] };
+function wellnessPct(r) {
+  const k = r.test_key, t = TESTS[k], sc = Number(r.score);
+  if (!isFinite(sc)) return null;
+  let bands;
+  if (k === 'stress_symptoms' || k === 'insomnia_test') {
+    bands = [{ lo:0, hi:49, key:'low' }, { lo:50, hi:69, key:'medium' }, { lo:70, hi:100, key:'high' }];
+  } else {
+    if (!t || t.personality || !t.cutoffs || !t.cutoffs.length) return null;
+    bands = []; let lo = 0;
+    t.cutoffs.forEach(c => {
+      const last = bands[bands.length - 1];
+      if (last && last.key === c.key) last.hi = c.max; else bands.push({ lo, hi: c.max, key: c.key });
+      lo = c.max;
+    });
+  }
+  const reversed = bands[0].key === 'high'; // эхний түвшин нь "high" бол оноо өндөр байх тусам сайн
+  const b = bands.find(x => sc <= x.hi) || bands[bands.length - 1];
+  const [bot, top] = WELL_BAND[b.key] || [0, 100];
+  const frac = b.hi > b.lo ? Math.min(1, Math.max(0, (sc - b.lo) / (b.hi - b.lo))) : 0;
+  return Math.round(reversed ? bot + frac * (top - bot) : top - frac * (top - bot));
+}
 async function loadMonthlyAnalysis() {
   const chartEl = document.getElementById('year-chart');
   const alertEl = document.getElementById('low-months-alert');
@@ -2503,9 +2530,9 @@ async function loadMonthlyAnalysis() {
 
   const { data: rawData, error } = await sb.from('test_results').select('score, max_score, created_at, test_key').eq('user_id', currentUser.id).order('created_at', { ascending:true }).limit(2000);
   if (error) { console.error('loadMonthlyAnalysis error:', error); return; }
-  // Сэтгэл зүйн шинжтэй бус тестүүдийг (өнгө ялгах, анхаарлын сарнилт) нэгдсэн сэтгэл зүйн дүн шинжилгээнд оруулахгүй
-  const EXCLUDED_FROM_WELLNESS = ['color_vision', 'attention_scale', 'pvt_b'];
-  const data = (rawData || []).filter(r => !EXCLUDED_FROM_WELLNESS.includes(r.test_key) && !String(r.test_key).startsWith('hr_'));
+  // Зөвхөн сэтгэл зүйн байдлыг үнэлдэг (шалгууртай) тестүүдийг ашиглана. Зан чанар, оюуны чадвар,
+  // анхаарал, өнгө ялгах, хүний нөөцийн тестүүд энэ үзүүлэлтэд орохгүй.
+  const data = (rawData || []).map(r => ({ ...r, w: wellnessPct(r) })).filter(r => r.w !== null);
 
   // Сар бүрийн (сүүлийн 12 сар) түлхүүрийг өнөөдрөөс тооцоолж бэлдэнэ
   const nowP = getUbParts();
@@ -2522,8 +2549,7 @@ async function loadMonthlyAnalysis() {
   (data || []).forEach(r => {
     const p = getUbParts(r.created_at);
     const key = monthKey(p.year, p.month);
-    const wellness = 100 - Math.round((r.score / r.max_score) * 100);
-    sums[key] = (sums[key] || 0) + wellness;
+    sums[key] = (sums[key] || 0) + r.w;
     counts[key] = (counts[key] || 0) + 1;
   });
 

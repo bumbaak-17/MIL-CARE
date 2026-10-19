@@ -936,6 +936,35 @@
 .ins-ok,.ins-more{margin:0;font-size:.88rem;line-height:1.6;color:#2C3F45}.ins-more{margin-top:10px;font-size:.82rem;color:#5A6B70}
 @media print{.ins-it{break-inside:avoid}}
 </style>
+<style id="fbx-css">
+.fbx-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.fbx-kpi{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.fbx-kn{font-size:1.45rem;font-weight:800;color:var(--cream);line-height:1.1;font-variant-numeric:tabular-nums}.fbx-kn small{font-size:.8rem;font-weight:600;color:var(--sub)}
+.fbx-kl{font-size:.76rem;color:var(--sub);margin-top:3px}
+.fbx-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.fbx-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.fbx-card h4{margin:0 0 10px;font-size:.88rem;font-weight:800;color:var(--cream)}
+.fbx-bars{display:grid;gap:7px}
+.fbx-row{display:grid;grid-template-columns:minmax(70px,38%) 1fr auto;align-items:center;gap:8px;font-size:.8rem;cursor:default}
+.fbx-row:hover .fbx-fill{filter:brightness(1.15)}
+.fbx-l{color:var(--cream);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fbx-track{height:10px;background:var(--panel-2);border-radius:5px;overflow:hidden}
+.fbx-fill{height:100%;background:#0A677A;border-radius:0 4px 4px 0}
+.fbx-v{font-weight:700;color:var(--cream);font-variant-numeric:tabular-nums;white-space:nowrap}.fbx-v small{font-weight:500;color:var(--sub)}
+.fbx-cols{display:flex;align-items:flex-end;gap:6px;height:150px;padding-bottom:34px;position:relative}
+.fbx-col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;position:relative;cursor:default}
+.fbx-cbar{width:100%;max-width:30px;background:#0A677A;border-radius:4px 4px 0 0}
+.fbx-col:hover .fbx-cbar{filter:brightness(1.15)}
+.fbx-cv{font-size:.72rem;font-weight:700;color:var(--cream);margin-bottom:2px}
+.fbx-cl{position:absolute;bottom:-18px;font-size:.68rem;color:var(--sub)}
+.fbx-cm{position:absolute;bottom:-33px;font-size:.66rem;color:var(--sub)}
+.fbx-note{margin:8px 0 0;font-size:.72rem;color:var(--sub)}
+.fbx-st{color:#B07A12;letter-spacing:1px}.fbx-st span{color:#C9D1DD}
+.fbx-warn{font-size:.86rem;line-height:1.55;padding:.8rem 1rem;border-radius:12px;background:#FCF5EA;border-left:4px solid #9A5F0E;color:#5A3A08}
+.fbx-warn code{background:rgba(0,0,0,.06);padding:0 4px;border-radius:4px}
+.fbx-tbl{margin-top:10px;font-size:.84rem}.fbx-tbl summary{cursor:pointer;font-weight:700;color:var(--gold)}
+@media (max-width:700px){.fbx-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.fbx-grid{grid-template-columns:1fr}}
+</style>
 <style id="hb-css">
 .hb{background:#fff;border:1px solid #E1E9E8;border-radius:14px;padding:14px 16px;margin:12px 0}
 .hb-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
@@ -4922,15 +4951,37 @@ function fbPick(btn, n) {
   box.querySelector('[data-fb-lbl]').textContent = FB_LABELS[n];
   box.querySelector('.fb-more').style.display = 'block';
 }
+/* Илгээж чадаагүй үнэлгээг төхөөрөмж дээр түр хадгалж, дараа нь автоматаар илгээнэ */
+const FB_QUEUE_KEY = 'fbQueue';
+function fbQueueGet() { try { return JSON.parse(localStorage.getItem(FB_QUEUE_KEY) || '[]'); } catch (e) { return []; } }
+function fbQueueSet(q) { try { if (q.length) localStorage.setItem(FB_QUEUE_KEY, JSON.stringify(q.slice(-50))); else localStorage.removeItem(FB_QUEUE_KEY); } catch (e) {} }
+async function fbInsert(row) {
+  try { const { error } = await sb.from('report_feedback').insert(row); return error || null; }
+  catch (e) { return e; }
+}
+async function fbFlushQueue() {
+  if (!currentUser?.id || currentUser.isAnonymous) return;
+  const q = fbQueueGet(); if (!q.length) return;
+  const left = [];
+  for (const r of q) { const err = await fbInsert({ ...r, user_id: currentUser.id }); if (err) left.push(r); }
+  fbQueueSet(left);
+}
 async function fbSend(btn) {
   const box = btn.closest('.fb-box'); const rating = +box.dataset.rating;
   if (!rating) { showToast('Эхлээд од дарж үнэлнэ үү.', 'warn'); return; }
-  if (!currentUser?.id) { showToast('Нэвтэрсний дараа үнэлгээ өгөх боломжтой.', 'warn'); return; }
+  if (!currentUser?.id || currentUser.isAnonymous) { showToast('Үнэлгээ өгөхийн тулд эхлээд нэвтэрнэ үү.', 'warn'); return; }
   btn.disabled = true;
   const comment = (box.querySelector('textarea').value || '').trim().slice(0, 1000) || null;
-  const { error } = await sb.from('report_feedback').insert({ user_id: currentUser.id, report_type: box.dataset.fbType, test_key: box.dataset.fbKey || null, rating, comment });
-  if (error) { console.error('feedback error:', error); btn.disabled = false; showToast('Үнэлгээ хадгалахад алдаа гарлаа.', 'warn'); return; }
+  const row = { report_type: box.dataset.fbType, test_key: box.dataset.fbKey || null, rating, comment };
+  const err = await fbInsert({ ...row, user_id: currentUser.id });
+  if (err) {
+    console.error('feedback error:', err);
+    const q = fbQueueGet(); q.push({ ...row, created_at: new Date().toISOString() }); fbQueueSet(q);
+    box.innerHTML = `<div class="fb-done">✓ Баярлалаа! Таны үнэлгээг (${'★'.repeat(rating)}) хүлээн авлаа.</div><div class="fb-hint" style="margin-top:.3rem">Сервертэй холбогдож чадсангүй. Үнэлгээ тань энэ төхөөрөмж дээр түр хадгалагдсан бөгөөд дараагийн удаа сайтад ороход автоматаар илгээгдэнэ.</div>`;
+    return;
+  }
   box.innerHTML = `<div class="fb-done">✓ Баярлалаа! Таны үнэлгээ (${'★'.repeat(rating)}) хадгалагдлаа.</div>`;
+  fbFlushQueue();
 }
 /* Тестийн үр дүн гарах бүрд үнэлгээний хэсэг нэмнэ */
 (function fbWatchModal() {
@@ -4944,20 +4995,60 @@ async function fbSend(btn) {
   }).observe(box, { childList: true });
 })();
 const FB_TYPE_NAMES = { test:'Тест бүрийн үр дүн', psy:'Миний сэтгэл зүйн байдлын тайлан', hr:'Хүний нөөцийн нэгдсэн тайлан', quick:'Түргэн шуурхай үнэлгээ' };
+function fbxBars(rows, max, fmt) {
+  return `<div class="fbx-bars">${rows.map(r => `<div class="fbx-row" title="${esc(r.tip || '')}">
+      <div class="fbx-l">${r.label}</div>
+      <div class="fbx-track"><div class="fbx-fill" style="width:${max ? Math.max(1.5, 100 * r.v / max) : 0}%"></div></div>
+      <div class="fbx-v">${fmt(r)}</div></div>`).join('')}</div>`;
+}
+function fbxTestName(k) { const t = TESTS[k]; return t ? String(t.title).replace(/\s*\(.*?\)\s*$/, '').replace(/\s+—.*$/, '') : (k || '—'); }
 async function loadFeedbackStats() {
   const el = document.getElementById('fb-admin'); if (!el) return;
   el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div>';
-  const { data, error } = await sb.from('report_feedback').select('report_type, test_key, rating, comment, created_at').order('created_at', { ascending:false }).limit(5000);
-  if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж чадсангүй (report_feedback хүснэгт үүсээгүй байж болзошгүй).</div>'; return; }
-  if (!data || !data.length) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор үнэлгээ ирээгүй байна.</div>'; return; }
-  const by = {}; data.forEach(r => { (by[r.report_type] = by[r.report_type] || []).push(r.rating); });
-  const avg = a => (a.reduce((x, y) => x + y, 0) / a.length).toFixed(2);
-  const all = data.map(r => r.rating), sat = all.filter(x => x >= 4).length;
-  const rows = Object.keys(FB_TYPE_NAMES).filter(k => by[k]).map(k => `<tr><td>${FB_TYPE_NAMES[k]}</td><td class="n">${by[k].length}</td><td class="n">${avg(by[k])}</td><td class="n">${Math.round(100 * by[k].filter(x => x >= 4).length / by[k].length)}%</td></tr>`).join('');
-  const cms = data.filter(r => r.comment).slice(0, 15).map(r => `<div class="fb-cm">${'★'.repeat(r.rating)} · ${FB_TYPE_NAMES[r.report_type] || r.report_type} · ${timeAgo(r.created_at)}<br>${esc(r.comment)}</div>`).join('');
-  el.innerHTML = `<p style="font-size:.9rem;margin:0 0 .7rem;">Нийт <b>${all.length}</b> үнэлгээ · дундаж <b>${avg(all)} / 5</b> · сэтгэл хангалуун (4–5 од) <b>${Math.round(100 * sat / all.length)}%</b></p>
-    <table class="fb-adm-t"><tr><th>Тайлан</th><th class="n">Тоо</th><th class="n">Дундаж</th><th class="n">4–5 од</th></tr>${rows}</table>
-    ${cms ? `<div style="margin-top:.9rem;font-weight:800;font-size:.85rem;">Сүүлийн сэтгэгдлүүд</div>${cms}` : ''}`;
+  let res; try { res = await sb.from('report_feedback').select('report_type, test_key, rating, comment, created_at').order('created_at', { ascending:false }).limit(5000); } catch (e) { res = { error: e }; }
+  const { data, error } = res;
+  if (error) {
+    const missing = /report_feedback|relation|PGRST20|42P01/i.test((error.message || '') + (error.code || ''));
+    el.innerHTML = `<div class="fbx-warn"><b>Үнэлгээг уншиж чадсангүй.</b> ${missing ? 'Supabase дээр <code>report_feedback</code> хүснэгт үүсээгүй байна. SQL Editor-т <code>report_feedback.sql</code>-ийг ажиллуулсны дараа үнэлгээ хадгалагдаж, энд харагдана.' : 'Админ эрхээр нэвтэрсэн эсэхээ шалгаад, хуудсыг дахин ачаална уу.'}</div>`;
+    return;
+  }
+  if (!data || !data.length) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор үнэлгээ ирээгүй байна. Хэрэглэгчид тест, тайлангийн доор од дарж үнэлэхэд энд график гарна.</div>'; return; }
+  const n = data.length, sum = data.reduce((a, r) => a + r.rating, 0), avg = sum / n;
+  const sat = data.filter(r => r.rating >= 4).length, low = data.filter(r => r.rating <= 2).length;
+  // 1) Одны тархалт
+  const dist = [5,4,3,2,1].map(k => { const c = data.filter(r => r.rating === k).length; return { label: '★'.repeat(k), v: c, pct: Math.round(100 * c / n), tip: `${k} од: ${c} үнэлгээ` }; });
+  const distMax = Math.max(...dist.map(d => d.v));
+  // 2) Тайлангийн төрлөөр
+  const byT = {}; data.forEach(r => { (byT[r.report_type] = byT[r.report_type] || []).push(r.rating); });
+  const types = Object.keys(FB_TYPE_NAMES).filter(k => byT[k]).map(k => { const a = byT[k], m = a.reduce((x, y) => x + y, 0) / a.length; return { label: FB_TYPE_NAMES[k], v: m, n: a.length, tip: `${FB_TYPE_NAMES[k]}: ${a.length} үнэлгээ, дундаж ${m.toFixed(2)}` }; });
+  // 3) Тест бүрээр
+  const byK = {}; data.filter(r => r.report_type === 'test' && r.test_key).forEach(r => { (byK[r.test_key] = byK[r.test_key] || []).push(r.rating); });
+  const tests = Object.keys(byK).map(k => { const a = byK[k], m = a.reduce((x, y) => x + y, 0) / a.length; return { label: fbxTestName(k), v: m, n: a.length, tip: `${fbxTestName(k)}: ${a.length} үнэлгээ, дундаж ${m.toFixed(2)}` }; }).sort((a, b) => b.n - a.n || b.v - a.v).slice(0, 15).sort((a, b) => b.v - a.v);
+  // 4) Сүүлийн 8 долоо хоногийн тоо
+  const wk = []; const now = Date.now(), W = 7 * 864e5;
+  for (let i = 7; i >= 0; i--) { const from = now - (i + 1) * W, to = now - i * W; const rs = data.filter(r => { const t = new Date(r.created_at).getTime(); return t > from && t <= to; });
+    const d = new Date(to); wk.push({ label: `${d.getMonth() + 1}/${d.getDate()}`, v: rs.length, m: rs.length ? rs.reduce((a, r) => a + r.rating, 0) / rs.length : null }); }
+  const wkMax = Math.max(1, ...wk.map(w => w.v));
+  const cols = wk.map(w => `<div class="fbx-col" title="${w.label} хүртэлх 7 хоног: ${w.v} үнэлгээ${w.m != null ? ', дундаж ' + w.m.toFixed(1) : ''}">
+      <div class="fbx-cv">${w.v || ''}</div><div class="fbx-cbar" style="height:${w.v ? Math.max(4, 100 * w.v / wkMax) : 0}%"></div>
+      <div class="fbx-cl">${w.label}</div><div class="fbx-cm">${w.m != null ? '★' + w.m.toFixed(1) : '—'}</div></div>`).join('');
+  const cms = data.filter(r => r.comment).slice(0, 20).map(r => `<div class="fb-cm"><span class="fbx-st">${'★'.repeat(r.rating)}<span>${'★'.repeat(5 - r.rating)}</span></span> · ${r.report_type === 'test' && r.test_key ? fbxTestName(r.test_key) : (FB_TYPE_NAMES[r.report_type] || r.report_type)} · ${timeAgo(r.created_at)}<br>${esc(r.comment)}</div>`).join('');
+  const tableRows = types.map(t => `<tr><td>${t.label}</td><td class="n">${t.n}</td><td class="n">${t.v.toFixed(2)}</td><td class="n">${Math.round(100 * byT[Object.keys(FB_TYPE_NAMES).find(k => FB_TYPE_NAMES[k] === t.label)].filter(x => x >= 4).length / t.n)}%</td></tr>`).join('');
+  el.innerHTML = `
+    <div class="fbx-kpis">
+      <div class="fbx-kpi"><div class="fbx-kn">${n}</div><div class="fbx-kl">Нийт үнэлгээ</div></div>
+      <div class="fbx-kpi"><div class="fbx-kn">${avg.toFixed(2)}<small> / 5</small></div><div class="fbx-kl">Дундаж оноо</div></div>
+      <div class="fbx-kpi"><div class="fbx-kn">${Math.round(100 * sat / n)}%</div><div class="fbx-kl">Сэтгэл хангалуун (4–5 од)</div></div>
+      <div class="fbx-kpi"><div class="fbx-kn">${Math.round(100 * low / n)}%</div><div class="fbx-kl">Сэтгэл дундуур (1–2 од)</div></div>
+    </div>
+    <div class="fbx-grid">
+      <div class="fbx-card"><h4>Одны тархалт</h4>${fbxBars(dist, distMax, r => `${r.v} <small>(${r.pct}%)</small>`)}</div>
+      <div class="fbx-card"><h4>Сүүлийн 8 долоо хоног</h4><div class="fbx-cols">${cols}</div><p class="fbx-note">Багана: ирсэн үнэлгээний тоо · доор нь тухайн 7 хоногийн дундаж од</p></div>
+      <div class="fbx-card"><h4>Тайлангийн төрлөөр (дундаж од)</h4>${fbxBars(types, 5, r => `${r.v.toFixed(1)} <small>(${r.n})</small>`)}</div>
+      ${tests.length ? `<div class="fbx-card"><h4>Тест бүрээр (дундаж од)</h4>${fbxBars(tests, 5, r => `${r.v.toFixed(1)} <small>(${r.n})</small>`)}</div>` : ''}
+    </div>
+    <details class="fbx-tbl"><summary>Хүснэгтээр харах</summary><table class="fb-adm-t"><tr><th>Тайлан</th><th class="n">Тоо</th><th class="n">Дундаж</th><th class="n">4–5 од</th></tr>${tableRows}</table></details>
+    ${cms ? `<div class="fbx-card" style="margin-top:12px"><h4>Сүүлийн сэтгэгдлүүд</h4>${cms}</div>` : ''}`;
 }
 
 function aiHash(str) { let h = 5381; for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
@@ -5090,6 +5181,8 @@ function openModal(key) {
   `;
   document.getElementById('modal-overlay').classList.add('open');
 }
+setInterval(() => { if (fbQueueGet().length) fbFlushQueue(); }, 60000);
+setTimeout(() => fbFlushQueue(), 8000);
 function closeModal(){ aiTestCtx = null; document.getElementById('modal-overlay').classList.remove('open'); }
 
 /* ================= PVT-B — СОНОР СЭРЭМЖИЙН СОРИЛ =================

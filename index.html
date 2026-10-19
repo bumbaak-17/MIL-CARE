@@ -702,6 +702,87 @@
   .iq-cl-q{font-size:.86rem;flex:1;}
   .iq-cl-opts{display:flex;gap:1rem;flex-shrink:0;font-size:.85rem;white-space:nowrap;}
   .iq-cl-opts label{cursor:pointer;display:flex;align-items:center;gap:.3rem;}
+
+.pf-out{display:flex;align-items:center;gap:16px;padding:18px 22px;border-radius:20px;margin-bottom:18px;
+  background:linear-gradient(135deg,rgba(192,69,58,.07),rgba(192,69,58,.02));border:1px solid rgba(192,69,58,.22)}
+.pf-out-ic{flex:none;width:46px;height:46px;border-radius:14px;background:rgba(192,69,58,.12);color:#C0453A;display:flex;align-items:center;justify-content:center}
+.pf-out-ic svg,.pf-out-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.pf-out-t{flex:1;min-width:0}
+.pf-out-t b{display:block;font-size:.98rem;color:var(--cream)}
+.pf-out-t p{margin:.2rem 0 0;font-size:.82rem;color:var(--sub);line-height:1.45}
+.pf-out-btn{flex:none;display:inline-flex;align-items:center;gap:.5rem;border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:.9rem;color:#fff;
+  padding:.75rem 1.4rem;border-radius:14px;background:linear-gradient(135deg,#D2554A,#B23A30);box-shadow:0 8px 18px -8px rgba(178,58,48,.6);transition:transform .15s,box-shadow .15s}
+.pf-out-btn:hover{transform:translateY(-1px);box-shadow:0 12px 22px -8px rgba(178,58,48,.65)}
+.pf-out-btn:hover svg{transform:translateX(2px)}
+.pf-out-btn svg{transition:transform .15s}
+@media (max-width:760px){.pf-out{flex-wrap:wrap}.pf-out-btn{width:100%;justify-content:center}}
+/* ===== Профайл (шинэ загвар) ===== */
+.pf-hero{position:relative;overflow:hidden;border-radius:24px;padding:28px 30px;color:#fff;margin-bottom:18px;
+  background:radial-gradient(120% 140% at 100% 0%,rgba(255,255,255,.14) 0,rgba(255,255,255,0) 45%),linear-gradient(135deg,#063F4A 0%,#0A677A 58%,#128A9C 100%);
+  box-shadow:0 18px 40px -18px rgba(6,63,74,.55)}
+.pf-hero:before{content:"";position:absolute;right:-60px;bottom:-90px;width:280px;height:280px;border-radius:50%;border:38px solid rgba(255,255,255,.06)}
+.pf-hero:after{content:"";position:absolute;right:120px;top:-70px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.05)}
+.pf-top{position:relative;z-index:1;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.pf-av{flex:none;width:92px;height:92px;border-radius:50%;background:#fff;padding:6px;box-shadow:0 0 0 4px rgba(255,255,255,.22),0 10px 24px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;font-size:2.3rem}
+.pf-av img{width:100%;height:100%;object-fit:contain;border-radius:50%}
+.pf-id{flex:1;min-width:200px}
+.pf-kicker{font-size:.72rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.7)}
+.pf-name{font-size:1.65rem;font-weight:800;line-height:1.15;margin-top:.15rem;letter-spacing:-.01em}
+.pf-since{font-size:.85rem;color:rgba(255,255,255,.78);margin-top:.3rem}
+.pf-chips{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.85rem}
+.pf-chip{display:inline-flex;align-items:center;gap:.4rem;font-size:.78rem;font-weight:700;padding:.38rem .8rem;border-radius:99px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);color:#fff;backdrop-filter:blur(6px)}
+.pf-chip svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.pf-badge{position:relative;z-index:1;flex:none;align-self:flex-start;display:inline-flex;align-items:center;gap:.45rem;font-size:.78rem;font-weight:800;padding:.5rem .85rem;border-radius:12px;background:rgba(242,193,78,.18);color:#F7D584;border:1px solid rgba(242,193,78,.35)}
+.pf-badge svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+.pf-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:18px}
+.pf-stat{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px 18px;display:flex;align-items:center;gap:14px;transition:transform .15s,box-shadow .15s}
+.pf-stat:hover{transform:translateY(-2px);box-shadow:0 10px 24px -14px rgba(21,30,51,.35)}
+.pf-ico{flex:none;width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:var(--t-soft);color:var(--t)}
+.pf-ico svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.pf-num{font-size:1.75rem;font-weight:800;line-height:1;color:var(--cream);font-variant-numeric:tabular-nums}
+.pf-lbl{font-size:.78rem;color:var(--sub);margin-top:.3rem;font-weight:600}
+.pf-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:18px;margin-bottom:18px}
+.pf-card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px 22px}
+.pf-card h3{display:flex;align-items:center;gap:.55rem;font-size:1rem;font-weight:800;margin:0 0 .7rem;color:var(--cream)}
+.pf-card h3 .pf-hi{width:30px;height:30px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;background:var(--gold-soft);color:var(--gold)}
+.pf-card h3 .pf-hi svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.pf-card p{font-size:.85rem;color:var(--sub);line-height:1.55;margin:0}
+.pf-acct{display:flex;align-items:center;gap:.7rem;background:var(--panel-2);border-radius:14px;padding:.75rem .9rem;margin-bottom:.8rem}
+.pf-acct .g{width:34px;height:34px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;flex:none;box-shadow:0 1px 3px rgba(0,0,0,.12);font-weight:800;color:#4285F4}
+.pf-acct b{display:block;font-size:.9rem;color:var(--cream);word-break:break-all}
+.pf-acct span{font-size:.75rem;color:var(--sub)}
+.pf-logout{display:inline-flex;align-items:center;gap:.45rem;margin-top:1rem;border:1px solid rgba(192,69,58,.35);background:rgba(192,69,58,.06);color:var(--red,#C0453A);font-family:inherit;font-weight:700;font-size:.85rem;padding:.55rem 1.1rem;border-radius:12px;cursor:pointer;transition:background .15s}
+.pf-logout:hover{background:rgba(192,69,58,.12)}
+.pf-logout svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.pf-list{list-style:none;margin:.2rem 0 0;padding:0;display:grid;gap:.55rem}
+.pf-list li{display:flex;gap:.6rem;font-size:.84rem;color:var(--sub);line-height:1.45}
+.pf-list li svg{flex:none;width:18px;height:18px;margin-top:1px;stroke:var(--gold);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.pf-acc{background:var(--panel);border:1px solid var(--line);border-radius:20px;overflow:hidden;margin-bottom:18px}
+.pf-acc-h{display:flex;align-items:center;gap:.7rem;padding:18px 22px;cursor:pointer;user-select:none}
+.pf-acc-h h3{flex:1;margin:0;font-size:1rem;font-weight:800;color:var(--cream)}
+.pf-acc-h small{display:block;font-size:.76rem;font-weight:500;color:var(--sub);margin-top:.15rem}
+.pf-acc-h .pf-hi{width:36px;height:36px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;background:var(--gold-soft);color:var(--gold);flex:none}
+.pf-acc-h .pf-hi svg,.pf-chev svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.pf-chev{width:34px;height:34px;border-radius:50%;background:var(--panel-2);display:flex;align-items:center;justify-content:center;color:var(--sub);transition:transform .25s}
+.pf-acc-b{padding:0 22px 22px;border-top:1px solid var(--line)}
+.pf-sub{font-size:.8rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);margin:1.1rem 0 .6rem}
+.pf-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pf-f label{display:block;font-size:.78rem;font-weight:700;color:var(--sub);margin-bottom:.35rem}
+.pf-f select,.pf-f input{width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;font-family:inherit;font-size:.93rem;background:var(--panel);color:var(--cream);transition:border-color .15s,box-shadow .15s}
+.pf-f select:focus,.pf-f input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-soft)}
+.pf-actions{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:.9rem}
+.pf-actions .connect-btn{width:auto;padding:.6rem 1.4rem;margin:0}
+.pf-actions .modal-close{margin:0}
+@media (max-width:760px){
+  .pf-hero{padding:22px 20px;border-radius:20px}
+  .pf-av{width:76px;height:76px}
+  .pf-name{font-size:1.35rem}
+  .pf-stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .pf-stat{flex-direction:column;align-items:flex-start;gap:10px;padding:14px}
+  .pf-ico{width:38px;height:38px;border-radius:12px}
+  .pf-num{font-size:1.4rem}
+  .pf-grid,.pf-row{grid-template-columns:1fr}
+}
 </style>
 <style id="tr-css">
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif:wght@500;600&display=swap');
@@ -1186,10 +1267,10 @@
         <div class="page-head"><h2>Миний сэтгэл зүй</h2><p>Сүүлийн 30 хоногийн үзүүлэлт.</p></div>
         <button class="connect-btn" style="width:auto;padding:.6rem 1.2rem;margin:0 0 1rem;" onclick="openPsyReport()">📄 Миний сэтгэл зүйн байдлын тайлан</button>
         <div class="section-card">
-          <div class="metric-row"><div class="metric-top"><span>Стресс</span><span>72%</span></div><div class="metric-track"><div class="metric-fill stress" style="width:72%;"></div></div></div>
-          <div class="metric-row"><div class="metric-top"><span>Ажлын хэт их ядралт</span><span>58%</span></div><div class="metric-track"><div class="metric-fill burnout" style="width:58%;"></div></div></div>
-          <div class="metric-row"><div class="metric-top"><span>Сэтгэл ханамж</span><span>42%</span></div><div class="metric-track"><div class="metric-fill sat" style="width:42%;"></div></div></div>
-          <div class="trend-note">📈 Таны стресс сүүлийн 14 хоногт буурсан байна.</div>
+          <div class="metric-row"><div class="metric-top"><span>Стресс</span><span>—</span></div><div class="metric-track"><div class="metric-fill stress" style="width:0%;"></div></div></div>
+          <div class="metric-row"><div class="metric-top"><span>Ажлын хэт их ядралт</span><span>—</span></div><div class="metric-track"><div class="metric-fill burnout" style="width:0%;"></div></div></div>
+          <div class="metric-row"><div class="metric-top"><span>Сэтгэл ханамж</span><span>—</span></div><div class="metric-track"><div class="metric-fill sat" style="width:0%;"></div></div></div>
+          <div class="trend-note">Ачаалж байна...</div>
         </div>
         <div class="section-card">
           <div class="rc-head"><div class="rc-title">7 хоногийн сэтгэл зүйн байдал</div></div>
@@ -1409,85 +1490,69 @@
       <div id="view-profile" class="view">
         <div class="page-head"><h2>Миний профайл</h2><p>Таны данс, идэвхжил, тохиргоог удирдах хэсэг.</p></div>
 
-        <!-- Профайлын толгой хэсэг -->
-        <div class="section-card">
-          <div style="display:flex;align-items:center;gap:1.1rem;flex-wrap:wrap;">
-            <div class="user-avatar" style="width:64px;height:64px;font-size:1.7rem;">🎖️</div>
-            <div style="flex:1;min-width:180px;">
-              <div id="profile-handle" style="font-weight:800;font-size:1.2rem;">...</div>
-              <div id="profile-since" style="font-size:.8rem;color:var(--sub);margin-top:.15rem;">Элссэн огноо: ...</div>
+        <section class="pf-hero">
+          <div class="pf-top">
+            <div class="pf-av" id="profile-avatar">🎖️</div>
+            <div class="pf-id">
+              <div class="pf-kicker">Алба хаагчийн профайл</div>
+              <div class="pf-name" id="profile-handle">...</div>
+              <div class="pf-since" id="profile-since">Элссэн огноо: ...</div>
+              <div class="pf-chips">
+                <span class="pf-chip"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg><span id="profile-branch-badge">—</span></span>
+                <span class="pf-chip"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg><span id="profile-role-badge">—</span></span>
+              </div>
             </div>
-            <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
-              <span class="tag other" id="profile-branch-badge">—</span>
-              <span class="tag calm" id="profile-role-badge">—</span>
-            </div>
+            <div class="pf-badge"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Нэр нууцлагдсан</div>
+          </div>
+        </section>
+
+        <div class="pf-stats">
+          <div class="pf-stat" style="--t:#0A677A;--t-soft:rgba(10,103,122,.1)"><div class="pf-ico"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v5L5 18a2 2 0 0 0 1.8 3h10.4A2 2 0 0 0 19 18l-5-10V3"/><path d="M7.5 14h9"/></svg></div><div><div class="pf-num" id="profile-stat-tests">0</div><div class="pf-lbl">Өгсөн тест</div></div></div>
+          <div class="pf-stat" style="--t:#6E4FB0;--t-soft:rgba(110,79,176,.1)"><div class="pf-ico"><svg viewBox="0 0 24 24"><path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/></svg></div><div><div class="pf-num" id="profile-stat-diary">0</div><div class="pf-lbl">Өдрийн тэмдэглэл</div></div></div>
+          <div class="pf-stat" style="--t:#B7791F;--t-soft:rgba(183,121,31,.12)"><div class="pf-ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div><div><div class="pf-num" id="profile-stat-days">0</div><div class="pf-lbl">Платформд хамт байгаа хоног</div></div></div>
+        </div>
+
+        <div class="pf-grid">
+          <div class="pf-card">
+            <div id="auth-section"></div>
+          </div>
+          <div class="pf-card">
+            <h3><span class="pf-hi"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span>Нууцлал ба өгөгдөл</h3>
+            <ul class="pf-list">
+              <li><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg><span>Таны өдрийн тэмдэглэл, тестийн дүн зөвхөн танд харагдана (Row-Level Security-ээр database-ийн түвшинд хамгаалагдсан).</span></li>
+              <li><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg><span>Сэтгэгдлээ хуваалцах хэсэгт бичсэн зүйл нэрээ нуусан, санамсаргүй нэрээр харагдана.</span></li>
+            </ul>
           </div>
         </div>
 
-        <!-- Нэвтэрсэн бүртгэлийн мэдээлэл -->
-        <div class="section-card" id="auth-section"></div>
+        <div class="pf-acc">
+          <div class="pf-acc-h" onclick="toggleProfileDetails()">
+            <span class="pf-hi"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></span>
+            <h3>Ангилал ба жинхэнэ мэдээлэл<small>Цэргийн төрөл, албан хаагчийн төрөл, нэр, цол</small></h3>
+            <span class="pf-chev" id="profile-details-arrow"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+          </div>
+          <div id="profile-details-body" class="pf-acc-b" style="display:none;">
+            <div class="pf-sub">Ангилал</div>
+            <p style="font-size:.8rem;color:var(--sub);margin:0 0 .9rem;">Байгууллагын нэгтгэсэн статистикт ашиглагдана. Хэрэв алдаатай сонгосон бол энд өөрчилж болно.</p>
+            <div class="pf-row">
+              <div class="pf-f"><label>Цэргийн төрөл</label><select id="profile-branch-select"></select></div>
+              <div class="pf-f"><label>Албан хаагчийн төрөл</label><select id="profile-role-select"></select></div>
+            </div>
+            <div class="pf-actions"><button class="connect-btn" onclick="saveClassification()">Ангиллаа шинэчлэх</button><div id="profile-class-msg" style="font-size:.82rem;"></div></div>
 
-        <!-- Миний сэтгэл зүйн идэвхтэй байдал -->
-        <div class="section-card">
-          <div class="section-head"><h3>Миний сэтгэл зүйн идэвхтэй байдал</h3></div>
-          <div class="quick-grid" style="margin-bottom:0;">
-            <div class="quick-card" style="cursor:default;" data-nogoto="1">
-              <div class="quick-icon">🧠</div>
-              <div class="quick-title" id="profile-stat-tests">0</div>
-              <div class="quick-sub">Өгсөн тест</div>
+            <div class="pf-sub" style="margin-top:1.6rem;">Жинхэнэ мэдээлэл (сонголтоор)</div>
+            <p style="font-size:.8rem;color:var(--sub);margin:0 0 .9rem;">Энэ мэдээллийг зөвхөн та өөрөө болон баталгаажсан админ харах боломжтой — бусад хэрэглэгч, мэргэжилтэнд хэзээ ч харагдахгүй.</p>
+            <div class="pf-row">
+              <div class="pf-f"><label>Жинхэнэ нэр</label><input type="text" id="profile-realname" placeholder="Овог нэр"></div>
+              <div class="pf-f"><label>Цол</label><input type="text" id="profile-rank" placeholder="Жишээ: Ахмад"></div>
             </div>
-            <div class="quick-card" style="cursor:default;" data-nogoto="1">
-              <div class="quick-icon">💬</div>
-              <div class="quick-title" id="profile-stat-diary">0</div>
-              <div class="quick-sub">Дневникийн тэмдэглэл</div>
-            </div>
+            <div class="pf-actions"><button class="connect-btn" onclick="saveIdentity()">Хадгалах</button><button class="modal-close" onclick="clearIdentity()">Устгах</button><div id="profile-save-msg" style="font-size:.82rem;"></div></div>
           </div>
         </div>
-
-        <!-- Цэргийн ангилал + Жинхэнэ мэдээлэл (нэгтгэсэн, нээгдэж хаагддаг) -->
-        <div class="section-card" style="padding:0;overflow:hidden;">
-          <div class="section-head" style="cursor:pointer;padding:1.2rem 1.4rem;margin:0;justify-content:space-between;" onclick="toggleProfileDetails()">
-            <h3 style="margin:0;">⚙️ Ангилал ба жинхэнэ мэдээлэл</h3>
-            <span id="profile-details-arrow" style="font-size:.85rem;color:var(--sub);transition:transform .2s;">▼</span>
-          </div>
-          <div id="profile-details-body" style="display:none;padding:0 1.4rem 1.4rem;">
-            <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Байгууллагын нэгтгэсэн статистикт ашиглагдана. Хэрэв алдаатай сонгосон бол энд өөрчилж болно.</p>
-            <div class="field">
-              <label style="display:block;margin-bottom:.4rem;">Цэргийн төрөл</label>
-              <select id="profile-branch-select" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);"></select>
-            </div>
-            <div class="field">
-              <label style="display:block;margin-bottom:.4rem;">Албан хаагчийн төрөл</label>
-              <select id="profile-role-select" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);"></select>
-            </div>
-            <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" onclick="saveClassification()">Ангиллаа шинэчлэх</button>
-            <div id="profile-class-msg" style="font-size:.82rem;margin-top:.7rem;"></div>
-
-            <hr style="border:none;border-top:1px solid var(--line);margin:1.4rem 0;">
-
-            <div style="font-weight:800;font-size:.92rem;margin-bottom:.4rem;">Жинхэнэ мэдээлэл (сонголтоор)</div>
-            <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Энэ мэдээллийг зөвхөн та өөрөө болон баталгаажсан админ харах боломжтой — бусад хэрэглэгч, мэргэжилтэнд хэзээ ч харагдахгүй.</p>
-            <div class="field"><label style="display:block;margin-bottom:.4rem;">Жинхэнэ нэр</label><input type="text" id="profile-realname" placeholder="Овог нэр" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);"></div>
-            <div class="field"><label style="display:block;margin-bottom:.4rem;">Цол</label><input type="text" id="profile-rank" placeholder="Жишээ: Ахмад" style="width:100%;border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;font-family:inherit;font-size:.95rem;background:#fff;color:var(--cream);"></div>
-            <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" onclick="saveIdentity()">Хадгалах</button>
-            <button class="modal-close" style="margin-left:.6rem;" onclick="clearIdentity()">Устгах</button>
-            <div id="profile-save-msg" style="font-size:.82rem;margin-top:.7rem;"></div>
-          </div>
-        </div>
-
-        <!-- Нууцлал ба өгөгдөл -->
-        <div class="section-card">
-          <div class="section-head"><h3>Нууцлал ба өгөгдөл</h3></div>
-          <div class="privacy-note" style="margin-top:0;">
-            Таны дневник, тестийн дүн зөвхөн танд харагдана (Row-Level Security-ээр database-ийн түвшинд хамгаалагдсан). Сэтгэгдлээ хуваалцах хэсэгт бичсэн зүйл нэрээ нуусан, санамсаргүй нэрээр харагдана.
-          </div>
-        </div>
-
-        <!-- Гарах -->
-        <div class="section-card">
-          <div class="section-head"><h3>🚪 Гарах</h3></div>
-          <p id="logout-note" style="font-size:.85rem;color:var(--sub);margin:0 0 1rem;">Гарахад та энэ төхөөрөмж дээрх session-ээ дуусгана.</p>
-          <button class="modal-close" style="border-color:rgba(192,69,58,.4);color:var(--red);" onclick="confirmLogout()">Гарах</button>
+        <div class="pf-out">
+          <div class="pf-out-ic"><svg viewBox="0 0 24 24"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l-5-5 5-5M5 12h11"/></svg></div>
+          <div class="pf-out-t"><b>Системээс гарах</b></div>
+          <button class="pf-out-btn" onclick="confirmLogout()">Гарах<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
         </div>
       </div>
 
@@ -1612,14 +1677,14 @@ async function ensureUser() {
 }
 /* ================= ИМЭЙЛ БҮРТГЭЛ (олон төхөөрөмж дээр өгөгдлөө үргэлжлүүлэн ашиглах) =================
    Anonymous хэрэглэгч имэйл/нууц үг холбовол (updateUser) яг ижил user_id хэвээр үлдэж,
-   өмнөх бүх тест/дневникийн түүх алдагдалгүй, зөвхөн "байнгын" статустай болно. */
+   өмнөх бүх тест, өдрийн тэмдэглэлийн түүх алдагдалгүй, зөвхөн "байнгын" статустай болно. */
 function renderAuthSection() {
   const el = document.getElementById('auth-section');
   if (!el || !currentUser) return;
   el.innerHTML = `
-    <div class="section-head"><h3>🔐 Нэвтэрсэн бүртгэл</h3></div>
-    <p style="font-size:.85rem;color:var(--sub);margin:0 0 1rem;">Та <b>${esc(currentUser.email || OAUTH_NAMES[currentUser.provider] || '—')}</b> ${currentUser.email && OAUTH_NAMES[currentUser.provider] ? '(' + OAUTH_NAMES[currentUser.provider] + ') ' : ''}бүртгэлээр нэвтэрсэн байна. Өөр утас, компьютер дээрээс ч мөн адил ${OAUTH_NAMES[currentUser.provider] || (FACEBOOK_LOGIN_ENABLED ? 'Google эсвэл Facebook' : 'Google')} товч дараад, энэ бүртгэлээрээ шууд нэвтэрч, өгөгдлөө үргэлжлүүлэн ашиглах боломжтой.</p>
-    <button class="modal-close" onclick="confirmLogout()">Гарах</button>
+    <h3><span class="pf-hi"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span>Нэвтэрсэн бүртгэл</h3>
+    <div class="pf-acct"><div class="g">${(OAUTH_NAMES[currentUser.provider] || 'G').charAt(0)}</div><div><b>${esc(currentUser.email || OAUTH_NAMES[currentUser.provider] || '—')}</b><span>${OAUTH_NAMES[currentUser.provider] || 'Бүртгэл'}-ээр нэвтэрсэн</span></div></div>
+    <p style="margin:0 0 .4rem;">Та <b>${esc(currentUser.email || OAUTH_NAMES[currentUser.provider] || '—')}</b> ${currentUser.email && OAUTH_NAMES[currentUser.provider] ? '(' + OAUTH_NAMES[currentUser.provider] + ') ' : ''}бүртгэлээр нэвтэрсэн байна. Өөр утас, компьютер дээрээс ч мөн адил ${OAUTH_NAMES[currentUser.provider] || (FACEBOOK_LOGIN_ENABLED ? 'Google эсвэл Facebook' : 'Google')} товч дараад, энэ бүртгэлээрээ шууд нэвтэрч, өгөгдлөө үргэлжлүүлэн ашиглах боломжтой.</p>
   `;
 }
 
@@ -1634,7 +1699,7 @@ async function signOutUser() {
 function confirmLogout() {
   const isAnon = currentUser?.isAnonymous !== false;
   const warning = isAnon
-    ? 'Та гарахдаа итгэлтэй байна уу?\n\n⚠️ Анхаар: Та имэйлээр бүртгүүлээгүй тул гарсны дараа өмнөх тест, дневникийн түүхдээ дахин хандах боломжгүй болно!'
+    ? 'Та гарахдаа итгэлтэй байна уу?\n\n⚠️ Анхаар: Та имэйлээр бүртгүүлээгүй тул гарсны дараа өмнөх тест, өдрийн тэмдэглэлийн түүхдээ дахин хандах боломжгүй болно!'
     : 'Та гарахдаа итгэлтэй байна уу?';
   if (!confirm(warning)) return;
   logoutAndRestart();
@@ -1811,6 +1876,7 @@ function toggleProfileDetails() {
   const willOpen = body.style.display === 'none';
   body.style.display = willOpen ? 'block' : 'none';
   arrow.style.transform = willOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+  arrow.closest('.pf-acc')?.classList.toggle('open', willOpen);
 }
 
 async function saveClassification() {
@@ -1825,10 +1891,19 @@ async function saveClassification() {
   msgEl.textContent = 'Ангилал шинэчлэгдлээ.';
   document.getElementById('profile-branch-badge').textContent = BRANCH_LABELS[branch] || branch;
   document.getElementById('profile-role-badge').textContent = ROLE_LABELS[role] || role;
+  setProfileAvatar();
+}
+function setProfileAvatar() {
+  const av = document.getElementById('profile-avatar'); if (!av) return;
+  const br = (typeof BRANCHES !== 'undefined') && BRANCHES.find(b => b.key === currentUser?.branch);
+  av.innerHTML = br && br.icon ? br.icon.replace(/style="[^"]*"/, '') : '🎖️';
 }
 async function loadProfilePage() {
   if (!currentUser?.id) return;
   renderAuthSection();
+  setProfileAvatar();
+  const daysEl = document.getElementById('profile-stat-days');
+  if (daysEl) daysEl.textContent = currentUser.createdAt ? Math.max(1, Math.ceil((Date.now() - new Date(currentUser.createdAt).getTime()) / 864e5)) : '—';
   const logoutNote = document.getElementById('logout-note');
   if (logoutNote) {
     logoutNote.textContent = currentUser.isAnonymous !== false
@@ -1927,7 +2002,7 @@ async function loadHrResultsInner() {
     content.innerHTML = `
       <div class="section-card">
         <div class="section-head"><h3>📋 Тест бөглөсөн хүмүүсийн жагсаалт</h3></div>
-        <p style="font-size:.8rem;color:var(--sub);margin:0 0 .8rem;">Тест тус бүрийн хамгийн сүүлийн үр дүн. "Анхаарах" гэсэн үр дүн онош биш — мэргэжилтний нэмэлт үнэлгээ шаардлагатайг илтгэнэ.</p>
+        <p style="font-size:.8rem;color:var(--sub);margin:0 0 .8rem;">Тест тус бүрийн хамгийн сүүлийн үр дүн. "Анхаарах" гэсэн үр дүн нь мэргэжилтний нэмэлт үнэлгээ шаардлагатайг илтгэнэ.</p>
         <div id="hr-results-list"></div>
       </div>
       <div class="section-card">
@@ -2385,23 +2460,36 @@ async function loadAnalyticsSummary() {
   applyMetric('burnout', burnout30);
   applyMetric('sat', sat30);
 
-  // Сүүлийн 14 хоног ба өмнөх 14 хоногийг харьцуулж, стрессийн бодит хандлагыг гаргана
-  const half = 14 * 86400000;
-  const recentFrom = nowMs - half;
-  const recentStress = windowPct('gad7', MOOD_STRESS_SIGNAL, recentFrom, nowMs);
-  const prevStress = windowPct('gad7', MOOD_STRESS_SIGNAL, from30, recentFrom);
+  /* Сүүлийн 14 хоногийг түүнээс өмнөх 14 хоногтой (15–28 дахь өдөр) харьцуулна.
+     Зарчим: (1) зөвхөн ижил хэмжүүрийг хооронд нь харьцуулна;
+             (2) хоёр үед хоёуланд нь хангалттай өгөгдөл байх үед л дүгнэнэ;
+             (3) жижиг хэлбэлзлийг өөрчлөлт гэж үзэхгүй.
+     a) Түгшүүрийн тест (GAD-7, 0–21) хоёр үед хоёуланд бөглөгдсөн бол үе бүрийн сүүлийн оноог харьцуулна.
+        Утга учиртай өөрчлөлт: 4 ба түүнээс дээш оноо (GAD-7-ийн эмнэлзүйн ач холбогдолтой хамгийн бага өөрчлөлт).
+     b) Үгүй бол "Өнөөдөр би..." тэмдэглэлийн стрессийн дохиог (0–100%) харьцуулна: үе бүрт ≥3 тэмдэглэл,
+        утга учиртай өөрчлөлт: 10 ба түүнээс дээш хувь. */
+  const DAY = 86400000, recFrom = nowMs - 14 * DAY, prevFrom = nowMs - 28 * DAY;
+  const inWin = (t, a, b) => { const x = new Date(t).getTime(); return x >= a && x < b; };
+  const gad = tests.filter(r => r.test_key === 'gad7' && r.max_score).sort((x, y) => new Date(x.created_at) - new Date(y.created_at));
+  const gPrev = gad.filter(r => inWin(r.created_at, prevFrom, recFrom)).pop();
+  const gRec = gad.filter(r => inWin(r.created_at, recFrom, nowMs + 1)).pop();
+  const sig = m => MOOD_STRESS_SIGNAL[m.mood];
+  const mPrev = moods.filter(m => sig(m) !== undefined && inWin(m.created_at, prevFrom, recFrom)).map(sig);
+  const mRec = moods.filter(m => sig(m) !== undefined && inWin(m.created_at, recFrom, nowMs + 1)).map(sig);
+  const mean = arr => arr.reduce((t, x) => t + x, 0) / arr.length;
 
-  if (recentStress.pct === null || prevStress.pct === null) {
-    noteEl.textContent = 'ℹ️ Хандлагыг харьцуулахад хангалттай өгөгдөл алга. Тогтмол тест бөглөж, өдрөө тэмдэглэсээр байвал энд бодит хандлагын дүн шинжилгээ гарч ирнэ.';
+  if (gPrev && gRec) {
+    const p = Number(gPrev.score), r = Number(gRec.score), d = p - r;
+    if (d >= 4) noteEl.textContent = `📈 Таны түгшүүр, стрессийн тестийн (GAD-7) оноо сүүлийн 14 хоногт буурсан байна: ${p} → ${r} (21 онооноос).`;
+    else if (d <= -4) noteEl.textContent = `📉 Таны түгшүүр, стрессийн тестийн (GAD-7) оноо сүүлийн 14 хоногт нэмэгдсэн байна: ${p} → ${r} (21 онооноос). Анхаарал хандуулаарай.`;
+    else noteEl.textContent = `➖ Таны түгшүүр, стрессийн тестийн (GAD-7) оноо сүүлийн 14 хоногт тогтвортой байна: ${p} → ${r} (21 онооноос).`;
+  } else if (mPrev.length >= 3 && mRec.length >= 3) {
+    const p = Math.round(mean(mPrev)), r = Math.round(mean(mRec)), d = p - r;
+    if (d >= 10) noteEl.textContent = `📈 Өдрийн тэмдэглэлээс харахад таны стресс сүүлийн 14 хоногт буурсан байна: ${p}% → ${r}%.`;
+    else if (d <= -10) noteEl.textContent = `📉 Өдрийн тэмдэглэлээс харахад таны стресс сүүлийн 14 хоногт нэмэгдсэн байна: ${p}% → ${r}%. Анхаарал хандуулаарай.`;
+    else noteEl.textContent = `➖ Өдрийн тэмдэглэлээс харахад таны стресс сүүлийн 14 хоногт тогтвортой байна: ${p}% → ${r}%.`;
   } else {
-    const diff = Math.round(prevStress.pct - recentStress.pct); // эерэг = буурсан (сайжирсан)
-    if (diff >= 5) {
-      noteEl.textContent = `📈 Таны стресс сүүлийн 14 хоногт ${diff} нэгжээр буурсан байна.`;
-    } else if (diff <= -5) {
-      noteEl.textContent = `📉 Таны стресс сүүлийн 14 хоногт ${Math.abs(diff)} нэгжээр нэмэгдсэн байна. Анхаарал хандуулаарай.`;
-    } else {
-      noteEl.textContent = '➖ Таны стресс сүүлийн 14 хоногт харьцангуй тогтвортой байна.';
-    }
+    noteEl.textContent = 'ℹ️ Хандлагыг харьцуулахад хангалттай өгөгдөл алга. Сүүлийн 2 долоо хоног бүрт дор хаяж 3 удаа "Өнөөдөр би..." хэсэгт тэмдэглэл хөтлөх, эсвэл түгшүүрийн тестийг (GAD-7) 2 долоо хоногийн зайтай бөглөхөд энд таны бодит хандлага гарна.';
   }
 }
 
@@ -3190,7 +3278,7 @@ function updateSymptomCount() {
 function renderSymptomForm() {
   document.getElementById('modal-box').innerHTML = `
     <h3>🧭 Анхан шатны шинж тэмдгийн үнэлгээ</h3>
-    <p class="sg-lead">Сүүлийн 2 долоо хоногт өөрт илэрч буй шинж тэмдгийг тэмдэглэнэ үү. Энэ бол онош биш, зөвхөн аль тестийг бөглөхийг санал болгох зорилготой.</p>
+    <p class="sg-lead">Сүүлийн 2 долоо хоногт өөрт илэрч буй шинж тэмдгийг тэмдэглэнэ үү. Таны тэмдэглэснээр аль тестийг бөглөхийг санал болгоно.</p>
     <div class="sg-scroll"><div class="sg-grid">
       ${SYMPTOM_CATEGORIES.map((cat, ci) => `
         <div class="sg-cat${cat.risk ? ' risk' : ''}">
@@ -3324,7 +3412,7 @@ const PRO_GUIDE = {
       { meaning: 'Хөнгөн зэргийн шинж тэмдэг ажиглагдаж байна. Энэ түвшинд ихэвчлэн эмчилгээ шаардлагагүй, харин өөрийгөө дэмжих энгийн аргууд, ажиглалт хангалттай байдаг.',
         care: ['Өдөрт 1–2 жижиг, тодорхой зүйл төлөвлөж хийх (богино алхалт, найзтайгаа уулзах, дуртай зүйлээ хийх). Сэтгэл санаа сайжрахыг хүлээлгүй эхлээд хийх нь илүү үр дүнтэй.', 'Өглөө гадаа гэрэлд гарах, нэг цагт унтаж босох, долоо хоногт 3–5 удаа 20–30 минут хөнгөн дасгал хийх.', '"Би хэнд ч хэрэггүй" гэх мэт өөрийгөө буруутгасан бодол төрөхөд түүнийг баталж, үгүйсгэж буй баримтыг цаасан дээр хоёр багана болгон бичиж харах.', '2–4 долоо хоногийн дараа тестээ давтан өгч, өөрчлөлтөө харах.'],
         seek: '2–4 долоо хоногт сайжрахгүй эсвэл улам дордвол сэтгэл зүйчтэй уулзаарай.' },
-      { meaning: 'Дунд зэргийн шинж тэмдэг илэрч байна. Судалгаагаар 10 ба түүнээс дээш оноо нь мэргэжлийн тусламж хэрэгтэй сэтгэл гутралыг 10 хүн тутмын 9 орчимд нь зөв илрүүлдэг. Гэхдээ оношийг зөвхөн мэргэжилтэн ярилцлагаар тогтооно.',
+      { meaning: 'Дунд зэргийн шинж тэмдэг илэрч байна. Судалгаагаар 10 ба түүнээс дээш оноо нь мэргэжлийн тусламж хэрэгтэй сэтгэл гутралыг 10 хүн тутмын 9 орчимд нь зөв илрүүлдэг.',
         care: ['Сэтгэл зүйч эсвэл эмчтэй уулзаж, дэлгэрэнгүй үнэлгээ хийлгэх.', 'Итгэмжит хүндээ (найз, гэр бүл, хамт ажиллагч) байдлаа хэлж, ганцаараа даах гэж оролдохгүй байх.', 'Өдөр тутмын хамгийн энгийн хэвшлээ хадгалах: нэг цагт босох, хоолоо идэх, 10–15 минут алхах.', 'Архи, тайвшруулах бодисоор сэтгэл санаагаа засах гэж оролдохгүй байх — энэ нь шинж тэмдгийг уртасгаж, улам дордуулдаг.'],
         seek: 'Ойрын 1–2 долоо хоногт мэргэжилтэнтэй уулзахыг зөвлөж байна.' },
       { meaning: 'Дунджаас хүнд шинж тэмдэг илэрч байна. Энэ түвшинд сэтгэл зүйн эмчилгээ болон/эсвэл эмийн эмчилгээг цаг алдалгүй эхлүүлэхийг зөвлөдөг.',
@@ -3361,7 +3449,7 @@ const PRO_GUIDE = {
       { meaning: 'Дунд зэргийн шинж тэмдэг илэрч байна. Оноо анхаарал татах босгод ойртсон тул мэргэжилтэнд үнэлгээ хийлгэх нь зүйтэй.',
         care: ['Дурсамж эсвэл айдас хүчтэй болоход "5-4-3-2-1" дасгал хийх: харагдаж буй 5, мэдрэгдэж буй 4, сонсогдож буй 3, үнэртэж буй 2, амтлагдаж буй 1 зүйлийг нэрлэж, өнөөдрийн бодит орчиндоо эргэн ирэх.', 'Тухайн үйл явдлыг сануулдаг газар, хүнээс бүрэн зайлсхийх нь шинж тэмдгийг уртасгадаг. Мэргэжилтний дэмжлэгтэйгээр аажмаар нүүр тулахыг хичээх.', 'Нойрны тогтмол дэглэм баримтлах; нойроо архи, тайвшруулах бодисоор засах гэж оролдохгүй байх.', 'Итгэмжит хүндээ байдлаа ярих.'],
         seek: 'Ойрын 2–4 долоо хоногт сэтгэл зүйчид хандахыг зөвлөж байна.' },
-      { meaning: 'Гэмтлийн дараах стрессийн эмгэг (PTSD) байх магадлал өндөр байна. Энэ нь онош биш боловч мэргэжлийн үнэлгээ шаардлагатай. Гэмтэлд чиглэсэн сэтгэл зүйн эмчилгээ шинж тэмдгийг мэдэгдэхүйц бууруулдаг нь батлагдсан.',
+      { meaning: 'Гэмтлийн дараах стрессийн эмгэг (PTSD) байх магадлал өндөр байна. Мэргэжлийн үнэлгээ шаардлагатай. Гэмтэлд чиглэсэн сэтгэл зүйн эмчилгээ шинж тэмдгийг мэдэгдэхүйц бууруулдаг нь батлагдсан.',
         care: ['1–2 долоо хоногийн дотор сэтгэл зүйч эсвэл сэтгэцийн эмчид хандах.', 'Ганцаараа байхгүй байх — итгэмжит хүн, ойр дотныхондоо байдлаа хэлэх.', 'Дурсамж, айдас сэдрэх үед "5-4-3-2-1" дасгал болон удаан амьсгалын дасгал (4 секундэд авч, 6 секундэд гаргах) хийх.', 'Архи, мансууруулах бодис хэрэглэхгүй байх — эдгээр нь шинж тэмдгийг улам дордуулдаг.'],
         seek: 'Өөрийгөө гэмтээх бодол төрөх, уураа барьж чадахгүй болох, архины хэрэглээ нэмэгдэх зэрэг байвал мэргэжилтэнд яаралтай хандаарай. PTSD бол эмчлэгддэг эмгэг.' }
     ]
@@ -3454,7 +3542,7 @@ PRO_GUIDE.nikotin_hamaarl = {
   ],
 };
 PRO_GUIDE.arhiny_hamaarl = {
-  about: 'Архины хамааралтай эсэхийг илрүүлэх тест нь Мичиганы архины хэрэглээг илрүүлэх тест (MAST; Selzer, 1971)-д суурилсан 24 асуулттай скрийнинг хэрэгсэл. Амьдралын туршийн туршлагыг асуудаг тул өнгөрсөн асуудлыг ч тусгадаг. Онооны түлхүүр нь аргачлалын баримт бичгийн дагуу. Энэ нь онош биш — оношийг зөвхөн эмч тогтооно.',
+  about: 'Архины хамааралтай эсэхийг илрүүлэх тест нь Мичиганы архины хэрэглээг илрүүлэх тест (MAST; Selzer, 1971)-д суурилсан 24 асуулттай скрийнинг хэрэгсэл. Амьдралын туршийн туршлагыг асуудаг тул өнгөрсөн асуудлыг ч тусгадаг. Онооны түлхүүр нь аргачлалын баримт бичгийн дагуу.',
   tiers: [
     { meaning: 'Архины хараат байдал илрээгүй.',
       care: ['Хэрэглэдэг бол бага эрсдэлтэй хэрэглээг баримтлах: долоо хоногт хэд хэдэн өдөр огт хэрэглэхгүй байх, нэг удаад их хэмжээгээр уухгүй байх.', 'Жолоо барих, аюултай тоног төхөөрөмж ажиллуулах, шөнийн ээлжинд гарахын өмнө огт хэрэглэхгүй байх.', 'Стресс, нойргүйдлээ архиар "засах" зуршлаас зайлсхийх.'],
@@ -3564,7 +3652,7 @@ const PERSONALITY_ADVICE = {
 const GENERIC_PRO = {
   low: { meaning: 'Одоогийн үзүүлэлт хэвийн, эрсдэл багатай түвшинд байна.', care: ['Тогтмол нойр, хөдөлгөөн, ойр дотны хүмүүстэйгээ харилцах сайн дадлаа хадгалах.'], seek: 'Тусгай арга хэмжээ шаардлагагүй. Өөрчлөлт мэдрэгдвэл тестээ давтан өгөөрэй.' },
   medium: { meaning: 'Үзүүлэлт дунд зэргийн анхаарал шаардах түвшинд байна. Энэ нь шууд асуудал гэсэн үг биш — байдлаа анхааралтай ажиглаж, өөрийгөө дэмжих хэрэгтэй гэсэн дохио.', care: ['Амралт, унтах цагаа тогтмол болгож, өдрийн тэмдэглэл хөтөлж байдлаа ажиглах.', 'Итгэмжит хүн, хамт олонтойгоо байдлаа ярилцах.'], seek: '2–4 долоо хоногт сайжрахгүй эсвэл улам дордвол сэтгэл зүйчтэй зөвлөлдөөрэй.' },
-  high: { meaning: 'Үзүүлэлт өндөр анхаарал шаардах түвшинд байна. Энэ нь онош биш боловч мэргэжилтэнд үнэлгээ хийлгэх хэрэгтэй гэсэн дохио.', care: ['Ойрын хугацаанд сэтгэл зүйчтэй уулзах цаг товлох.', 'Итгэмжит хүн, ойр дотныхондоо байдлаа хэлж, ганцаараа байхгүй байх.'], seek: 'Ойрын 1–2 долоо хоногт мэргэжилтэнтэй уулзахыг зөвлөж байна.' }
+  high: { meaning: 'Үзүүлэлт өндөр анхаарал шаардах түвшинд байна. Мэргэжилтэнд үнэлгээ хийлгэх хэрэгтэй.', care: ['Ойрын хугацаанд сэтгэл зүйчтэй уулзах цаг товлох.', 'Итгэмжит хүн, ойр дотныхондоо байдлаа хэлж, ганцаараа байхгүй байх.'], seek: 'Ойрын 1–2 долоо хоногт мэргэжилтэнтэй уулзахыг зөвлөж байна.' }
 };
 
 /* Оноо, түвшинд тохирсон алхмуудыг буцаана (нэгдсэн дүн шинжилгээнд ч ашиглана) */
@@ -3620,8 +3708,7 @@ function buildProReport(key, t, total, max, level, levelKey) {
     <section class="tr-sec"><h4>Энэ юу гэсэн үг вэ?</h4><p class="tr-mean">${tier.meaning}</p></section>
     <section class="tr-sec"><h4>Одоо юу хийх вэ?</h4><ol class="tr-steps">${tier.care.map(x => `<li>${x}</li>`).join('')}</ol></section>
     <div class="tr-seek" style="--tr-tone:${tone[0]};--tr-soft:${tone[1]}"><b>Мэргэжилтэнд хэзээ хандах вэ?</b>${tier.seek}</div>
-    ${tier.about ? `<details class="tr-about"><summary>Энэ тестийн тухай</summary><p>${tier.about}</p></details>` : ''}
-    <div class="disclaimer-note" style="margin-top:.9rem;">Энэ тест нь эрт илрүүлэх (скрийнинг) зорилготой бөгөөд онош биш. Оношийг зөвхөн сэтгэл зүйч, эмч ярилцлага, үнэлгээгээр тогтооно. Үр дүн таныг тодорхойлдоггүй — цаг хугацаа, дэмжлэгтэйгээр өөрчлөгддөг.</div>`;
+    ${tier.about ? `<details class="tr-about"><summary>Энэ тестийн тухай</summary><p>${tier.about}</p></details>` : ''}`;
 }
 
 
@@ -4388,7 +4475,7 @@ async function finishPvtTest() {
       <div class="pvt-stat"><span>Нийт хариулт</span><b>${n}</b></div>
     </div>
     ${compareHtml}
-    <div class="result-block"><b>Тайлбар:</b> Энэ сорил нь ядаргаа, сонор сэрэмжийг хэмждэг бөгөөд сэтгэцийн эмгэгийг оношлохгүй. Ангилал нь туршилтын шатны урьдчилсан үнэлгээ. Ядаргаа өндөр гарвал нойр, амралтаа анхаарч, дахин сорил өгөөрэй.</div>
+    <div class="result-block"><b>Тайлбар:</b> Энэ сорил нь ядаргаа, сонор сэрэмжийг хэмждэг. Ангилал нь туршилтын шатны урьдчилсан үнэлгээ. Ядаргаа өндөр гарвал нойр, амралтаа анхаарч, дахин сорил өгөөрэй.</div>
     <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="openPvtTest('${pvtMode}')">Дахин өгөх</button></div>
   `;
 }
@@ -5038,7 +5125,7 @@ async function scoreHrPredeploy() {
     : pclTotal === null
       ? card('1. PTSD (PC-PTSD-5)', pcScore, 5, false, `Богино асуулгын оноо ${PD_CUT.pcptsd5}-аас доош тул нэмэлт асуулга шаардлагагүй.`)
       : card('1. PTSD (PC-PTSD-5 → PCL-5)', pclTotal, 80, r.pcl.pos, r.pcl.pos
-          ? `Богино асуулга эерэг (${pcScore}/5), нэмэлт асуулгын оноо ${PD_CUT.pcl5}-аас дээш байна. Сэтгэл зүйч, эмчийн нарийвчилсан үнэлгээ шаардлагатай. Энэ нь онош биш.`
+          ? `Богино асуулга эерэг (${pcScore}/5), нэмэлт асуулгын оноо ${PD_CUT.pcl5}-аас дээш байна. Сэтгэл зүйч, эмчийн нарийвчилсан үнэлгээ шаардлагатай.`
           : `Богино асуулга эерэг (${pcScore}/5) байсан ч нэмэлт асуулгын оноо ${PD_CUT.pcl5}-аас доош байна.`);
   const phqCard = phq9 === null
     ? card('2. Сэтгэл гутрал (PHQ-2)', st.phq2, 6, false, `Богино асуулгын оноо ${PD_CUT.phq2}-аас доош тул нэмэлт асуулга шаардлагагүй.`)
@@ -5064,7 +5151,7 @@ async function scoreHrPredeploy() {
   hrOpen(`<h3>🎖️ Томилолтын өмнөх үзлэг — Үр дүн</h3>
     ${riskBlocks}
     <div class="result-block" style="margin:0 0 .4rem;">${flagged.length
-      ? `<b>Нэмэлт үнэлгээ шаардлагатай чиглэл:</b> ${flagged.join(', ')}. Эдгээр нь онош биш — эмч, сэтгэл зүйч таны нөхцөл байдлыг ярилцлагаар тодруулна. Шинж тэмдэг байгаа нь томилолтод явах боломжгүй гэсэн үг биш.`
+      ? `<b>Нэмэлт үнэлгээ шаардлагатай чиглэл:</b> ${flagged.join(', ')}. Эмч, сэтгэл зүйч таны нөхцөл байдлыг ярилцлагаар тодруулна. Шинж тэмдэг байгаа нь томилолтод явах боломжгүй гэсэн үг биш.`
       : '<b>Бүх чиглэлээр үзлэгийн босгоос доош байна.</b> Эцсийн дүгнэлтийг эмч ярилцлагын дараа гаргана.'}</div>
     ${ptsdCard}${phqCard}${gadCard}${audCard}${k6Card}
     ${pdNextSteps(r, st)}
@@ -5807,7 +5894,7 @@ function hrReportHtml(user, latest, hrMode) {
     </header>
     <section class="rp-sum"><h2>Ерөнхий дүгнэлт</h2>${para.map(x => `<p>${x}</p>`).join('')}</section>
     <section class="rp-how"><h3>Энэ тайланг хэрхэн ойлгох вэ</h3><ul>
-      <li>Энэ бол онош биш. ${V.p} зан чанар, хандлагын одоогийн зураглал юм.</li>
+      <li>${V.p} зан чанар, хандлагын одоогийн зураглал юм.</li>
       <li>Ихэнх үзүүлэлтийн хувьд "өндөр", "бага" гэдэг нь сайн, муу гэсэн үг биш — ажил үүргээс хамаарч аль аль нь давуу тал болж болно.${HR_PREDEPLOY_ENABLED ? ' Харин сэтгэл санааны үзлэгт анхаарал татсан үзүүлэлтийг заавал мэргэжилтэнтэй ярилцана.' : ''}</li>
       <li>Үзүүлэлтүүд дадлага, туршлагаар өөрчлөгддөг. 6–12 сарын дараа дахин бөглөж өөрчлөлтөө хараарай.</li></ul></section>
     ${kpis.length || wellRows.length ? `<section class="rp-kpi">${kpis.map(([k, l]) => `<div class="rp-k"><span>${l}</span><strong>${cap(rpBand(P[k]))}</strong><div class="rp-meter sm"><i style="width:${Math.round(P[k])}%"></i></div></div>`).join('')}
@@ -5957,7 +6044,7 @@ function psyReportHtml(latest) {
   const para = [];
   para.push(`Та нийт ${rows.length} тест бөглөсөн байна. Тест тус бүрийн хамгийн сүүлийн үр дүнг нэгтгэн харлаа.`);
   const reds = flagged.filter(r => info[r.test_key].tone === 'r'), yel = flagged.filter(r => info[r.test_key].tone === 'w');
-  if (reds.length) para.push(`Өндөр анхаарал шаардах үр дүн гарсан чиглэл: ${list(reds.map(nm))}. Энэ нь онош биш боловч мэргэжилтэнтэй уулзаж ярилцах хэрэгтэй гэсэн дохио.`);
+  if (reds.length) para.push(`Өндөр анхаарал шаардах үр дүн гарсан чиглэл: ${list(reds.map(nm))}. Мэргэжилтэнтэй уулзаж ярилцах хэрэгтэй.`);
   if (yel.length) para.push(`Дунд зэргийн анхаарал шаардах чиглэл: ${list(yel.map(nm))}. Доорх зөвлөмжүүдийг хэрэгжүүлж, байдлаа ажиглаарай.`);
   if (!reds.length && !yel.length && good.length) para.push('Бөглөсөн тестүүдийн аль нь ч анхаарал татах түвшинд гараагүй. Одоогийн сайн дадлаа хадгалаарай.');
   if (good.length && (reds.length || yel.length)) para.push(`Хэвийн түвшинд байгаа чиглэл: ${list(good.slice(0, 5).map(nm))}. Эдгээр нь таны нөөц, давуу тал.`);
@@ -5984,7 +6071,7 @@ function psyReportHtml(latest) {
       <div class="rp-head-r"><p>Огноо: ${hrRepDate(new Date())}</p><p class="rp-conf">Зөвхөн танд харагдана</p></div></header>
     <section class="rp-sum"><h2>Ерөнхий дүгнэлт</h2>${para.map(x => `<p>${x}</p>`).join('')}</section>
     <section class="rp-how"><h3>Энэ тайланг хэрхэн ойлгох вэ</h3><ul>
-      <li>Энэ бол онош биш. Таны бөглөсөн тестүүдийн одоогийн зураглал юм.</li>
+      <li>Таны бөглөсөн тестүүдийн одоогийн зураглал юм.</li>
       <li>Ногоон нь хэвийн, шар нь анхаарах, улаан нь мэргэжилтэнтэй ярилцах хэрэгтэйг илтгэнэ.</li>
       <li>Сэтгэл санаа цаг хугацаа, дэмжлэгээр өөрчлөгддөг. 1–2 сар тутамд тестүүдээ давтан бөглөөрэй.</li></ul></section>
     ${flagged.length ? `<section class="rp-ins"><h2>Анхаарах үзүүлэлтүүд</h2>${flagged.map(r => { const I = info[r.test_key];
@@ -5994,7 +6081,7 @@ function psyReportHtml(latest) {
       ${seekList.length ? `<div class="rp-in r" style="margin-top:12px"><h4>Мэргэжилтэнд хэзээ хандах вэ?</h4>${seekList.map(x => `<p>${x}</p>`).join('')}</div>` : ''}
       ${reds.length ? `<p class="rp-note">Яаралтай үед, эсвэл өөрийгөө гэмтээх бодол төрвөл мэргэжилтэнд шууд хандаарай. Сайт дээрх "Сэтгэл зүйч" хэсгээр мэргэжилтэнтэй холбогдож болно.</p>` : ''}</section>
     <section class="rp-details"><h2>Тест тус бүрийн үр дүн</h2>${dom}</section>
-    <footer class="rp-foot"><p>Тест тус бүрийн хамгийн сүүлийн үр дүнг ашиглав. Тестүүд нь эрт илрүүлэх зорилготой бөгөөд оношийг зөвхөн сэтгэл зүйч, эмч ярилцлагаар тогтооно.${old.length ? ` ${old.length} тестийн үр дүн 2 сараас өмнөх тул одоогийн байдлыг бүрэн илэрхийлэхгүй байж болно.` : ''}</p>
+    <footer class="rp-foot"><p>Тест тус бүрийн хамгийн сүүлийн үр дүнг ашиглав.${old.length ? ` ${old.length} тестийн үр дүн 2 сараас өмнөх тул одоогийн байдлыг бүрэн илэрхийлэхгүй байж болно.` : ''}</p>
       <p>Энэ тайлан зөвхөн танд харагдах бөгөөд хүний нөөцийн ажилтан, удирдлагад дамжуулагдахгүй.</p></footer>
   </article>`;
 }
@@ -6416,7 +6503,7 @@ async function scoreStressSymptomsTest() {
 
   renderMultiLabelResult(
     'Стрессийн шинжүүдийг илрүүлэх тест',
-    'Таны хариултаас харахад чиглэл бүрээр илэрсэн шинж тэмдгийн хувь (%)-ийг харуулав. Хувь өндөр байх тусам холбогдох шинж тэмдэг илүү тод илэрч байгааг илтгэнэ — энэ бол эмнэлгийн онош биш, зөвхөн эрт анхаарал татах чиглүүлэг.',
+    'Таны хариултаас харахад чиглэл бүрээр илэрсэн шинж тэмдгийн хувь (%)-ийг харуулав. Хувь өндөр байх тусам холбогдох шинж тэмдэг илүү тод илэрч байгааг илтгэнэ.',
     results, hasSelfHarmFlag
   );
 }
@@ -6476,7 +6563,7 @@ async function scoreInsomniaTest() {
 
   renderMultiLabelResult(
     'Нойргүйдлийг илрүүлэх тест',
-    'Таны хариултаас харахад нойрны чиглэл бүрээр илэрсэн шинжийн хувь (%)-ийг харуулав. Хувь өндөр байх тусам холбогдох шинж илүү тод илэрч байгааг илтгэнэ — энэ бол эмнэлгийн онош биш, зөвхөн эрт анхаарал татах чиглүүлэг.',
+    'Таны хариултаас харахад нойрны чиглэл бүрээр илэрсэн шинжийн хувь (%)-ийг харуулав. Хувь өндөр байх тусам холбогдох шинж илүү тод илэрч байгааг илтгэнэ.',
     results, false
   );
 }
@@ -7749,19 +7836,12 @@ async function loadProPortal() {
       <div class="section-head"><h3>👋 Тавтай морил, ${myProName}!</h3></div>
       <p style="font-size:.85rem;color:var(--sub);margin:0;">Танд ирсэн зөвлөгөөний хүсэлтүүд доор жагсаагдана. Нэг мөрийг дарж, хариулаарай. Хэрэглэгчтэй чатлах явцад "Онлайн зөвлөгөөг зөвшөөрөх" товч дарж, видео дуудлага идэвхжүүлж болно.</p>
     </div>
-    <div class="section-card" style="border:2px solid var(--red,#c0392b);">
-      <div class="section-head"><h3>🚨 Эрсдэлийн дохио</h3></div>
-      <p style="font-size:.82rem;color:var(--sub);margin:0 0 .8rem;">Автомат үнэлгээгээр эрт анхаарал татсан тохиолдлууд. Эцсийн шийдвэрийг та мэргэжлийн үнэлгээгээрээ гаргана уу.</p>
-      <div id="pro-risk-alerts"></div>
-    </div>
     <div class="section-card">
       <div class="section-head"><h3>💬 Ирсэн хүсэлтүүд</h3></div>
       <div id="pro-chat-threads"></div>
     </div>
   `;
   loadProChatThreads();
-  loadRiskAlertsForPro();
-  subscribeRiskAlertsRealtime();
 }
 
 function riskAlertLabel(reason) {

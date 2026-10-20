@@ -569,6 +569,18 @@
   .metric-fill.stress{background:linear-gradient(90deg,#8B4A3F,var(--red));}
   .metric-fill.burnout{background:linear-gradient(90deg,var(--gold-deep),var(--gold));}
   .metric-fill.sat{background:linear-gradient(90deg,#3F6B4A,#6E9A61);}
+  .metric-top{align-items:center;gap:8px}.metric-top>span:last-child{white-space:nowrap}.metric-top .qx-chip{font-size:.72rem}.mx-sc{font-weight:600;color:var(--sub);font-size:.8rem;margin-left:4px}
+  .qx-chip.mx-none{background:#EEF3F3;color:#5A6B70;font-weight:600}
+  .metric-src{font-size:.74rem;color:var(--sub);margin-top:.35rem}.metric-src a{color:inherit;font-weight:700}
+  .metric-help{font-size:.76rem;color:var(--sub);margin:0 0 1rem;line-height:1.5}
+  .mx-it{padding:.75rem 0;border-bottom:1px solid #E6EEEE}.mx-it:last-of-type{border-bottom:0}
+  .mx-top{display:flex;justify-content:space-between;align-items:center;gap:8px}.mx-n{font-weight:700;font-size:.86rem}
+  .mx-dir{font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap}
+  .mx-dir.up{background:#E4F1EC;color:#2F6B50}.mx-dir.eq{background:#EEF3F3;color:#5A6B70}.mx-dir.dn{background:#FDE7E5;color:#8E1B12}
+  .mx-cmp{margin-top:.45rem;display:flex;flex-wrap:wrap;align-items:center;gap:4px}.mx-cmp .qx-chip,.mx-rc .qx-chip{font-size:.7rem;padding:2px 8px}
+  .mx-ar{color:var(--sub);font-weight:700;margin:0 2px}.mx-when{font-size:.76rem;color:var(--sub);white-space:nowrap}
+  .mx-go{border:0;background:var(--teal,#2A6F73);color:#fff;font-weight:700;font-size:.74rem;padding:.35rem .8rem;border-radius:20px;cursor:pointer;white-space:nowrap}
+  .mx-rc.due .mx-n{color:#14262C}.mx-empty{font-size:.8rem;color:var(--sub);margin:0;line-height:1.5}
   .trend-note{display:flex;align-items:center;gap:.5rem;background:var(--gold-soft);color:var(--gold);
     border-radius:10px;padding:.8rem 1rem;font-size:.85rem;font-weight:700;margin-top:1rem;}
 
@@ -1470,11 +1482,16 @@
         <div class="page-head"><h2>Миний сэтгэл зүй</h2><p>Сүүлийн 30 хоногийн үзүүлэлт.</p></div>
         <button class="connect-btn" style="width:auto;padding:.6rem 1.2rem;margin:0 0 1rem;" onclick="openPsyReport()">📄 Миний сэтгэл зүйн байдлын тайлан</button>
         <div class="section-card">
-          <div class="metric-row"><div class="metric-top"><span>Стресс</span><span>—</span></div><div class="metric-track"><div class="metric-fill stress" style="width:0%;"></div></div></div>
-          <div class="metric-row"><div class="metric-top"><span>Ажлын хэт их ядралт</span><span>—</span></div><div class="metric-track"><div class="metric-fill burnout" style="width:0%;"></div></div></div>
-          <div class="metric-row"><div class="metric-top"><span>Сэтгэл ханамж</span><span>—</span></div><div class="metric-track"><div class="metric-fill sat" style="width:0%;"></div></div></div>
+          <div class="metric-row"><div class="metric-top"><span>Сэтгэл санаа</span><span>—</span></div><div class="metric-track"><div class="metric-fill mood" style="width:0%;"></div></div><div class="metric-src"></div></div>
+          <div class="metric-row"><div class="metric-top"><span>Стресс, түгшүүр</span><span>—</span></div><div class="metric-track"><div class="metric-fill stress" style="width:0%;"></div></div><div class="metric-src"></div></div>
+          <div class="metric-row"><div class="metric-top"><span>Нойр</span><span>—</span></div><div class="metric-track"><div class="metric-fill sleep" style="width:0%;"></div></div><div class="metric-src"></div></div>
+          <div class="metric-row"><div class="metric-top"><span>Ажлаас халшрах хам шинж</span><span>—</span></div><div class="metric-track"><div class="metric-fill burnout" style="width:0%;"></div></div><div class="metric-src"></div></div>
+          <div class="metric-row"><div class="metric-top"><span>Сэтгэл ханамж</span><span>—</span></div><div class="metric-track"><div class="metric-fill sat" style="width:0%;"></div></div><div class="metric-src"></div></div>
+          <p class="metric-help">Сүүлийн 30 хоногт бөглөсөн хамгийн сүүлийн тестийн дүнг тухайн тестийн өөрийн шалгуураар харуулна. Ногоон нь хэвийн, шар нь анхаарах, улаан нь мэргэжилтэнтэй ярилцах түвшин.</p>
           <div class="trend-note">Ачаалж байна...</div>
         </div>
+        <div class="section-card" id="an-change"><div class="rc-head"><div class="rc-title">Өөрчлөлтийн хандлага</div></div><div class="mx-list"></div></div>
+        <div class="section-card" id="an-recheck"><div class="rc-head"><div class="rc-title">Дахин бөглөх хуваарь</div></div><div class="mx-list"></div></div>
         <div class="section-card">
           <div class="rc-head"><div class="rc-title">7 хоногийн сэтгэл зүйн байдал</div></div>
           <div class="week-grid" id="week-grid-2"></div>
@@ -2619,6 +2636,88 @@ const MOOD_STRESS_SIGNAL   = { anxious:100, angry:90, tired:60, sad:55, lonely:5
 const MOOD_BURNOUT_SIGNAL  = { tired:100,  lonely:70, sad:55,  angry:40, anxious:35, calm:15, happy:10, grateful:5  };
 const MOOD_SAT_SIGNAL      = { grateful:100, happy:90, calm:70, lonely:35, sad:25, tired:30, angry:15, anxious:20 };
 
+/* Нэг тестийн дүнгийн түвшинг тестийн өөрийн шалгуураар тодорхойлно (оноо тооцоо өөрчлөгдөхгүй). */
+const MX_COL = { low:'#3F7A5E', medium:'#C08A2E', high:'#B42318' };
+const MX_CHIP = { low:'l', medium:'m', high:'h' };
+const MX_NAME = { phq9:'PHQ-9 сэтгэл гутралын тест', gutral_soril:'Сэтгэл гутралыг илрүүлэх сорил', gad7:'GAD-7 түгшүүрийн тест',
+  tugeemel_tugshilt:'Түгээмэл сэтгэл түгшилтийн сорил', sleep:'Нойрны чанарын тест', insomnia_test:'Нойргүйдлийг илрүүлэх тест',
+  cbi:'Ажлаас халшрах хам шинжийн тест (CBI)', satisfaction:'Сэтгэл ханамжийн тест', mergejliin_setgel_hanamj:'Мэргэжлийн сэтгэл ханамжийн тест',
+  pcl5:'PCL-5 сэтгэл зүйн гэмтлийн тест', audit:'AUDIT архины хэрэглээний тест', arhiny_hamaarl:'Архины хамаарлын тест',
+  nikotin_hamaarl:'Никотины хамаарлын тест', mansuuruulah_bodis:'Мансууруулах бодисын хэрэглээний сорил',
+  internet_tanglaam_dontolt:'Интернэт, тоглоомын донтолтын судалгаа', gar_utasny_dontolt:'Гар утасны донтолтын тест' };
+// Хандлага, хуваарьт хамруулах сэтгэл зүйн байдлын тестүүд (зан чанар, чадварын тестүүд орохгүй)
+const MX_TRACK = ['phq9','gutral_soril','gad7','tugeemel_tugshilt','pcl5','sleep','insomnia_test','cbi','satisfaction','mergejliin_setgel_hanamj',
+  'audit','arhiny_hamaarl','nikotin_hamaarl','mansuuruulah_bodis','internet_tanglaam_dontolt','gar_utasny_dontolt'];
+const MX_RECHECK_DAYS = { low:60, medium:14, high:14 };
+function mxDate(t) { const p = getUbParts(t); return `${p.year}.${String(p.month).padStart(2,'0')}.${String(p.day).padStart(2,'0')}`; }
+function mxLevel(r) {
+  const k = r.test_key, t = TESTS[k], sc = Number(r.score);
+  if (!t || !isFinite(sc)) return null;
+  if (k === 'insomnia_test') { // 17 тийм/үгүй асуулт: хамгийн өндөр дэд хэсгийн хувь (wellnessPct-тэй ижил зааг)
+    const key = sc >= 70 ? 'high' : sc >= 50 ? 'medium' : 'low';
+    return { key, label: { low:'Шинж бага', medium:'Анхаарах', high:'Илэрхий' }[key], sc: Math.round(sc) + '%', frac: sc / 100,
+      extra: r.level && key !== 'low' ? ` (${String(r.level).toLowerCase()})` : '' };
+  }
+  if (!t.cutoffs || !t.cutoffs.length) return null;
+  const max = Number(r.max_score) || t.cutoffs[t.cutoffs.length - 1].max;
+  const hit = t.cutoffs.find(c => sc <= c.max) || t.cutoffs[t.cutoffs.length - 1];
+  const label = hit.label.replace(/^(Ажлын )?[Сс]этгэл ханамжийн түвшин /, '').replace(/ зэргийн сэтгэл түгшилт$/, ' зэрэг')
+    .replace(/^Түгшилтийн шинж бага$/, 'Бага').replace(/ зэргийн сэтгэл гутралтай$/, ' зэрэг').replace(/^\S/, ch => ch.toUpperCase());
+  return { key: hit.key, label, sc: `${Math.round(sc)}/${Math.round(max)}`, frac: max ? sc / max : 0 };
+}
+const MX_RANK = { low:0, medium:1, high:2 };
+/* Өөрчлөлтийн хандлага: ижил тестийн өмнөх ба сүүлийн дүнг харьцуулна. Түвшин өөрчлөгдсөн,
+   эсвэл тогтвортой байдлын хувь (wellnessPct) 10-аас дээш нэгжээр өөрчлөгдсөн үед л "өөрчлөгдсөн" гэж үзнэ. */
+function renderMxChange(all) {
+  const box = document.querySelector('#an-change .mx-list'); if (!box) return;
+  const rows = [];
+  MX_TRACK.forEach(k => {
+    const h = all.filter(r => r.test_key === k && mxLevel(r)).sort((x, y) => new Date(y.created_at) - new Date(x.created_at));
+    if (h.length < 2) return;
+    const cur = h[0], prev = h[1], Lc = mxLevel(cur), Lp = mxLevel(prev);
+    const wc = wellnessPct(cur), wp = wellnessPct(prev);
+    let dir = 0;
+    if (MX_RANK[Lc.key] !== MX_RANK[Lp.key]) dir = MX_RANK[Lc.key] < MX_RANK[Lp.key] ? 1 : -1;
+    else if (wc !== null && wp !== null && Math.abs(wc - wp) >= 10) dir = wc > wp ? 1 : -1;
+    rows.push({ k, cur, prev, Lc, Lp, dir });
+  });
+  if (!rows.length) {
+    box.innerHTML = '<p class="mx-empty">Нэг тестийг хоёр ба түүнээс дээш удаа бөглөхөд өмнөх болон сүүлийн дүнгийн өөрчлөлт энд харагдана.</p>';
+    return;
+  }
+  rows.sort((a, b) => a.dir - b.dir);
+  const TXT = { 1:['up','Сайжирсан'], 0:['eq','Тогтвортой'], '-1':['dn','Анхаарах'] };
+  box.innerHTML = rows.map(x => { const [c, t] = TXT[x.dir]; return `<div class="mx-it">
+      <div class="mx-top"><span class="mx-n">${MX_NAME[x.k] || TESTS[x.k].title}</span><span class="mx-dir ${c}">${t}</span></div>
+      <div class="mx-cmp"><span class="qx-chip ${MX_CHIP[x.Lp.key]}">${x.Lp.label}</span> <span class="mx-sc">${x.Lp.sc}</span>
+        <span class="mx-ar">→</span> <span class="qx-chip ${MX_CHIP[x.Lc.key]}">${x.Lc.label}</span> <span class="mx-sc">${x.Lc.sc}</span></div>
+      <div class="metric-src">${mxDate(x.prev.created_at)} → ${mxDate(x.cur.created_at)}</div></div>`; }).join('');
+}
+/* Дахин бөглөх хуваарь: тест бүрийн сүүлийн дүнгийн түвшингээр (хэвийн 2 сар, анхаарах/өндөр 2 долоо хоног) */
+function renderMxRecheck(all) {
+  const box = document.querySelector('#an-recheck .mx-list'); if (!box) return;
+  const DAY = 86400000, now = Date.now();
+  const rows = [];
+  MX_TRACK.forEach(k => {
+    const r = all.filter(x => x.test_key === k && mxLevel(x)).sort((x, y) => new Date(y.created_at) - new Date(x.created_at))[0];
+    if (!r) return;
+    const L = mxLevel(r), due = new Date(r.created_at).getTime() + MX_RECHECK_DAYS[L.key] * DAY;
+    rows.push({ k, r, L, due });
+  });
+  if (!rows.length) {
+    box.innerHTML = '<p class="mx-empty">Сэтгэл зүйн тест бөглөсний дараа тест бүрийг хэзээ дахин бөглөх нь энд харагдана.</p>';
+    return;
+  }
+  rows.sort((a, b) => a.due - b.due);
+  box.innerHTML = rows.map(x => { const over = x.due <= now; const left = Math.ceil((x.due - now) / DAY);
+    return `<div class="mx-it mx-rc${over ? ' due' : ''}">
+      <div class="mx-top"><span class="mx-n">${MX_NAME[x.k] || TESTS[x.k].title}</span>${over
+        ? `<button class="mx-go" onclick="openModal('${x.k}')">Одоо бөглөх</button>`
+        : `<span class="mx-when">${left} хоногийн дараа</span>`}</div>
+      <div class="metric-src">Сүүлд ${mxDate(x.r.created_at)}-нд бөглөсөн · <span class="qx-chip ${MX_CHIP[x.L.key]}">${x.L.label}</span> · дахин бөглөх: ${mxDate(x.due)}</div></div>`; }).join('')
+    + '<p class="mx-empty" style="margin-top:.6rem">Хэвийн дүнтэй бол 2 сарын дараа, анхаарах эсвэл өндөр дүнтэй бол 2 долоо хоногийн дараа дахин бөглөхийг зөвлөж байна.</p>';
+}
+
 async function loadAnalyticsSummary() {
   const noteEl = document.querySelector('.trend-note');
   if (!currentUser?.id) { return; }
@@ -2626,51 +2725,48 @@ async function loadAnalyticsSummary() {
   const from30 = nowMs - 30*86400000;
 
   const [testsRes, moodsRes] = await Promise.all([
-    sb.from('test_results').select('test_key, score, max_score, created_at').eq('user_id', currentUser.id).gte('created_at', new Date(from30).toISOString()),
+    sb.from('test_results').select('test_key, score, max_score, level, created_at').eq('user_id', currentUser.id).order('created_at', { ascending:false }).limit(1000),
     sb.from('mood_entries').select('mood, created_at').eq('user_id', currentUser.id).gte('created_at', new Date(from30).toISOString()),
   ]);
   if (testsRes.error) console.error('analytics tests error:', testsRes.error);
   if (moodsRes.error) console.error('analytics moods error:', moodsRes.error);
-  const tests = testsRes.data || [];
+  const allTests = testsRes.data || [];
+  const tests = allTests.filter(r => new Date(r.created_at).getTime() >= from30);
   const moods = moodsRes.data || [];
 
-  // Тодорхой цонхны (window) дундаж хувийг тест эсвэл mood дохио дээр үндэслэн тооцоолно.
-  // Тест бөглөсөн бодит үр дүн байвал үүнийг тэргүүн ач холбогдолтой эх сурвалж болгоно, үгүй бол өдрийн мэдрэмжээс дүгнэнэ.
-  function windowPct(testKey, moodSignalMap, fromMs, toMs) {
-    const relevantTests = tests.filter(r => r.test_key === testKey && r.max_score && new Date(r.created_at).getTime() >= fromMs && new Date(r.created_at).getTime() < toMs);
-    if (relevantTests.length) {
-      const avg = relevantTests.reduce((s,r) => s + (r.score / r.max_score * 100), 0) / relevantTests.length;
-      return { pct: avg, source: 'test' };
-    }
-    const relevantMoods = moods.filter(m => moodSignalMap[m.mood] !== undefined && new Date(m.created_at).getTime() >= fromMs && new Date(m.created_at).getTime() < toMs);
-    if (relevantMoods.length) {
-      const avg = relevantMoods.reduce((s,m) => s + moodSignalMap[m.mood], 0) / relevantMoods.length;
-      return { pct: avg, source: 'mood' };
-    }
-    return { pct: null, source: 'none' };
+  // Үзүүлэлт бүрийг тухайн чиглэлийн тестүүдээс хамгийн сүүлд бөглөсөн дүнгээр, тестийн өөрийн шалгуураар харуулна.
+  // Тест бөглөөгүй бол тоо зохиохгүй ("Тест бөглөөгүй" + тест рүү орох товч).
+  const byNew = (x, y) => new Date(y.created_at) - new Date(x.created_at);
+  function latestOf(keys, list) {
+    return (list || tests).filter(r => keys.includes(r.test_key) && mxLevel(r)).sort(byNew)[0] || null;
   }
-
-  function applyMetric(fillClass, result) {
+  function applyMetric(fillClass, keys, openKey) {
     const fill = document.querySelector(`.metric-fill.${fillClass}`);
     if (!fill) return;
     const row = fill.closest('.metric-row');
-    const pctSpan = row.querySelector('.metric-top span:last-child');
-    if (result.pct === null) {
-      pctSpan.textContent = '—';
+    const valSpan = row.querySelector('.metric-top span:last-child');
+    const src = row.querySelector('.metric-src');
+    const r = latestOf(keys);
+    if (!r) {
+      valSpan.innerHTML = '<span class="qx-chip mx-none">Тест бөглөөгүй</span>';
       fill.style.width = '0%';
-    } else {
-      const rounded = Math.round(result.pct);
-      pctSpan.textContent = rounded + '%';
-      fill.style.width = rounded + '%';
+      if (src) src.innerHTML = `Сүүлийн 30 хоногт энэ чиглэлийн тест бөглөөгүй байна. <a href="#" onclick="openModal('${openKey}');return false;">Тест бөглөх →</a>`;
+      return;
     }
+    const L = mxLevel(r);
+    valSpan.innerHTML = `<span class="qx-chip ${MX_CHIP[L.key]}">${L.label}</span> <span class="mx-sc">${L.sc}</span>`;
+    fill.style.width = Math.max(3, Math.min(100, Math.round(L.frac * 100))) + '%';
+    fill.style.background = MX_COL[L.key];
+    if (src) src.textContent = `${MX_NAME[r.test_key] || TESTS[r.test_key].title}${L.extra || ''} · ${mxDate(r.created_at)}-нд бөглөсөн`;
   }
 
-  const stress30 = windowPct('gad7', MOOD_STRESS_SIGNAL, from30, nowMs);
-  const burnout30 = windowPct('cbi', MOOD_BURNOUT_SIGNAL, from30, nowMs);
-  const sat30 = windowPct('satisfaction', MOOD_SAT_SIGNAL, from30, nowMs);
-  applyMetric('stress', stress30);
-  applyMetric('burnout', burnout30);
-  applyMetric('sat', sat30);
+  applyMetric('mood', ['phq9', 'gutral_soril'], 'phq9');
+  applyMetric('stress', ['gad7', 'tugeemel_tugshilt'], 'gad7');
+  applyMetric('sleep', ['sleep', 'insomnia_test'], 'sleep');
+  applyMetric('burnout', ['cbi'], 'cbi');
+  applyMetric('sat', ['satisfaction', 'mergejliin_setgel_hanamj'], 'satisfaction');
+  renderMxChange(allTests);
+  renderMxRecheck(allTests);
 
   /* Сүүлийн 14 хоногийг түүнээс өмнөх 14 хоногтой (15–28 дахь өдөр) харьцуулна.
      Зарчим: (1) зөвхөн ижил хэмжүүрийг хооронд нь харьцуулна;

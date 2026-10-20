@@ -987,6 +987,29 @@
 .ar-tag.c{background:#FDF1F0;color:#8E1B12}.ar-tag.h{background:#FCF5EA;color:#6E4309}.ar-tag.ack{opacity:.6}
 @media (max-width:600px){.ar-sum{grid-template-columns:1fr 1fr 1fr}.ar-kn{font-size:1.15rem}}
 </style>
+<style id="qx-css">
+.qx-row{padding:10px 0;border-bottom:1px solid #E6EEEE}.qx-row:last-of-type{border-bottom:0}
+.qx-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.qx-n{font-weight:700;font-size:.9rem;color:#14262C}
+.qx-chip{font-size:.74rem;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.qx-chip.l{background:#E4F1EC;color:#2F6B50}.qx-chip.m{background:#FCF0DC;color:#7A4A0B}.qx-chip.h{background:#FDE7E5;color:#8E1B12}
+.qx-bar{height:8px;border-radius:5px;background:#EEF3F3;margin:8px 0 5px;overflow:hidden}.qx-bar div{height:100%;border-radius:0 4px 4px 0}
+.qx-sc{font-size:.76rem;color:#5A6B70}
+.t2-card .lk-card:first-child{margin-top:0}
+</style>
+<style id="t2b-css">
+.t2-sw{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.t2-sw .sw{border-radius:12px;padding:11px 13px}
+.t2-sw .sw h5{margin:0 0 6px;font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+.t2-sw .sw ul{margin:0;padding-left:1.05rem;font-size:.88rem;line-height:1.55;color:#1D343B}.t2-sw .sw li{margin:.25rem 0}
+.t2-sw .s{background:#EEF6F1}.t2-sw .s h5{color:#2F6B50}
+.t2-sw .w{background:#FCF5EA}.t2-sw .w h5{color:#7A4A0B}
+.t2-note{margin-top:14px;font-size:.84rem;line-height:1.55;padding:.75rem .95rem;border-radius:12px;background:#EDF3F2;color:#1D343B}.t2-note b{color:#0A677A}
+.qx-more{margin-top:8px}.qx-more summary{cursor:pointer;font-weight:700;font-size:.82rem;color:#0A677A}
+.qx-more-b{font-size:.85rem;line-height:1.6;margin-top:6px;padding:10px 12px;border-radius:10px;background:#F7FAFA;color:#1D343B}
+.qx-more-b ul{margin:.4rem 0;padding-left:1.05rem}
+@media (max-width:560px){.t2-sw{grid-template-columns:1fr}}
+</style>
 <style id="hb-css">
 .hb{background:#fff;border:1px solid #E1E9E8;border-radius:14px;padding:14px 16px;margin:12px 0}
 .hb-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
@@ -3885,13 +3908,18 @@ function getProTier(key, t, total) {
 /* Дэлгэрэнгүй, мэргэжлийн хэлбэрийн үр дүнгийн тайлан (HTML) */
 function trHeadText(name, levelText, toneKey, scoreText) {
   const tone = TR_TONE[toneKey] || TR_TONE.low;
-  return `<div class="tr-head" style="--tr-tone:${tone[0]}"><p class="tr-k">${name} — таны үр дүн</p>
-    <div class="tr-row"><h3 class="tr-lv">${levelText}</h3>${scoreText ? `<div class="tr-sc"><b>${scoreText}</b>оноо</div>` : ''}</div></div>`;
+  const d = new Date(), dt = `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+  return `<div class="tr-head" style="--tr-tone:${tone[0]}"><p class="tr-k">${name}</p>
+    <div class="tr2-main"><div><h3 class="tr-lv">${levelText}</h3></div>${scoreText ? `<div class="tr-sc"><b>${scoreText}</b>оноо</div>` : ''}</div>
+    <div class="tr2-pills"><span class="tr2-pill">📅 ${dt}</span></div></div>`;
 }
 function trAdviceHtml(A) {
   if (!A) return '';
-  const blk = (t, a, c) => a && a.length ? `<section class="tr-sec"><h4>${t}</h4><ul class="tr-list ${c}">${a.map(x => `<li>${x}</li>`).join('')}</ul></section>` : '';
-  return blk('Давуу тал', A.s, 's') + blk('Анхаарах зүйл', A.w, 'w') + blk('Хөгжүүлэх зөвлөмж', A.d, 'd');
+  const li = a => `<ul>${a.map(x => `<li>${x}</li>`).join('')}</ul>`;
+  const sw = (A.s && A.s.length) || (A.w && A.w.length) ? `<section class="t2-card"><h4 class="t2-h"><span class="t2-ic">${T2_IC.bulb}</span>Таны онцлог</h4>
+    <div class="t2-sw">${A.s && A.s.length ? `<div class="sw s"><h5>Давуу тал</h5>${li(A.s)}</div>` : ''}${A.w && A.w.length ? `<div class="sw w"><h5>Анхаарах зүйл</h5>${li(A.w)}</div>` : ''}</div></section>` : '';
+  const dv = A.d && A.d.length ? `<section class="t2-card t2-plan"><h4 class="t2-h"><span class="t2-ic">${T2_IC.plan}</span>Хөгжүүлэх зөвлөмж</h4>${t2List(A.d)}<p class="t2-tip">Хийсэн алхмаа дарж тэмдэглээрэй.</p></section>` : '';
+  return sw + dv;
 }
 /* Темпераментын хэв шинж бүрийн давуу тал, анхаарах зүйл, зөвлөмж (тайлбар нь аргачлалын баримт бичгийнх хэвээр) */
 const TEMP_ADVICE = {
@@ -4506,44 +4534,57 @@ async function scoreCombinedTests() {
     summaryText = 'Ерөнхийдөө тайван, тогтвортой үзүүлэлттэй байна. Одоогийн дадлаа үргэлжлүүлээрэй.';
   }
 
-  // Хамгийн өндөр хувьтай (давамгайлж буй) чиглэлийг тодорхойлж, түүнд тохирсон практик зөвлөгөө өгнө
+  // Хамгийн их анхаарал шаардах (тогтвортой байдал хамгийн бага) чиглэл
   const dominant = results.reduce((m, r) => (r.well < m.well ? r : m), results[0]);
   const dominantTier = getProTier(dominant.key, dominant.t, dominant.total);
   const dominantTips = dominantTier ? dominantTier.care : (PRACTICAL_ADVICE[dominant.key] || []);
-  const dominantHtml = dominant.well < 70 && dominantTips.length ? `
-    <div class="section-card" style="margin:1rem 0;background:var(--gold-soft);border:1px solid var(--gold);">
-      <div style="font-weight:800;font-size:.9rem;margin-bottom:.6rem;">🎯 Танд хамгийн их нөлөөлж буй тал: <span style="color:var(--gold-deep);">${dominant.t.emo} ${dominant.t.title}</span></div>
-      <div style="font-size:.83rem;color:var(--sub);margin-bottom:.7rem;">Амьдралдаа хэрэгжүүлж болох энгийн алхмууд:</div>
-      <ul class="result-list">${dominantTips.map(tip => `<li>${tip}</li>`).join('')}</ul>
-    </div>
-  ` : '';
-
-  const html = `
-    <h3>🧭 Нэгдсэн дүн шинжилгээ</h3>
-    ${hasSelfHarmFlag ? `<div class="disclaimer-note" style="background:var(--red-soft);border-left:3px solid var(--red);padding:1rem;border-radius:8px;margin-bottom:1rem;">
+  const toneOf = w => w >= 70 ? 'low' : w >= 50 ? 'medium' : 'high';
+  const ovTone = highAreas.length ? 'high' : toneOf(avgWell);
+  const tone = TR_TONE[ovTone];
+  const ringCol = ovTone === 'low' ? '#6FC79A' : ovTone === 'medium' ? '#F2B544' : '#F1857A';
+  const C = 2 * Math.PI * 32, f = Math.max(0, Math.min(1, avgWell / 100));
+  const d = new Date(), dt = `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+  const hero = `<div class="tr-head" style="--tr-tone:${tone[0]}"><p class="tr-k">Түргэн шуурхай үнэлгээ · ${results.length} тест</p>
+    <div class="tr2-main"><div><h3 class="tr-lv">${overallLevel}</h3><p class="tr2-sub">Сэтгэл зүйн тогтвортой байдал ${avgWell}%</p></div>
+      <div class="tr2-ring" aria-label="${avgWell}%"><svg viewBox="0 0 78 78"><circle cx="39" cy="39" r="32" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="7"/>${f > 0 ? `<circle cx="39" cy="39" r="32" fill="none" stroke="${ringCol}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${(C*f).toFixed(1)} ${C.toFixed(1)}"/>` : ''}</svg><b>${avgWell}<small>%</small></b></div></div>
+    <div class="tr2-pills"><span class="tr2-pill">📅 ${dt}</span><span class="tr2-pill"><i></i>Дахин шалгах: ${TR_RECHECK[ovTone]}</span></div></div>`;
+  const alert = hasSelfHarmFlag ? `<div class="disclaimer-note" style="background:var(--red-soft);border-left:3px solid var(--red);padding:1rem;border-radius:12px;margin:14px 0 0;">
       <b style="color:var(--red);">⚠️ Танд яаралтай дэмжлэг хэрэгтэй байж болзошгүй.</b><br>
       Хэрэв та амиа хорлох тухай бодож байгаа бол <b>одоо</b> мэргэжилтэнтэй (сэтгэл зүйч, эмч) холбогдоорой. Доорх товчийг дарахад л болно. Та ганцаараа биш, тусламж байгаа.
-      <div style="margin-top:.7rem;"><button class="connect-btn" style="width:auto;padding:.5rem 1.1rem;font-size:.82rem;" onclick="closeModal(); goto('pros');">Мэргэжилтэнтэй холбогдох</button></div>
-    </div>` : ''}
-    <div class="result-level">${overallLevel} (сэтгэл зүйн тогтвортой байдал ${avgWell}%)</div>
-    <div class="result-block">${summaryText}</div>
-    <div style="margin:1.1rem 0;">
-      ${results.map(r => `
-        <div style="margin-bottom:.9rem;">
-          <div style="display:flex;justify-content:space-between;font-size:.84rem;font-weight:700;margin-bottom:.3rem;">
-            <span>${r.t.emo} ${r.t.title}</span><span>${r.level} · ${Math.round(r.total)}/${Math.round(r.max)}</span>
-          </div>
-          <div class="bar-track"><div class="bar-fill" style="width:${r.well}%;background:${r.well >= 70 ? '#3F7A5E' : r.well >= 50 ? '#C08A2E' : '#B42318'};"></div></div>
-        </div>
-      `).join('')}
-    </div>
-    ${(() => { const L = linkInsights(k => { const r = results.find(x => x.key === k); return r ? (r.well < 50 ? 'r' : r.well < 70 ? 'w' : 's') : null; });
-      return L.length ? `<style>${HR_REPORT_CSS}</style><div class="rp" style="background:none;padding:0;margin:1rem 0"><h3 style="font-size:1rem;margin:0 0 .5rem">🔗 Үзүүлэлтүүдийн уялдаа</h3>${linkCardsHtml(L)}</div>` : ''; })()}
-    ${dominantHtml}
-    <div class="disclaimer-note">Мөр бүрийн зураас нь тухайн чиглэлийн сэтгэл зүйн тогтвортой байдлыг харуулна: ногоон — хэвийн, шар — анхаарах, улаан — мэргэжилтэнтэй ярилцах. Дэлгэрэнгүй мэдээллийг "Миний сэтгэл зүй" хуудаснаас харах боломжтой.</div>
+      <div style="margin-top:.7rem;"><button class="connect-btn" style="width:auto;padding:.5rem 1.1rem;font-size:.82rem;" onclick="closeModal(); goto('pros');">Мэргэжилтэнтэй холбогдох</button></div></div>` : '';
+  // Дүгнэлт
+  const sumCard = `<section class="t2-card t2-mean"><h4 class="t2-h"><span class="t2-ic">${T2_IC.bulb}</span>Ерөнхий дүгнэлт</h4><p>${summaryText}</p></section>`;
+  // Тестүүдийн дүн
+  const lvCls = r => r.levelKey === 'high' ? 'h' : r.levelKey === 'medium' ? 'm' : 'l';
+  const rows = results.map(r => `<div class="qx-row">
+      <div class="qx-top"><span class="qx-n">${r.t.emo} ${qName(r).charAt(0).toUpperCase() + qName(r).slice(1)}</span><span class="qx-chip ${lvCls(r)}">${r.level}</span></div>
+      <div class="qx-bar"><div style="width:${Math.max(3, r.well)}%;background:${r.well >= 70 ? '#3F7A5E' : r.well >= 50 ? '#C08A2E' : '#B42318'}"></div></div>
+      <div class="qx-sc">${Math.round(r.total)} / ${Math.round(r.max)} оноо · тогтвортой байдал ${r.well}%</div></div>`).join('');
+  const testsCard = `<section class="t2-card"><h4 class="t2-h"><span class="t2-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></span>Тестүүдийн дүн</h4>${rows}
+    <p class="t2-tip">Зураас урт байх тусам сэтгэл зүйн тогтвортой байдал сайн. Ногоон нь хэвийн, шар нь анхаарах, улаан нь мэргэжилтэнтэй ярилцах.</p></section>`;
+  // Таны хариултаас: бүх тестийн хариултаас хамгийн их анхаарал татсан 3-ыг нэгтгэнэ
+  const ins = []; results.forEach(r => { const R = answerInsights(r.key, `cq_${r.key}_`); if (R) R.top.forEach(x => ins.push({ ...x, tk: r.key })); });
+  ins.sort((a, b) => (INS_THEMES[b.theme]?.urgent ? 1 : 0) - (INS_THEMES[a.theme]?.urgent ? 1 : 0) || b.r - a.r);
+  const seenT = new Set(), topIns = ins.filter(x => !seenT.has(x.theme) && seenT.add(x.theme)).slice(0, 3);
+  const insCard = topIns.length ? `<section class="t2-card t2-ins"><h4 class="t2-h"><span class="t2-ic">${T2_IC.user}</span>Таны хариултаас</h4><p class="ins-sub">Бүх тестийн хариултаас хамгийн их анхаарал татсан ${topIns.length} зүйл:</p>
+    ${topIns.map(x => { const T = INS_THEMES[x.theme]; return `<div class="ins-it${T.urgent ? ' urg' : ''}"><div class="ins-t">${T.t}</div>
+      <div class="ins-q">«${insEsc(String(x.q).replace(/\s*[.?]\s*$/, ''))}» гэсэн асуултад <b>${insEsc(String(x.a).trim().toLowerCase())}</b> гэж хариулсан байна.</div><div class="ins-tip">${T.tip}</div></div>`; }).join('')}</section>` : '';
+  // Уялдаа
+  const L = linkInsights(k => { const r = results.find(x => x.key === k); return r ? (r.well < 50 ? 'r' : r.well < 70 ? 'w' : 's') : null; });
+  const linkCard = L.length ? `<style>${HR_REPORT_CSS}</style><section class="t2-card"><h4 class="t2-h"><span class="t2-ic">🔗</span>Үзүүлэлтүүдийн уялдаа</h4><div class="rp" style="background:none;padding:0;margin:0;box-shadow:none;border:0">${linkCardsHtml(L)}</div></section>` : '';
+  // Төлөвлөгөө (хамгийн их анхаарах чиглэлээр)
+  let planCard = planHtml(dominant.key, dominant.well < 70 ? dominant.levelKey : 'low', dominant.well < 70 ? dominantTips : []);
+  if (planCard) planCard = planCard.replace('Таны төлөвлөгөө</h4>', `Таны төлөвлөгөө</h4><p class="ins-sub" style="margin-top:-4px">Хамгийн их анхаарах чиглэл: <b>${qName(dominant)}</b></p>`);
+  const seekTxt = (dominantTier && dominantTier.seek) || (GENERIC_PRO[ovTone] || GENERIC_PRO.medium).seek;
+  const duo = `<div class="t2-duo" style="--tr-tone:${tone[0]};--tr-soft:${tone[1]}">
+      <div class="t2-box t2-re"><b>${T2_IC.cal}Дахин хэзээ шалгах вэ?</b>${ADVICE_RECHECK[ovTone]}</div>
+      <div class="t2-box t2-seek"><b>${T2_IC.user}Мэргэжилтэнд хэзээ хандах вэ?</b>${seekTxt}</div></div>`;
+
+  const html = `${hero}${alert}${sumCard}${testsCard}${insCard}${linkCard}${planCard}${duo}
+    <p class="t2-tip" style="margin-top:12px">Тест тус бүрийн дэлгэрэнгүй дүнг "Миний сэтгэл зүй" хуудасны "Миний сэтгэл зүйн байдлын тайлан"-гаас харах боломжтой.</p>
     ${AI_SUMMARY_ENABLED ? aiBoxHtml('quick') : ''}
     ${fbHtml('quick')}
-    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="closeModal(); goto('pros');">Мэргэжилтэнтэй холбогдох</button></div>
+    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="modal-close" onclick="printTestAdvice()">🖨️ Хэвлэх / PDF</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="closeModal(); goto('pros');">Мэргэжилтэнтэй холбогдох</button></div>
   `;
   document.getElementById('modal-box').innerHTML = html;
 }
@@ -6855,7 +6896,31 @@ const HR_REPORT_CSS = `.lk-card{border:1px solid #D6E1E0;border-radius:12px;padd
 .rp-hr{background:#F3F6F8;border:1px solid var(--line);border-radius:12px;padding:16px 20px}.rp-hr h4{margin-top:10px;color:var(--deep)}
 .rp-foot{margin-top:26px;padding-top:12px;border-top:2px solid var(--deep);font-size:11px;color:var(--muted)}.rp-foot p+p{margin-top:6px}
 @media (max-width:640px){.rp-two,.rp-sc-g{grid-template-columns:1fr}.rp-head{padding:18px}.rp-head-r{text-align:left}.rp-sum{padding:16px 18px}.rp-head h1{font-size:23px}}
-@media print{.rp section{break-inside:auto}.rp-in,.rp-sc,.rp-k,.rp-it{break-inside:avoid}}`;
+@media print{.rp section{break-inside:auto}.rp-in,.rp-sc,.rp-k,.rp-it{break-inside:avoid}}
+.rp h1,.rp h2,.rp h3{font-family:Inter,Arial,sans-serif;font-weight:800;letter-spacing:-.01em}
+.rp h2{font-size:17px;display:flex;align-items:center;gap:8px}
+.rp h2::before{content:"";width:6px;height:18px;border-radius:3px;background:var(--teal);flex:none;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.rp-col h2::before{background:currentColor}
+.rp-head{border-radius:18px;background:linear-gradient(135deg,#0D3B46 0%,#0A5562 100%);position:relative;overflow:hidden;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.rp-head::after{content:"";position:absolute;left:0;right:0;bottom:0;height:5px;background:#6FC79A}
+.rp-head h1{font-size:26px}
+.rp-sum{margin-top:14px!important;background:#fff;border:1px solid #E1E9E8;border-top:1px solid #E1E9E8;border-radius:16px;padding:18px 20px}
+.rp-sum p{font-family:Inter,Arial,sans-serif;font-size:14.5px;line-height:1.7}
+.rp>section:not(.rp-sum){background:#fff;border:1px solid #E1E9E8;border-radius:16px;padding:16px 18px;margin-top:14px}
+.rp>section.rp-how{background:#F7FAFA}
+.rp-in{border-radius:12px;border-left-width:4px}
+.rp-sc{border-bottom:1px solid #E6EEEE}
+.rp-dom{border-top:0;padding-top:4px}.rp-dom+.rp-dom{border-top:1px dashed #D6E1E0;padding-top:12px;margin-top:6px}
+.rp-dom h3{font-size:14px;color:var(--teal);text-transform:uppercase;letter-spacing:.04em}
+.rp-sc-v{background:#EDF3F2;border-radius:20px;padding:2px 10px;font-size:12.5px}
+.rp-sc-v.r{background:#FDE7E5;color:#8E1B12}.rp-sc-v.w{background:#FCF0DC;color:#7A4A0B}.rp-sc-v.s{background:#E4F1EC;color:#2F6B50}
+.rp-tl{border-left:0;margin-left:0}
+.rp-tl>li{padding:12px 14px 12px 46px;margin-bottom:8px;background:#F7FAFA;border:1px solid #E6EEEE;border-radius:12px}
+.rp-tl>li::before{left:12px;top:12px;width:24px;height:24px}
+.rp-k{border-radius:0}
+.rp-hr{border-radius:14px}
+.rp-foot{border-top:1px solid #D6E1E0}
+@media print{.rp>section:not(.rp-sum),.rp-sum{border-color:#D6E1E0;break-inside:auto}.rp-tl>li{break-inside:avoid}}`;
 
 let hrReportLast = '';
 async function openHrReport(uid) {
@@ -7254,8 +7319,8 @@ async function scoreModal(key) {
       <div style="margin-top:.7rem;"><button class="connect-btn" style="width:auto;padding:.5rem 1.1rem;font-size:.82rem;" onclick="closeModal(); goto('pros');">Мэргэжилтэнтэй холбогдох</button></div>
     </div>` : ''}
     ${t.personality ? (t.cutoffs ? buildPersonalityScale(t, total, max) : '') : buildResultChart(key, t, total, max)}
-    ${t.personality ? `<div class="result-block"><b>Тайлбар:</b> Энэ бол таны зан төлөвийн онцлог бөгөөд "засах шаардлагатай асуудал" биш — хүн бүр өөр өөр хэв шинжтэй байдаг.</div>
-    ${rec ? `<div class="result-block"><b>Зөвлөмж:</b><ul class="result-list">${rec.map(r=>`<li>${r}</li>`).join('')}</ul></div>` : ''}` : buildProReport(key, t, total, max, level, levelKey)}
+    ${t.personality ? `<div class="t2-note"><b>Санамж:</b> Энэ бол таны зан төлөвийн онцлог бөгөөд засах шаардлагатай асуудал биш. Хүн бүр өөр өөр хэв шинжтэй байдаг.</div>
+    ${rec ? `<section class="t2-card t2-plan"><h4 class="t2-h"><span class="t2-ic">${T2_IC.plan}</span>Танд санал болгох зүйлс</h4>${t2List(rec)}<p class="t2-tip">Хийсэн алхмаа дарж тэмдэглээрэй.</p></section>` : ''}` : buildProReport(key, t, total, max, level, levelKey)}
 
     <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button>${t.personality ? '' : `<button class="modal-close" onclick="printTestAdvice()">🖨️ Хэвлэх / PDF</button>`}${t.personality ? '' : `<button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="closeModal(); goto('pros');">Мэргэжилтэнтэй холбогдох</button>`}</div>
   `;
@@ -7315,39 +7380,43 @@ const MULTI_GUIDE = {
 function multiGuideHtml(r) {
   const G = MULTI_GUIDE[r.key];
   if (!G || r.pct < 50) return '';
-  return `<details style="margin-top:.45rem;"><summary style="cursor:pointer;font-weight:700;font-size:.82rem;color:var(--gold);">Тайлбар ба зөвлөмж</summary>
-    <div style="font-size:.83rem;line-height:1.55;margin-top:.35rem;">${G.m}
-    <ul class="result-list" style="margin:.35rem 0;">${G.care.map(x => `<li>${x}</li>`).join('')}</ul>
+  return `<details class="qx-more"><summary>Тайлбар ба зөвлөмж</summary>
+    <div class="qx-more-b">${G.m}
+    <ul>${G.care.map(x => `<li>${x}</li>`).join('')}</ul>
     <b>Мэргэжилтэнд хэзээ хандах вэ?</b> ${G.seek}
     ${G.link ? `<div style="margin-top:.45rem;"><button class="modal-close" style="padding:.3rem .8rem;font-size:.78rem;" onclick="openModal('${G.link}')">Баталгаажсан тестээр нягтлах: ${G.linkName}</button></div>` : ''}</div></details>`;
 }
 
 function renderMultiLabelResult(title, subtitle, results, hasSelfHarmFlag) {
   const topPct = results[0].pct;
+  const lv = topPct >= 70 ? 'high' : topPct >= 50 ? 'medium' : 'low';
   const rec = topPct >= 50
-    ? ['Аль болох эрт мэргэжлийн сэтгэл зүйчид хандахыг зөвлөж байна.','Итгэмжит хүн, ахлагчдаа мэдэгдээрэй.','Шаардлагатай бол "Сэтгэл зүйч" хэсгээр шууд холбогдоорой.']
-    : ['Одоогийн дадлаа үргэлжлүүлээрэй.','Тогтмол амралт, дасгал хөдөлгөөнөө хэвээр байлгаарай.','Шинж тэмдэг үргэлжилвэл мэргэжилтэнтэй холбогдоорой.'];
+    ? ['Аль болох эрт сэтгэл зүйчтэй уулзаарай.', 'Итгэдэг хүн эсвэл ахлагчдаа байдлаа хэлээрэй.', 'Шаардлагатай бол "Сэтгэл зүйч" хэсгээр шууд холбогдоорой.']
+    : ['Одоогийн сайн дадлаа үргэлжлүүлээрэй.', 'Амралт, дасгал хөдөлгөөнөө тогтмол байлгаарай.', 'Шинж тэмдэг үргэлжилбэл мэргэжилтэнтэй холбогдоорой.'];
+  const key = aiTestCtx?.key || (/нойр/i.test(title) ? 'insomnia_test' : 'stress_symptoms');
+  const tone = TR_TONE[lv];
+  const col = p => p >= 70 ? '#B42318' : p >= 50 ? '#C08A2E' : '#3F7A5E';
+  const chip = p => p >= 70 ? '<span class="qx-chip h">Өндөр</span>' : p >= 50 ? '<span class="qx-chip m">Анхаарах</span>' : '<span class="qx-chip l">Бага</span>';
+  const rows = results.map(r => `<div class="qx-row">
+      <div class="qx-top"><span class="qx-n">${r.label}</span>${chip(r.pct)}</div>
+      <div class="qx-bar"><div style="width:${Math.max(2, r.pct)}%;background:${col(r.pct)}"></div></div>
+      <div class="qx-sc">${r.yesCount}/${r.total} шинж тэмдэг илэрсэн · ${r.pct}%</div>${multiGuideHtml(r)}</div>`).join('');
+  const D = ADVICE[ADVICE_DOMAIN[key]];
   document.getElementById('modal-box').innerHTML = `
-    ${trHeadText(title, results[0].pct >= 50 ? 'Анхаарах чиглэл: ' + chShort(results[0].label) : 'Онцгой анхаарах шинж илрээгүй', results[0].pct >= 70 ? 'high' : results[0].pct >= 50 ? 'medium' : 'low')}
-    ${hasSelfHarmFlag ? `<div class="disclaimer-note" style="background:var(--red-soft);border-left:3px solid var(--red);padding:1rem;border-radius:8px;margin-bottom:1rem;">
+    ${trHeadText(title, topPct >= 50 ? 'Анхаарах чиглэл: ' + chShort(results[0].label) : 'Онцгой анхаарах шинж илрээгүй', lv)}
+    ${hasSelfHarmFlag ? `<div class="disclaimer-note" style="background:var(--red-soft);border-left:3px solid var(--red);padding:1rem;border-radius:12px;margin:14px 0 0;">
       <b style="color:var(--red);">⚠️ Танд яаралтай дэмжлэг хэрэгтэй байж болзошгүй.</b><br>
       Хэрэв та амиа хорлох тухай бодож байгаа бол <b>одоо</b> мэргэжилтэнтэй (сэтгэл зүйч, эмч) холбогдоорой. Доорх товчийг дарахад л болно. Та ганцаараа биш, тусламж байгаа.
-      <div style="margin-top:.7rem;"><button class="connect-btn" style="width:auto;padding:.5rem 1.1rem;font-size:.82rem;" onclick="closeModal(); goto('pros');">Мэргэжилтэнтэй холбогдох</button></div>
-    </div>` : ''}
-    <p style="font-size:.85rem;color:var(--sub);margin:0 0 1rem;">${subtitle}</p>
-    ${results.length >= 3 ? `<div class="ch-card"><div class="ch-title">Шинж тэмдгийн профайл</div><div class="ch-sub">Чиглэл бүрийн илэрсэн шинж тэмдгийн хувийг радар графикаар харууллаа.</div>${svgRadar(results.map(r => ({ label:r.label, pct:r.pct })))}</div>` : ''}
-    ${results.map(r => `
-      <div class="result-block" style="margin-bottom:.9rem;">
-        <div style="display:flex;justify-content:space-between;font-size:.88rem;font-weight:700;margin-bottom:.3rem;"><span>${r.label}</span><span>${r.pct}%</span></div>
-        <div class="bar-track"><div class="bar-fill" style="width:${r.pct}%;"></div></div>
-        <div style="font-size:.76rem;color:var(--sub);margin-top:.2rem;">${r.yesCount}/${r.total} холбогдох шинж тэмдэг илэрсэн</div>
-        ${multiGuideHtml(r)}
-      </div>
-    `).join('')}
-    <div class="result-block"><b>Зөвлөмж:</b><ul class="result-list">${rec.map(x=>`<li>${x}</li>`).join('')}</ul></div>
-    ${aiTestCtx ? adviceHtml(aiTestCtx.key, topPct >= 70 ? 'high' : topPct >= 50 ? 'medium' : 'low') : ''}
-    <div class="disclaimer-note" style="margin-top:.8rem;">Хувь нь тухайн чиглэлийн асуултуудаас "Тийм" гэж хариулсан хувийг илэрхийлнэ — өвчний магадлал биш. Энэ тест олон улсад баталгаажсан хэмжүүр биш тул 50%-аас дээш гарсан чиглэлийг баталгаажсан тестээр нягтлах, мэргэжилтэнтэй ярилцахыг зөвлөж байна.</div>
-    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="closeModal(); goto('pros');">Мэргэжилтэнтэй холбогдох</button></div>
+      <div style="margin-top:.7rem;"><button class="connect-btn" style="width:auto;padding:.5rem 1.1rem;font-size:.82rem;" onclick="closeModal(); goto('pros');">Мэргэжилтэнтэй холбогдох</button></div></div>` : ''}
+    <section class="t2-card t2-mean"><h4 class="t2-h"><span class="t2-ic">${T2_IC.bulb}</span>Энэ юу гэсэн үг вэ?</h4><p>${subtitle}</p>${D ? adviceSignsHtml(key, lv) : ''}</section>
+    ${results.length >= 3 ? `<div class="ch-card" style="margin-top:14px"><div class="ch-title">Шинж тэмдгийн профайл</div><div class="ch-sub">Чиглэл бүрийн илэрсэн шинж тэмдгийн хувийг радар графикаар харууллаа.</div>${svgRadar(results.map(r => ({ label: chShort(r.label), pct: r.pct })))}</div>` : ''}
+    <section class="t2-card"><h4 class="t2-h"><span class="t2-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></span>Чиглэл бүрийн дүн</h4>${rows}
+      <p class="t2-tip">Хувь нь тухайн чиглэлийн асуултуудад "Тийм" гэж хариулсан хувийг илэрхийлнэ. Өвчний магадлал биш.</p></section>
+    ${planHtml(key, lv, rec)}
+    <div class="t2-duo" style="--tr-tone:${tone[0]};--tr-soft:${tone[1]}">
+      <div class="t2-box t2-re"><b>${T2_IC.cal}Дахин хэзээ шалгах вэ?</b>${ADVICE_RECHECK[lv]}</div>
+      <div class="t2-box t2-seek"><b>${T2_IC.user}Мэргэжилтэнд хэзээ хандах вэ?</b>${topPct >= 50 ? 'Энэ тест олон улсад баталгаажсан хэмжүүр биш тул 50%-иас дээш гарсан чиглэлээ баталгаажсан тестээр нягталж, сэтгэл зүйчтэй ярилцаарай.' : 'Одоогоор тусгай арга хэмжээ шаардлагагүй. Шинж тэмдэг үргэлжилбэл мэргэжилтэнтэй холбогдоорой.'}</div></div>
+    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="modal-close" onclick="printTestAdvice()">🖨️ Хэвлэх / PDF</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="closeModal(); goto('pros');">Мэргэжилтэнтэй холбогдох</button></div>
   `;
 }
 
@@ -7883,7 +7952,7 @@ async function scoreTemperamentTest() {
           <div class="bar-track"><div class="bar-fill" style="width:${Math.round(s.pct)}%;"></div></div>
         </div>`).join('')}
     </div>
-    <div class="result-block"><b>Тайлбар:</b> Энэ бол таны зан төлөвийн онцлог бөгөөд "засах шаардлагатай асуудал" биш — хүн бүр өөр өөр хэв шинжтэй байдаг.</div>
+    <div class="t2-note"><b>Санамж:</b> Энэ бол таны зан төлөвийн онцлог бөгөөд засах шаардлагатай асуудал биш. Хүн бүр өөр өөр хэв шинжтэй байдаг.</div>
     <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button></div>
   `;
 }
@@ -8131,7 +8200,7 @@ async function scoreMBTI16Test() {
     <div class="result-block"><b>⚠️ Сул тал:</b><ul style="margin:.4rem 0 0 1.1rem;padding:0;">${info.weaknesses.map(s=>`<li>${s}</li>`).join('')}</ul></div>
     <div class="result-block"><b>💞 Харилцаанд хэрхэн илэрдэг:</b> ${info.relationships}</div>
     <div class="result-block"><b>💼 Тохирох карьерийн чиглэл:</b><ul style="margin:.4rem 0 0 1.1rem;padding:0;">${info.career.map(s=>`<li>${s}</li>`).join('')}</ul></div>
-    <div class="result-block"><b>Тайлбар:</b> Энэ бол таны зан төлөвийн онцлог бөгөөд "засах шаардлагатай асуудал" биш — хүн бүр өөр өөр хэв шинжтэй байдаг.</div>
+    <div class="t2-note"><b>Санамж:</b> Энэ бол таны зан төлөвийн онцлог бөгөөд засах шаардлагатай асуудал биш. Хүн бүр өөр өөр хэв шинжтэй байдаг.</div>
     <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button></div>
   `;
 }

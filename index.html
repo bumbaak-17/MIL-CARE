@@ -9246,10 +9246,10 @@ async function renderProOnlineConsultButton() {
   const el = document.getElementById('pro-online-consult-btn');
   if (!el || !currentProChatUserId || !myProId) return;
   const session = await getVideoSessionStatus(currentProChatUserId, myProId);
-  if (session?.status === 'approved' && session.video_room) {
+  if (session?.status === 'approved' && mcSafeRoomUrl(session.video_room)) {
     mcSetHTML(el, `
       <div style="text-align:center;color:var(--gold);font-size:.85rem;font-weight:700;margin-bottom:.5rem;">🟢 Онлайн зөвлөгөө зөвшөөрөгдсөн</div>
-      <a href="${session.video_room}" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;text-decoration:none;background:var(--gold);color:#fff;border-radius:12px;padding:.75rem;font-size:.92rem;font-weight:700;margin-bottom:.5rem;">🎥 Дуудлагад нэгдэх</a>
+      <a href="${escAttr(mcSafeRoomUrl(session.video_room))}" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;text-decoration:none;background:var(--gold);color:#fff;border-radius:12px;padding:.75rem;font-size:.92rem;font-weight:700;margin-bottom:.5rem;">🎥 Дуудлагад нэгдэх</a>
       <button onclick="proRevokeOnlineConsult('${currentProChatUserId}','${myProId}')" style="width:100%;background:none;border:1px solid var(--red,#c0392b);color:var(--red,#c0392b);border-radius:12px;padding:.6rem;font-size:.85rem;cursor:pointer;">Зөвшөөрлийг цуцлах</button>`);
   } else {
     mcSetHTML(el, `<button onclick="proApproveOnlineConsult('${currentProChatUserId}','${myProId}')" style="width:100%;background:var(--gold);color:#fff;border:none;border-radius:12px;padding:.75rem;font-size:.92rem;font-weight:700;cursor:pointer;">🎥 Онлайн зөвлөгөөг зөвшөөрөх</button>`);
@@ -9335,8 +9335,8 @@ async function renderUserOnlineConsultButton() {
   const el = document.getElementById('chat-online-consult-btn');
   if (!el || !currentUser?.id || !currentChatProId) return;
   const session = await getVideoSessionStatus(currentUser.id, currentChatProId);
-  if (session?.status === 'approved' && session.video_room) {
-    mcSetHTML(el, `<a href="${session.video_room}" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;text-decoration:none;background:var(--gold);color:#fff;border-radius:12px;padding:.75rem;font-size:.92rem;font-weight:700;">🎥 Онлайн зөвлөгөө — Дуудлагад нэгдэх</a>`);
+  if (session?.status === 'approved' && mcSafeRoomUrl(session.video_room)) {
+    mcSetHTML(el, `<a href="${escAttr(mcSafeRoomUrl(session.video_room))}" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;text-decoration:none;background:var(--gold);color:#fff;border-radius:12px;padding:.75rem;font-size:.92rem;font-weight:700;">🎥 Онлайн зөвлөгөө — Дуудлагад нэгдэх</a>`);
   } else {
     el.innerHTML = `<div style="text-align:center;background:var(--panel-2);color:var(--sub);border-radius:12px;padding:.75rem;font-size:.88rem;opacity:.6;cursor:not-allowed;">🎥 Онлайн зөвлөгөө <span style="display:block;font-size:.72rem;margin-top:.2rem;">Мэргэжилтэн зөвшөөрсний дараа идэвхжинэ</span></div>`;
   }
@@ -9406,8 +9406,16 @@ function closeChat() {
 }
 
 /* ================= ОНЛАЙН ЗӨВЛӨГӨӨ: чат доторх идэвхжүүлэх систем ================= */
-function videoRoomFor(userId, proId) {
-  return `https://meet.jit.si/MILCARE-${userId.slice(0,8)}-${proId.slice(0,8)}`;
+const MC_JITSI_BASE = 'https://meet.jit.si';
+// Зөвшөөрөл бүрт таах боломжгүй (128 бит) өрөөний нэр үүсгэнэ
+function videoRoomFor() {
+  const b = new Uint8Array(16); crypto.getRandomValues(b);
+  return `${MC_JITSI_BASE}/MILCARE-${Array.from(b, x => x.toString(16).padStart(2, '0')).join('')}`;
+}
+// Өгөгдлийн сангаас ирсэн өрөөний хаягийг шалгана: зөвхөн манай Jitsi хаяг + санамсаргүй нэр
+function mcSafeRoomUrl(u) {
+  if (typeof u !== 'string' || !u.startsWith(MC_JITSI_BASE + '/MILCARE-')) return null;
+  return /^[0-9a-f]{32}$/.test(u.slice((MC_JITSI_BASE + '/MILCARE-').length)) ? u : null;
 }
 async function getVideoSessionStatus(userId, proId) {
   const { data, error } = await sb.from('video_sessions').select('*')
@@ -9416,7 +9424,7 @@ async function getVideoSessionStatus(userId, proId) {
   return data;
 }
 async function proApproveOnlineConsult(userId, proId) {
-  const videoRoom = videoRoomFor(userId, proId);
+  const videoRoom = videoRoomFor();
   const { error } = await sb.from('video_sessions').upsert({
     user_id: userId, professional_id: proId, status: 'approved', video_room: videoRoom, updated_at: new Date().toISOString()
   }, { onConflict: 'user_id,professional_id' });

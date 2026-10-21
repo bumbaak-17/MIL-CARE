@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://zsceezpxjigxdcwfrlkm.supabase.co; media-src 'self' data: blob: https://zsceezpxjigxdcwfrlkm.supabase.co; connect-src 'self' https://zsceezpxjigxdcwfrlkm.supabase.co wss://zsceezpxjigxdcwfrlkm.supabase.co; worker-src 'self' blob:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
+<script>if (window.top !== window.self) { try { window.top.location = window.self.location.href; } catch (e) { document.documentElement.style.display = "none"; } }</script>
 <title>MIL-CARE — Сэтгэл зүйн дэмжлэгийн платформ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -1590,7 +1591,7 @@
               <div id="admin-pro-form-wrap">
                 <input type="hidden" id="pro-edit-id" value="">
                 <div class="filter-bar" style="margin-bottom:.7rem;">
-                  <input type="text" id="pro-name" placeholder="Овог нэр (жишээ: Б.Ануударь)" style="border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
+                  <input type="text" id="pro-name" placeholder="Овог нэр (жишээ: Б.Бат)" style="border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
                   <input type="text" id="pro-spec" placeholder="Мэргэжил (жишээ: Клиникийн сэтгэл зүйч)" style="border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
                   <input type="number" id="pro-years" placeholder="Туршлага (жил)" min="0" style="border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
                   <input type="number" id="pro-price" placeholder="Үнэ (₮)" min="0" step="1000" style="border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
@@ -1641,7 +1642,7 @@
                 Анги, байгууллагын хүний нөөцийн мэргэжилтнийг эндээс бүртгэнэ. Тэрээр эхлээд өөрөө сайтад имэйл/нууц үгээрээ бүртгүүлсэн байх ёстой (жирийн хэрэглэгчийн адилаар), дараа нь та энд нэр, ангийг нь бичээд, бүртгүүлсэн имэйлээр нь холбоно. Холбогдсоны дараа тэрээр "Хүний нөөц" хэсэгт орж, хүний нөөцийн тестүүдийг бөглөсөн хүмүүсийн жагсаалтыг харах боломжтой болно.
               </p>
               <div class="filter-bar" style="margin-bottom:.7rem;">
-                <input type="text" id="hr-name" placeholder="Овог нэр (жишээ: Б.Түвшинбаяр)" style="border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
+                <input type="text" id="hr-name" placeholder="Овог нэр (жишээ: Д.Дорж)" style="border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
                 <input type="text" id="hr-unit" placeholder="Анги, байгууллага (жишээ: 084 анги)" style="border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
                 <input type="email" id="hr-email" placeholder="Бүртгүүлсэн имэйл" style="border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
               </div>
@@ -1828,6 +1829,42 @@ function esc(str) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
+/* ===== Аюулгүй HTML оруулах цэг: сайтын бүх динамик HTML энэ хоёр функцээр дамжина =====
+   HTML-ийг идэвхгүй <template> дотор задалж (скрипт ажиллахгүй, зураг ачаалагдахгүй), сайтад ашиглагддаггүй
+   аюултай элемент, үйлдэл, холбоосыг хасаад дараа нь хуудсанд оруулна. Хэрэглэгчийн текстийг esc()-ээр
+   escape хийдэгтэй нийлээд хадгалагдсан XSS-ээс давхар хамгаална. */
+const MC_ALLOWED_ON = new Set(['onclick', 'onchange', 'oninput', 'onkeydown']);
+const MC_BAD_TAGS = 'script,iframe,frame,frameset,object,embed,applet,base,meta,link,form,portal';
+const MC_URL_ATTRS = new Set(['href', 'src', 'action', 'formaction', 'xlink:href', 'poster', 'background']);
+function mcClean(html) {
+  const t = document.createElement('template');
+  t.innerHTML = html == null ? '' : String(html);
+  const walkClean = root => {
+    root.querySelectorAll(MC_BAD_TAGS).forEach(n => n.remove());
+    root.querySelectorAll('*').forEach(el => {
+      for (const a of Array.from(el.attributes)) {
+        const n = a.name.toLowerCase();
+        if (n.startsWith('on') && !MC_ALLOWED_ON.has(n)) el.removeAttribute(a.name);
+        else if (n === 'srcdoc') el.removeAttribute(a.name);
+        else if (MC_URL_ATTRS.has(n) && /^\s*(javascript|vbscript|data:text\/html)/i.test(a.value)) el.removeAttribute(a.name);
+      }
+      if (el.tagName === 'TEMPLATE') walkClean(el.content);
+    });
+  };
+  walkClean(t.content);
+  return t.content;
+}
+function mcSetHTML(el, html) {
+  if (!el) return html;
+  el.replaceChildren(mcClean(html));
+  return html;
+}
+function mcInsertHTML(el, pos, html) {
+  if (!el) return;
+  const frag = mcClean(html), p = String(pos).toLowerCase();
+  if (p === 'beforebegin') el.before(frag); else if (p === 'afterbegin') el.prepend(frag);
+  else if (p === 'afterend') el.after(frag); else el.append(frag);
+}
 // onclick="fn('...')" маягийн газарт динамик текстийг дамжуулахад ашиглана:
 // эхлээд JS мөрийн доторх backslash/single-quote-ыг escape хийж, дараа нь
 // HTML attribute-д аюулгүй болгож esc() дамжуулна (эсрэг дараалалтай хийвэл
@@ -1915,11 +1952,11 @@ async function ensureUser() {
 function renderAuthSection() {
   const el = document.getElementById('auth-section');
   if (!el || !currentUser) return;
-  el.innerHTML = `
+  mcSetHTML(el, `
     <h3><span class="pf-hi"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span>Нэвтэрсэн бүртгэл</h3>
     <div class="pf-acct"><div class="g">${(OAUTH_NAMES[currentUser.provider] || 'G').charAt(0)}</div><div><b>${esc(currentUser.email || OAUTH_NAMES[currentUser.provider] || '—')}</b><span>${OAUTH_NAMES[currentUser.provider] || 'Бүртгэл'}-ээр нэвтэрсэн</span></div></div>
     <p style="margin:0 0 .4rem;">Та <b>${esc(currentUser.email || OAUTH_NAMES[currentUser.provider] || '—')}</b> ${currentUser.email && OAUTH_NAMES[currentUser.provider] ? '(' + OAUTH_NAMES[currentUser.provider] + ') ' : ''}бүртгэлээр нэвтэрсэн байна. Өөр утас, компьютер дээрээс ч мөн адил ${OAUTH_NAMES[currentUser.provider] || (FACEBOOK_LOGIN_ENABLED ? 'Google эсвэл Facebook' : 'Google')} товч дараад, энэ бүртгэлээрээ шууд нэвтэрч, өгөгдлөө үргэлжлүүлэн ашиглах боломжтой.</p>
-  `;
+  `);
 }
 
 /* Гарах үед энэ төхөөрөмж дээр үлдсэн мэдрэг өгөгдлийг (хариултын ноорог, тайлангийн кэш, илгээгдээгүй үнэлгээ) устгана */
@@ -2043,7 +2080,7 @@ function obFacebookAuth() { if (!FACEBOOK_LOGIN_ENABLED) return; return obOAuth(
 
 function renderObBranch() {
   const el = document.getElementById('ob-branch-grid');
-  el.innerHTML = BRANCHES.map(b => `<div class="ob-card" data-key="${b.key}"><div class="ob-icon">${b.icon}</div><div class="ob-label">${b.label}</div></div>`).join('');
+  mcSetHTML(el, BRANCHES.map(b => `<div class="ob-card" data-key="${b.key}"><div class="ob-icon">${b.icon}</div><div class="ob-label">${b.label}</div></div>`).join(''));
   el.querySelectorAll('.ob-card').forEach(c => c.addEventListener('click', () => {
     obSelectedBranch = c.dataset.key;
     document.getElementById('ob-step-branch').style.display = 'none';
@@ -2053,7 +2090,7 @@ function renderObBranch() {
 }
 function renderObRole() {
   const el = document.getElementById('ob-role-grid');
-  el.innerHTML = PERSONNEL_TYPES.map(r => `<div class="ob-card" data-key="${r.key}"><div class="ob-icon">${r.icon}</div><div class="ob-label">${r.label}</div></div>`).join('');
+  mcSetHTML(el, PERSONNEL_TYPES.map(r => `<div class="ob-card" data-key="${r.key}"><div class="ob-icon">${r.icon}</div><div class="ob-label">${r.label}</div></div>`).join(''));
   el.querySelectorAll('.ob-card').forEach(c => c.addEventListener('click', () => {
     obSelectedRole = c.dataset.key;
     obSubmit();
@@ -2105,10 +2142,10 @@ function fillProfileSelects() {
   const bEl = document.getElementById('profile-branch-select');
   const rEl = document.getElementById('profile-role-select');
   if (bEl && !bEl.options.length) {
-    bEl.innerHTML = BRANCHES.map(b => `<option value="${b.key}">${b.emoji} ${b.label}</option>`).join('');
+    mcSetHTML(bEl, BRANCHES.map(b => `<option value="${b.key}">${b.emoji} ${b.label}</option>`).join(''));
   }
   if (rEl && !rEl.options.length) {
-    rEl.innerHTML = PERSONNEL_TYPES.map(r => `<option value="${r.key}">${r.icon} ${r.label}</option>`).join('');
+    mcSetHTML(rEl, PERSONNEL_TYPES.map(r => `<option value="${r.key}">${r.icon} ${r.label}</option>`).join(''));
   }
   if (currentUser?.branch) bEl.value = currentUser.branch;
   if (currentUser?.personnel_type) rEl.value = currentUser.personnel_type;
@@ -2139,7 +2176,7 @@ async function saveClassification() {
 function setProfileAvatar() {
   const av = document.getElementById('profile-avatar'); if (!av) return;
   const br = (typeof BRANCHES !== 'undefined') && BRANCHES.find(b => b.key === currentUser?.branch);
-  av.innerHTML = br && br.icon ? br.icon.replace(/style="[^"]*"/, '') : '🎖️';
+  mcSetHTML(av, br && br.icon ? br.icon.replace(/style="[^"]*"/, '') : '🎖️');
 }
 async function loadProfilePage() {
   if (!currentUser?.id) return;
@@ -2209,9 +2246,9 @@ async function loadIdentityList() {
   const { data, error } = await sb.from('user_identities').select('*, users(anon_handle)').order('updated_at', { ascending:false });
   if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Жагсаалт татахад алдаа гарлаа.</div>'; return; }
   if (!data || data.length===0) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор бодит нэр бүртгүүлсэн хэрэглэгч алга.</div>'; return; }
-  el.innerHTML = data.map(d => `
+  mcSetHTML(el, data.map(d => `
     <div class="risk-row"><span class="risk-id">${esc(d.users?.anon_handle) || '—'}</span><span>${d.real_name ? esc(d.real_name) : '(нэр өгөгдөөгүй)'} ${d.rank ? '· '+esc(d.rank) : ''}</span></div>
-  `).join('');
+  `).join(''));
 }
 
 /* ================= ХҮНИЙ НӨӨЦ: хэрэглэгчид тест өгөх, ХН мэргэжилтэн/админ үр дүн харах ================= */
@@ -2220,7 +2257,7 @@ async function loadHrResults() {
   catch (e) {
     console.error('loadHrResults failed:', e);
     const c = document.getElementById('hr-portal-content');
-    if (c) c.innerHTML = `<div class="section-card"><p style="font-size:.85rem;color:var(--red);margin:0;">Хүний нөөцийн хэсгийг ачаалахад алдаа гарлаа: ${esc(e && e.message || String(e))}</p></div>`;
+    if (c) mcSetHTML(c, `<div class="section-card"><p style="font-size:.85rem;color:var(--red);margin:0;">Хүний нөөцийн хэсгийг ачаалахад алдаа гарлаа: ${esc(e && e.message || String(e))}</p></div>`);
   }
 }
 async function loadHrResultsInner() {
@@ -2243,7 +2280,7 @@ async function loadHrResultsInner() {
   if (isAdmin || myHrId) {
     // ХН мэргэжилтэн / админ горим: бөглөсөн хүмүүсийн дэлгэрэнгүй жагсаалт
     subtitle.textContent = 'Хүний нөөцийн чиглэлийн тестүүдийг бөглөсөн хүмүүсийн жагсаалт, дэлгэрэнгүй үр дүн.';
-    content.innerHTML = `
+    mcSetHTML(content, `
       <div class="section-card">
         <div class="section-head"><h3>📋 Тест бөглөсөн хүмүүсийн жагсаалт</h3></div>
         <p style="font-size:.8rem;color:var(--sub);margin:0 0 .8rem;">Тест тус бүрийн хамгийн сүүлийн үр дүн. "Анхаарах" гэсэн үр дүн нь мэргэжилтний нэмэлт үнэлгээ шаардлагатайг илтгэнэ.</p>
@@ -2254,12 +2291,12 @@ async function loadHrResultsInner() {
         <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Алба хаагчдад харагдах тестүүд. Эндээс урьдчилан харж болно (бөглөвөл таны бүртгэлд хадгалагдана).</p>
         ${cardsHtml}
       </div>
-    `;
+    `);
     const el = document.getElementById('hr-results-list');
     el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div>';
     const { data, error } = await sb.from('test_results').select('*, users(anon_handle, branch, personnel_type)')
       .like('test_key', 'hr_%').order('created_at', { ascending:false }).limit(1000);
-    if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Жагсаалт татахад алдаа гарлаа: ' + esc(error.message) + '</div>'; console.error('loadHrResults error:', error); return; }
+    if (error) { mcSetHTML(el, '<div style="color:var(--sub);font-size:.85rem;">Жагсаалт татахад алдаа гарлаа: ' + esc(error.message) + '</div>'); console.error('loadHrResults error:', error); return; }
     if (!data || data.length===0) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор хүний нөөцийн чиглэлийн тест өгсөн хүн алга.</div>'; return; }
     const byUser = {};
     data.filter(r => HR_PREDEPLOY_ENABLED || !HR_PD_KEYS.includes(r.test_key)).forEach(r => {   // эрэмбэ нь шинээс хуучин тул тест бүрийн эхний мөр нь хамгийн сүүлийнх
@@ -2268,7 +2305,7 @@ async function loadHrResultsInner() {
     });
     const keyOrder = Object.keys(HR_TEST_TITLES);
     window.__hrByUser = byUser;
-    el.innerHTML = Object.entries(byUser).map(([uid, u]) => {
+    mcSetHTML(el, Object.entries(byUser).map(([uid, u]) => {
       const rows = u.order.sort((a, b) => keyOrder.indexOf(a) - keyOrder.indexOf(b)).map(k => u.latest[k]);
       const flag = rows.some(hrIsFlag);
       return `
@@ -2277,17 +2314,17 @@ async function loadHrResultsInner() {
           <button class="modal-close" style="float:right;padding:.25rem .7rem;font-size:.75rem;" onclick="openHrReport('${esc(uid)}')">📄 Сэтгэл зүйн байдлын нэгдсэн тайлан</button></div>
         ${rows.map(r => `<div style="font-size:.82rem;color:${hrIsFlag(r) ? 'var(--red)' : 'var(--sub)'};padding-left:.5rem;">• ${esc(HR_TEST_TITLES[r.test_key] || r.test_key)} — ${esc(hrFmtScore(r))} · ${timeAgo(r.created_at)}</div>`).join('')}
       </div>`;
-    }).join('');
+    }).join(''));
   } else {
     // Энгийн хэрэглэгчийн горим: бөглөх боломжтой тестүүд
     subtitle.textContent = 'Ажилд орох, цэргийн албанд татагдах, энхийг дэмжих ажиллагаанд явах гэх мэт үед бөглөдөг хүний нөөцийн чиглэлийн тестүүд.';
-    content.innerHTML = `<style>${HRS_CSS}</style>
+    mcSetHTML(content, `<style>${HRS_CSS}</style>
       ${hrsPanelHtml()}
       <div class="section-card">
         <p style="font-size:.85rem;color:var(--sub);margin:0 0 1.1rem;">🔒 Таны хариулт болон үр дүн танд болон эрх бүхий хүний нөөцийн мэргэжилтэн, админд л харагдана. Үнэн зөв хариулах нь танд тохирох дэмжлэг, үүргийг тодорхойлоход тусална.</p>
         ${cardsHtml}
       </div>
-    `;
+    `);
   }
 }
 
@@ -2361,7 +2398,7 @@ function showToast(message, type = 'info', duration = 3200) {
   if (!wrap) { alert(message); return; }
   const el = document.createElement('div');
   el.className = `toast ${type}`;
-  el.innerHTML = `<span class="toast-icon">${TOAST_ICONS[type] || TOAST_ICONS.info}</span><span>${message}</span>`;
+  mcSetHTML(el, `<span class="toast-icon">${TOAST_ICONS[type] || TOAST_ICONS.info}</span><span>${message}</span>`);
   wrap.appendChild(el);
   setTimeout(() => {
     el.classList.add('leaving');
@@ -2392,7 +2429,7 @@ function applyTodaySelection() {
 
 function renderMoodRow() {
   const el = document.getElementById('mood-row');
-  el.innerHTML = MOODS.map(m => `<div class="mood-btn" data-mood="${m.key}"><span class="emo">${m.emo}</span><span class="lbl">${m.label}</span></div>`).join('');
+  mcSetHTML(el, MOODS.map(m => `<div class="mood-btn" data-mood="${m.key}"><span class="emo">${m.emo}</span><span class="lbl">${m.label}</span></div>`).join(''));
   el.querySelectorAll('.mood-btn').forEach(b => b.addEventListener('click', async () => {
     await commitQuickMood(b);
   }));
@@ -2516,8 +2553,8 @@ let weekMoods = new Array(7).fill('none');
 const EMO_LOOKUP = { sad:'😢', angry:'😡', anxious:'😰', tired:'😴', happy:'🥰', lonely:'😔', calm:'😌', grateful:'❤️', none:'' };
 function renderWeek() {
   const html = DAYS.map((d,i)=>`<div><div class="week-day">${d}</div><div class="week-emo ${i===6?'today':''}">${EMO_LOOKUP[weekMoods[i]]||''}</div><div class="week-num">${weekNums[i]}</div></div>`).join('');
-  document.getElementById('week-grid').innerHTML = html;
-  document.getElementById('week-grid-2').innerHTML = html;
+  mcSetHTML(document.getElementById('week-grid'), html);
+  mcSetHTML(document.getElementById('week-grid-2'), html);
 }
 async function loadWeekMood() {
   if (!currentUser?.id) { renderWeek(); return; }
@@ -2582,13 +2619,13 @@ function renderQuoteCard() {
   const el = document.getElementById('quote-card');
   if (!el) return;
   const q = MOTIVATION_QUOTES[currentQuoteSlot() % MOTIVATION_QUOTES.length];
-  el.innerHTML = `
+  mcSetHTML(el, `
     <div class="quote-seal"><svg viewBox="0 0 24 24" fill="#FFFFFF"><path d="M12 21s-6.7-4.35-9.3-8.1C.86 10.2 1.4 6.6 4.2 5.1c2.3-1.25 5-0.5 6.3 1.5.4.6 1.2 1.5 1.5 2 .3-.5 1.1-1.4 1.5-2 1.3-2 4-2.75 6.3-1.5 2.8 1.5 3.34 5.1 1.5 7.8C18.7 16.65 12 21 12 21z"/></svg></div>
     <div>
       <p class="quote-text">«${q.text}»</p>
       ${q.name ? `<div class="quote-by">${q.name} <span>· ${q.era}</span></div>` : ''}
     </div>
-  `;
+  `);
 }
 renderQuoteCard();
 setInterval(renderQuoteCard, 30 * 60000); // 30 минут тутамд шинэчилнэ
@@ -2702,11 +2739,11 @@ function renderMxChange(all) {
   }
   rows.sort((a, b) => a.dir - b.dir);
   const TXT = { 1:['up','Сайжирсан'], 0:['eq','Тогтвортой'], '-1':['dn','Анхаарах'] };
-  box.innerHTML = rows.map(x => { const [c, t] = TXT[x.dir]; return `<div class="mx-it">
+  mcSetHTML(box, rows.map(x => { const [c, t] = TXT[x.dir]; return `<div class="mx-it">
       <div class="mx-top"><span class="mx-n">${MX_NAME[x.k] || TESTS[x.k].title}</span><span class="mx-dir ${c}">${t}</span></div>
       <div class="mx-cmp"><span class="qx-chip ${MX_CHIP[x.Lp.key]}">${x.Lp.label}</span> <span class="mx-sc">${x.Lp.sc}</span>
         <span class="mx-ar">→</span> <span class="qx-chip ${MX_CHIP[x.Lc.key]}">${x.Lc.label}</span> <span class="mx-sc">${x.Lc.sc}</span></div>
-      <div class="metric-src">${mxDate(x.prev.created_at)} → ${mxDate(x.cur.created_at)}</div></div>`; }).join('');
+      <div class="metric-src">${mxDate(x.prev.created_at)} → ${mxDate(x.cur.created_at)}</div></div>`; }).join(''));
 }
 /* Дахин бөглөх хуваарь: тест бүрийн сүүлийн дүнгийн түвшингээр (хэвийн 2 сар, анхаарах/өндөр 2 долоо хоног) */
 function renderMxRecheck(all) {
@@ -2724,13 +2761,13 @@ function renderMxRecheck(all) {
     return;
   }
   rows.sort((a, b) => a.due - b.due);
-  box.innerHTML = rows.map(x => { const over = x.due <= now; const left = Math.ceil((x.due - now) / DAY);
+  mcSetHTML(box, rows.map(x => { const over = x.due <= now; const left = Math.ceil((x.due - now) / DAY);
     return `<div class="mx-it mx-rc${over ? ' due' : ''}">
       <div class="mx-top"><span class="mx-n">${MX_NAME[x.k] || TESTS[x.k].title}</span>${over
         ? `<button class="mx-go" onclick="openModal('${x.k}')">Одоо бөглөх</button>`
         : `<span class="mx-when">${left} хоногийн дараа</span>`}</div>
       <div class="metric-src">Сүүлд ${mxDate(x.r.created_at)}-нд бөглөсөн · <span class="qx-chip ${MX_CHIP[x.L.key]}">${x.L.label}</span> · дахин бөглөх: ${mxDate(x.due)}</div></div>`; }).join('')
-    + '<p class="mx-empty" style="margin-top:.6rem">Хэвийн дүнтэй бол 2 сарын дараа, анхаарах эсвэл өндөр дүнтэй бол 2 долоо хоногийн дараа дахин бөглөхийг зөвлөж байна.</p>';
+    + '<p class="mx-empty" style="margin-top:.6rem">Хэвийн дүнтэй бол 2 сарын дараа, анхаарах эсвэл өндөр дүнтэй бол 2 долоо хоногийн дараа дахин бөглөхийг зөвлөж байна.</p>');
 }
 
 async function loadAnalyticsSummary() {
@@ -2765,11 +2802,11 @@ async function loadAnalyticsSummary() {
     if (!r) {
       valSpan.innerHTML = '<span class="qx-chip mx-none">Тест бөглөөгүй</span>';
       fill.style.width = '0%';
-      if (src) src.innerHTML = `Сүүлийн 30 хоногт энэ чиглэлийн тест бөглөөгүй байна. <a href="#" onclick="openModal('${openKey}');return false;">Тест бөглөх →</a>`;
+      if (src) mcSetHTML(src, `Сүүлийн 30 хоногт энэ чиглэлийн тест бөглөөгүй байна. <a href="#" onclick="openModal('${openKey}');return false;">Тест бөглөх →</a>`);
       return;
     }
     const L = mxLevel(r);
-    valSpan.innerHTML = `<span class="qx-chip ${MX_CHIP[L.key]}">${L.label}</span> <span class="mx-sc">${L.sc}</span>`;
+    mcSetHTML(valSpan, `<span class="qx-chip ${MX_CHIP[L.key]}">${L.label}</span> <span class="mx-sc">${L.sc}</span>`);
     fill.style.width = Math.max(3, Math.min(100, Math.round(L.frac * 100))) + '%';
     fill.style.background = MX_COL[L.key];
     if (src) src.textContent = `${MX_NAME[r.test_key] || TESTS[r.test_key].title}${L.extra || ''} · ${mxDate(r.created_at)}-нд бөглөсөн`;
@@ -2880,7 +2917,7 @@ async function loadMonthlyAnalysis() {
   });
 
   // ---- Chart ----
-  chartEl.innerHTML = monthly.map(m => {
+  mcSetHTML(chartEl, monthly.map(m => {
     if (m.pct === null) {
       return `<div class="year-bar-col">
         <div class="year-bar-val">—</div>
@@ -2895,19 +2932,19 @@ async function loadMonthlyAnalysis() {
       <div class="year-bar ${cls}" style="height:${h}px;"></div>
       <div class="year-bar-lbl">${MN_MONTHS_SHORT[m.month-1]}</div>
     </div>`;
-  }).join('');
+  }).join(''));
 
   // ---- 50%-иас доош сарууд + зөвлөгөө авах товч ----
   const lowMonths = monthly.filter(m => m.pct !== null && m.pct < 50);
   if (lowMonths.length === 0) {
     alertEl.innerHTML = '';
   } else {
-    alertEl.innerHTML = lowMonths.map(m => `
+    mcSetHTML(alertEl, lowMonths.map(m => `
       <div class="low-month-card">
         <div class="lm-text"><b>${MN_MONTHS_SHORT[m.month-1]} сар: ${m.pct}%</b> — тестийн дүнгээс харахад энэ сард сэтгэл зүйн байдал 50%-иас доош унасан байна.</div>
         <button onclick="goto('pros')">Зөвлөгөө авах</button>
       </div>
-    `).join('');
+    `).join(''));
   }
 }
 
@@ -2921,7 +2958,7 @@ const DIARY_EMOS = [
 let selectedDiaryEmo = null;
 function renderEmoGrid() {
   const el = document.getElementById('emo-grid');
-  el.innerHTML = DIARY_EMOS.map(m => `<div class="emo-btn" data-e="${m.key}"><span class="e">${m.e}</span><span class="l">${m.l}</span></div>`).join('');
+  mcSetHTML(el, DIARY_EMOS.map(m => `<div class="emo-btn" data-e="${m.key}"><span class="e">${m.e}</span><span class="l">${m.l}</span></div>`).join(''));
   el.querySelectorAll('.emo-btn').forEach(b => b.addEventListener('click', () => {
     el.querySelectorAll('.emo-btn').forEach(x=>x.classList.remove('selected'));
     b.classList.add('selected'); selectedDiaryEmo = b.dataset.e;
@@ -2961,9 +2998,9 @@ async function addDiary() {
 function renderDiaryList() {
   const el = document.getElementById('diary-list');
   if (diaryEntries.length===0){ el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;text-align:center;padding:1.5rem 0;">Одоогоор тэмдэглэл байхгүй байна.</div>'; return; }
-  el.innerHTML = diaryEntries.map(d => `
+  mcSetHTML(el, diaryEntries.map(d => `
     <div class="diary-entry"><div class="diary-top"><span class="diary-emo">${esc(d.emo)}</span><span style="font-weight:700;font-size:.85rem;">${esc(d.label)}</span><span class="diary-date">${esc(d.date)}</span></div><div class="diary-text">${esc(d.text)}</div></div>
-  `).join('');
+  `).join(''));
 }
 async function loadDiary() {
   if (!currentUser?.id) { renderDiaryList(); return; }
@@ -2996,7 +3033,7 @@ function toggleGroupExercise(num) {
 function renderGroupExercises() {
   const el = document.getElementById('group-exercise-list');
   if (!el) return;
-  el.innerHTML = GROUP_EXERCISES.map(ex => `
+  mcSetHTML(el, GROUP_EXERCISES.map(ex => `
     <div class="ge-item">
       <div class="ge-head" onclick="toggleGroupExercise(${ex.num})">
         <div class="ge-num">${ex.num}</div>
@@ -3005,7 +3042,7 @@ function renderGroupExercises() {
       </div>
       <div class="ge-body" id="ge-body-${ex.num}">${ex.html}</div>
     </div>
-  `).join('');
+  `).join(''));
 }
 
 
@@ -3022,11 +3059,11 @@ async function loadOrders(category, elId, subElId) {
   if (!el) return;
   el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div>';
   const { data, error } = await sb.from('psy_documents').select('*').eq('category', category).order('created_at', { ascending:false });
-  if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Жагсаалт татахад алдаа гарлаа: ' + error.message + '</div>'; console.error('loadOrders error:', error); return; }
+  if (error) { mcSetHTML(el, '<div style="color:var(--sub);font-size:.85rem;">Жагсаалт татахад алдаа гарлаа: ' + error.message + '</div>'); console.error('loadOrders error:', error); return; }
   const subEl = document.getElementById(subElId);
   if (subEl) subEl.textContent = (data?.length || 0) + ' баримт бичиг';
   if (!data || data.length===0) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;padding:.6rem 0;">Одоогоор баримт бичиг байршуулаагүй байна.</div>'; return; }
-  el.innerHTML = data.map(d => `
+  mcSetHTML(el, data.map(d => `
     <div class="section-card" style="display:flex;align-items:center;gap:.8rem;margin-bottom:.8rem;">
       <div style="font-size:1.6rem;flex-shrink:0;">${category === 'guide' ? '📘' : category === 'military_test' ? '🎖️' : '📄'}</div>
       <div style="flex:1;min-width:0;">
@@ -3036,7 +3073,7 @@ async function loadOrders(category, elId, subElId) {
       <button class="modal-close" style="width:auto;padding:.5rem 1rem;font-size:.85rem;flex-shrink:0;" onclick="viewOrderDoc('${escAttr(d.storage_path)}')">Харах</button>
       <button class="connect-btn" style="width:auto;padding:.5rem 1rem;font-size:.85rem;flex-shrink:0;" onclick="downloadOrderDoc('${escAttr(d.storage_path)}','${escAttr(d.title||'document')}')">Татах</button>
     </div>
-  `).join('');
+  `).join(''));
 }
 async function viewOrderDoc(storagePath) {
   const { data, error } = await sb.storage.from(DOCS_BUCKET).createSignedUrl(storagePath, 300);
@@ -3057,7 +3094,7 @@ async function loadAdminDocuments() {
   const { data, error } = await sb.from('psy_documents').select('*').order('created_at', { ascending:false });
   if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Жагсаалт татахад алдаа гарлаа.</div>'; console.error('loadAdminDocuments error:', error); return; }
   if (!data || data.length===0) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор баримт бичиг байршуулаагүй байна.</div>'; return; }
-  el.innerHTML = data.map(d => `
+  mcSetHTML(el, data.map(d => `
     <div class="comment-row" style="display:flex;gap:.5rem;padding:.6rem 0;border-top:1px solid var(--line);align-items:center;">
       <div style="font-size:1.3rem;flex-shrink:0;">${d.category === 'guide' ? '📘' : d.category === 'military_test' ? '🎖️' : '📄'}</div>
       <div style="flex:1;min-width:0;">
@@ -3067,7 +3104,7 @@ async function loadAdminDocuments() {
       <button onclick="editDocumentTitle('${d.id}', '${escAttr(d.title||'')}')" title="Засах" style="background:none;border:none;color:var(--gold);cursor:pointer;font-size:.85rem;flex-shrink:0;">✏️</button>
       <button onclick="adminDeleteDocument('${d.id}','${escAttr(d.storage_path)}')" title="Устгах" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>
     </div>
-  `).join('');
+  `).join(''));
 }
 async function editDocumentTitle(docId, currentTitle) {
   const newTitle = prompt('Баримт бичгийн шинэ нэрийг оруулна уу:', currentTitle);
@@ -3123,7 +3160,7 @@ function toggleProjective(num) {
 function renderProjectiveMethods() {
   const el = document.getElementById('projective-list');
   if (!el) return;
-  el.innerHTML = PROJECTIVE_METHODS.map(pj => `
+  mcSetHTML(el, PROJECTIVE_METHODS.map(pj => `
     <div class="ge-item">
       <div class="ge-head" onclick="toggleProjective(${pj.num})">
         <div class="ge-num">${pj.num}</div>
@@ -3132,7 +3169,7 @@ function renderProjectiveMethods() {
       </div>
       <div class="ge-body" id="pj-body-${pj.num}">${pj.html}</div>
     </div>
-  `).join('');
+  `).join(''));
 }
 
 
@@ -3151,7 +3188,7 @@ function toggleMemLifeEx(num) {
 function renderMemLifeExList() {
   const el = document.getElementById('memory-exercise-list');
   if (!el) return;
-  el.innerHTML = MEMORY_LIFE_EXERCISES.map(ex => `
+  mcSetHTML(el, MEMORY_LIFE_EXERCISES.map(ex => `
     <div class="ge-item">
       <div class="ge-head" onclick="toggleMemLifeEx(${ex.num})">
         <div class="ge-num">${ex.num}</div>
@@ -3160,7 +3197,7 @@ function renderMemLifeExList() {
       </div>
       <div class="ge-body" id="mle-body-${ex.num}">${ex.html}</div>
     </div>
-  `).join('');
+  `).join(''));
 }
 
 
@@ -3625,7 +3662,7 @@ function updateSymptomCount() {
   if (el) el.textContent = n ? ('Сонгосон: ' + n) : 'Юу ч сонгоогүй байна';
 }
 function renderSymptomForm() {
-  document.getElementById('modal-box').innerHTML = `
+  mcSetHTML(document.getElementById('modal-box'), `
     <h3>🧭 Анхан шатны шинж тэмдгийн үнэлгээ</h3>
     <p class="sg-lead">Сүүлийн 2 долоо хоногт өөрт илэрч буй шинж тэмдгийг тэмдэглэнэ үү. Таны тэмдэглэснээр аль тестийг бөглөхийг санал болгоно.</p>
     <div class="sg-scroll"><div class="sg-grid">
@@ -3642,7 +3679,7 @@ function renderSymptomForm() {
       `).join('')}
     </div></div>
     <div class="modal-actions"><span class="sg-count" id="sg-count">Юу ч сонгоогүй байна</span><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;" onclick="evaluateSymptoms()">Дүн харах</button></div>
-  `;
+  `);
 }
 function evaluateSymptoms() {
   const checked = Array.from(document.querySelectorAll('#modal-box input[type=checkbox]:checked'));
@@ -3723,7 +3760,7 @@ function startCombinedTests(keys, hasRisk) {
     html += `<div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button></div>`;
   }
 
-  document.getElementById('modal-box').innerHTML = html;
+  mcSetHTML(document.getElementById('modal-box'), html);
 }
 
 /* Давамгайлж буй чиглэлд тохирсон, амьдралд ойр практик зөвлөгөө */
@@ -4577,8 +4614,8 @@ async function loadResultHistory(key, max) {
       else if (wc > wp) { cls = 'up'; msg = `Өмнөх бөглөлтөөс (${pds}) ${amt} — байдал тань сайжирсан байна. Сайн байна, үргэлжлүүлээрэй!`; }
       else { cls = 'down'; msg = `Өмнөх бөглөлтөөс (${pds}) ${amt} — байдал тань жаахан муудсан байна. Төлөвлөгөөгөө хэрэгжүүлээд, шаардлагатай бол сэтгэл зүйчтэй ярилцаарай.`; }
     }
-    box.innerHTML = `<div class="rc-title" style="margin-top:1.1rem;">Өмнөх бөглөлттэй харьцуулалт</div>
-      <div class="rc-hist">${bars}</div><div class="rc-trend ${cls}">${cls === 'up' ? '↗' : cls === 'down' ? '↘' : '→'} <span>${msg}</span></div>`;
+    mcSetHTML(box, `<div class="rc-title" style="margin-top:1.1rem;">Өмнөх бөглөлттэй харьцуулалт</div>
+      <div class="rc-hist">${bars}</div><div class="rc-trend ${cls}">${cls === 'up' ? '↗' : cls === 'down' ? '↘' : '→'} <span>${msg}</span></div>`);
   } catch (e) { console.error('history error', e); }
 }
 
@@ -4697,7 +4734,7 @@ async function scoreCombinedTests() {
     ${fbHtml('quick')}
     <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="modal-close" onclick="printTestAdvice()">🖨️ Хэвлэх / PDF</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="closeModal(); goto('pros');">Мэргэжилтэнтэй холбогдох</button></div>
   `;
-  document.getElementById('modal-box').innerHTML = html;
+  mcSetHTML(document.getElementById('modal-box'), html);
 }
 
 
@@ -4708,7 +4745,7 @@ function renderIqChecklist() {
   const el = document.getElementById('iq-checklist-form');
   if (!el) return;
   let qIdx = 0;
-  el.innerHTML = IQ_CHECKLIST.map(cat => {
+  mcSetHTML(el, IQ_CHECKLIST.map(cat => {
     const rows = cat.qs.map(q => {
       const idx = qIdx++;
       return `<div class="iq-cl-row">
@@ -4720,7 +4757,7 @@ function renderIqChecklist() {
       </div>`;
     }).join('');
     return `<div class="iq-cl-cat"><h4>${cat.cat}</h4>${rows}</div>`;
-  }).join('');
+  }).join(''));
 }
 
 function scoreIqChecklist() {
@@ -4737,7 +4774,7 @@ function scoreIqChecklist() {
   else level = 'их';
   const resEl = document.getElementById('iq-checklist-result');
   resEl.style.display = 'block';
-  resEl.innerHTML = `<div style="font-size:1.3rem;font-weight:800;color:var(--gold);">Таны оноо: ${sum}</div><div style="font-size:.9rem;color:var(--sub);margin-top:.3rem;">Өөрийн үнэлсэн чадамж: <strong>${level}</strong></div><div style="font-size:.78rem;color:var(--sub);margin-top:.5rem;">Энэ дүн нь IQ (оюуны коэффициент) биш. Хариулт бүр таны өөрийнхөө тухай үнэлгээ бөгөөд стандартчилсан норм байхгүй.</div>`;
+  mcSetHTML(resEl, `<div style="font-size:1.3rem;font-weight:800;color:var(--gold);">Таны оноо: ${sum}</div><div style="font-size:.9rem;color:var(--sub);margin-top:.3rem;">Өөрийн үнэлсэн чадамж: <strong>${level}</strong></div><div style="font-size:.78rem;color:var(--sub);margin-top:.5rem;">Энэ дүн нь IQ (оюуны коэффициент) биш. Хариулт бүр таны өөрийнхөө тухай үнэлгээ бөгөөд стандартчилсан норм байхгүй.</div>`);
   resEl.scrollIntoView({ behavior:'smooth', block:'center' });
 }
 
@@ -4800,8 +4837,8 @@ function renderTestCard(key, t, i = 0) {
   </div>`;
 }
 function renderAllTestCards() {
-  document.getElementById('test-row-preview').innerHTML = Object.entries(TESTS).filter(([,t])=>!t.hidden).slice(0,5).map(([k,t],i)=>renderTestCard(k,t,i)).join('');
-  document.getElementById('test-grid-full').innerHTML = Object.entries(TESTS).filter(([,t])=>!t.hidden).map(([k,t],i)=>renderTestCard(k,t,i)).join('');
+  mcSetHTML(document.getElementById('test-row-preview'), Object.entries(TESTS).filter(([,t])=>!t.hidden).slice(0,5).map(([k,t],i)=>renderTestCard(k,t,i)).join(''));
+  mcSetHTML(document.getElementById('test-grid-full'), Object.entries(TESTS).filter(([,t])=>!t.hidden).map(([k,t],i)=>renderTestCard(k,t,i)).join(''));
 }
 renderAllTestCards(); /* скриптийн төгсгөлд дахин дуудна — тэр үед бүх тестийн асуултын жагсаалт бэлэн болсон байна */
 
@@ -4862,7 +4899,7 @@ function renderMemoryExercise(idx) {
   if (memoryTimerInterval) { clearInterval(memoryTimerInterval); memoryTimerInterval = null; }
   const ex = MEMORY_EXERCISES[idx];
   document.getElementById('memory-progress').textContent = `Дасгал ${idx+1} / ${MEMORY_EXERCISES.length}`;
-  document.getElementById('memory-instruction').innerHTML = ex.instruction;
+  mcSetHTML(document.getElementById('memory-instruction'), ex.instruction);
   document.getElementById('memory-image').src = ex.img;
   document.getElementById('memory-timer').textContent = ex.seconds;
   const btn = document.getElementById('memory-start-btn');
@@ -4943,7 +4980,7 @@ function toggleSonjooQuiz(key) {
 function renderSonjooQuizzes() {
   const el = document.getElementById('sonjoo-quiz-list');
   if (!el) return;
-  el.innerHTML = SONJOO_QUIZZES.map(q => `
+  mcSetHTML(el, SONJOO_QUIZZES.map(q => `
     <div class="ge-item">
       <div class="ge-head" onclick="toggleSonjooQuiz('${q.key}')">
         <div class="ge-title">${q.key === 'colors' ? '🎨' : '🚪'} ${q.title}</div>
@@ -4951,7 +4988,7 @@ function renderSonjooQuizzes() {
       </div>
       <div class="ge-body" id="sq-body-${q.key}">${q.html}</div>
     </div>
-  `).join('');
+  `).join(''));
 }
 
 function showColorMeaning(idx) {
@@ -4959,13 +4996,13 @@ function showColorMeaning(idx) {
   const el = document.getElementById('color-meaning-result');
   if (!el || !c) return;
   el.style.display = 'block';
-  el.innerHTML = `<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;"><span style="width:22px;height:22px;border-radius:50%;background:${c.hex};border:1px solid #ccc;display:inline-block;"></span><strong>${c.name}</strong></div><p style="margin:0;font-size:.88rem;line-height:1.6;">${c.text}</p>`;
+  mcSetHTML(el, `<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;"><span style="width:22px;height:22px;border-radius:50%;background:${c.hex};border:1px solid #ccc;display:inline-block;"></span><strong>${c.name}</strong></div><p style="margin:0;font-size:.88rem;line-height:1.6;">${c.text}</p>`);
   el.scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
 function openAttentionScaleTest() {
   document.getElementById('modal-overlay').classList.add('open');
-  document.getElementById('modal-box').innerHTML = `
+  mcSetHTML(document.getElementById('modal-box'), `
     <h3>🧠 Анхаарал сарнилтын түвшин тогтоох тест</h3>
     <p class="msub">Насанд хүрсэн хүний анхаарал хэр сарнидгийг хэмжих стандарт тест. Асуулт бүрд өөрт хамгийн тохирох хариултыг сонгоно уу.</p>
     <div id="mq-wrap">${ATTENTION_SCALE_QS.map((q,i)=>`
@@ -4973,7 +5010,7 @@ function openAttentionScaleTest() {
         <div class="q-opts">${OPTS6.map((o,v)=>`<label><input type="radio" name="aq${i}" value="${v}"> ${o}</label>`).join('')}</div>
       </div>`).join('')}</div>
     <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="scoreAttentionScaleTest()">Дүн харах</button></div>
-  `;
+  `);
 }
 
 async function scoreAttentionScaleTest() {
@@ -4997,13 +5034,13 @@ async function scoreAttentionScaleTest() {
     if (error) console.error('attention scale save error:', error);
   }
 
-  document.getElementById('modal-box').innerHTML = `
+  mcSetHTML(document.getElementById('modal-box'), `
     ${trHeadText('Анхаарал сарнилт', highRisk ? 'Анхаарал сарних магадлал өндөр' : 'Хэвийн', levelKey, total + ' / ' + max)}
     <div class="bar-row"><div class="bar-track"><div class="bar-fill" style="width:${pct}%;"></div></div></div>
     <div class="result-block"><b>Тайлбар:</b> ${interpretation}</div>
 
     <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="closeModal(); goto('pros');">Мэргэжилтэнтэй холбогдох</button></div>
-  `;
+  `);
 }
 
 function openColorTest() {
@@ -5015,7 +5052,7 @@ function renderIshiharaStep() {
   const box = document.getElementById('modal-box');
   if (ishiharaIdx >= ISHIHARA_PLATES.length) { renderIshiharaResult(); return; }
   const p = ISHIHARA_PLATES[ishiharaIdx];
-  box.innerHTML = `
+  mcSetHTML(box, `
     <h3>Өнгө ялгах чадварын тест</h3>
     <p style="color:var(--sub);font-size:.85rem;margin:-.4rem 0 1.1rem;">Плат ${ishiharaIdx+1} / ${ISHIHARA_PLATES.length} — доторх зурган дотор нуугдсан тоог бичнэ үү.</p>
     <div style="display:flex;justify-content:center;margin-bottom:1.2rem;">
@@ -5026,7 +5063,7 @@ function renderIshiharaStep() {
       <button class="modal-close" style="flex:1;" onclick="ishiharaAnswer(null)">Харагдахгүй байна</button>
       <button class="connect-btn" style="flex:1;" onclick="ishiharaAnswer(document.getElementById('ishihara-input').value.trim())">Дараах</button>
     </div>
-  `;
+  `);
   document.getElementById('ishihara-input').focus();
 }
 function ishiharaAnswer(val) {
@@ -5051,13 +5088,13 @@ async function renderIshiharaResult() {
     loadMonthlyAnalysis();
   }
 
-  document.getElementById('modal-box').innerHTML = `
+  mcSetHTML(document.getElementById('modal-box'), `
     <h3>Өнгө ялгах чадвар — Үр дүн</h3>
     <div class="result-level">${ishiharaCorrect} / ${total} зөв (${pct}%) — ${level}</div>
     <div class="result-block"><b>Тайлбар:</b> ${advice}</div>
     <div class="disclaimer-note">Дэлгэцийн тохиргоо, гэрэлтүүлэг үр дүнд нөлөөлж болно.</div>
     <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button></div>
-  `;
+  `);
 }
 
 
@@ -5156,10 +5193,10 @@ async function fbSend(btn) {
   if (err) {
     console.error('feedback error:', err);
     const q = fbQueueGet(); q.push({ ...row, created_at: new Date().toISOString() }); fbQueueSet(q);
-    box.innerHTML = `<div class="fb-done">✓ Баярлалаа! Таны үнэлгээг (${'★'.repeat(rating)}) хүлээн авлаа.</div><div class="fb-hint" style="margin-top:.3rem">Сервертэй холбогдож чадсангүй. Үнэлгээ тань энэ төхөөрөмж дээр түр хадгалагдсан бөгөөд дараагийн удаа сайтад ороход автоматаар илгээгдэнэ.</div>`;
+    mcSetHTML(box, `<div class="fb-done">✓ Баярлалаа! Таны үнэлгээг (${'★'.repeat(rating)}) хүлээн авлаа.</div><div class="fb-hint" style="margin-top:.3rem">Сервертэй холбогдож чадсангүй. Үнэлгээ тань энэ төхөөрөмж дээр түр хадгалагдсан бөгөөд дараагийн удаа сайтад ороход автоматаар илгээгдэнэ.</div>`);
     return;
   }
-  box.innerHTML = `<div class="fb-done">✓ Баярлалаа! Таны үнэлгээ (${'★'.repeat(rating)}) хадгалагдлаа.</div>`;
+  mcSetHTML(box, `<div class="fb-done">✓ Баярлалаа! Таны үнэлгээ (${'★'.repeat(rating)}) хадгалагдлаа.</div>`);
   fbFlushQueue();
 }
 /* Тестийн үр дүн гарах бүрд үнэлгээний хэсэг нэмнэ */
@@ -5170,7 +5207,7 @@ async function fbSend(btn) {
     if (box.querySelector('input[type=radio],input[type=checkbox],.q-block')) return;
     if (!box.querySelector('.tr-head,.result-block,.ch-card')) return;
     const acts = box.querySelector('.modal-actions'); if (!acts) return;
-    acts.insertAdjacentHTML('beforebegin', fbHtml('test', aiTestCtx.key));
+    mcInsertHTML(acts, 'beforebegin', fbHtml('test', aiTestCtx.key));
   }).observe(box, { childList: true });
 })();
 const FB_TYPE_NAMES = { test:'Тест бүрийн үр дүн', psy:'Миний сэтгэл зүйн байдлын тайлан', hr:'Хүний нөөцийн нэгдсэн тайлан', quick:'Түргэн шуурхай үнэлгээ' };
@@ -5188,7 +5225,7 @@ async function loadFeedbackStats() {
   const { data, error } = res;
   if (error) {
     const missing = /report_feedback|relation|PGRST20|42P01/i.test((error.message || '') + (error.code || ''));
-    el.innerHTML = `<div class="fbx-warn"><b>Үнэлгээг уншиж чадсангүй.</b> ${missing ? 'Supabase дээр <code>report_feedback</code> хүснэгт үүсээгүй байна. SQL Editor-т <code>report_feedback.sql</code>-ийг ажиллуулсны дараа үнэлгээ хадгалагдаж, энд харагдана.' : 'Админ эрхээр нэвтэрсэн эсэхээ шалгаад, хуудсыг дахин ачаална уу.'}</div>`;
+    mcSetHTML(el, `<div class="fbx-warn"><b>Үнэлгээг уншиж чадсангүй.</b> ${missing ? 'Supabase дээр <code>report_feedback</code> хүснэгт үүсээгүй байна. SQL Editor-т <code>report_feedback.sql</code>-ийг ажиллуулсны дараа үнэлгээ хадгалагдаж, энд харагдана.' : 'Админ эрхээр нэвтэрсэн эсэхээ шалгаад, хуудсыг дахин ачаална уу.'}</div>`);
     return;
   }
   if (!data || !data.length) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор үнэлгээ ирээгүй байна. Хэрэглэгчид тест, тайлангийн доор од дарж үнэлэхэд энд график гарна.</div>'; return; }
@@ -5213,7 +5250,7 @@ async function loadFeedbackStats() {
       <div class="fbx-cl">${w.label}</div><div class="fbx-cm">${w.m != null ? '★' + w.m.toFixed(1) : '—'}</div></div>`).join('');
   const cms = data.filter(r => r.comment).slice(0, 20).map(r => `<div class="fb-cm"><span class="fbx-st">${'★'.repeat(r.rating)}<span>${'★'.repeat(5 - r.rating)}</span></span> · ${r.report_type === 'test' && r.test_key ? fbxTestName(r.test_key) : (FB_TYPE_NAMES[r.report_type] || r.report_type)} · ${timeAgo(r.created_at)}<br>${esc(r.comment)}</div>`).join('');
   const tableRows = types.map(t => `<tr><td>${t.label}</td><td class="n">${t.n}</td><td class="n">${t.v.toFixed(2)}</td><td class="n">${Math.round(100 * byT[Object.keys(FB_TYPE_NAMES).find(k => FB_TYPE_NAMES[k] === t.label)].filter(x => x >= 4).length / t.n)}%</td></tr>`).join('');
-  el.innerHTML = `
+  mcSetHTML(el, `
     <div class="fbx-kpis">
       <div class="fbx-kpi"><div class="fbx-kn">${n}</div><div class="fbx-kl">Нийт үнэлгээ</div></div>
       <div class="fbx-kpi"><div class="fbx-kn">${avg.toFixed(2)}<small> / 5</small></div><div class="fbx-kl">Дундаж оноо</div></div>
@@ -5227,7 +5264,7 @@ async function loadFeedbackStats() {
       ${tests.length ? `<div class="fbx-card"><h4>Тест бүрээр (дундаж од)</h4>${fbxBars(tests, 5, r => `${r.v.toFixed(1)} <small>(${r.n})</small>`)}</div>` : ''}
     </div>
     <details class="fbx-tbl"><summary>Хүснэгтээр харах</summary><table class="fb-adm-t"><tr><th>Тайлан</th><th class="n">Тоо</th><th class="n">Дундаж</th><th class="n">4–5 од</th></tr>${tableRows}</table></details>
-    ${cms ? `<div class="fbx-card" style="margin-top:12px"><h4>Сүүлийн сэтгэгдлүүд</h4>${cms}</div>` : ''}`;
+    ${cms ? `<div class="fbx-card" style="margin-top:12px"><h4>Сүүлийн сэтгэгдлүүд</h4>${cms}</div>` : ''}`);
 }
 
 function aiHash(str) { let h = 5381; for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
@@ -5278,19 +5315,19 @@ async function aiRun(btn) {
       const html = R ? aiReportHtml(kind, R) : `<section class="rp-ai"><h2>Хиймэл оюуны дүгнэлт, зөвлөмж</h2>${aiFormat(txt)}</section>`;
       const art = box.closest('#modal-box')?.querySelector('article.rp');
       const anchor = art && (art.querySelector('.rp-details') || art.querySelector('.rp-foot'));
-      if (anchor) anchor.insertAdjacentHTML('beforebegin', html);
-      else box.insertAdjacentHTML('beforebegin', `<style>${HR_REPORT_CSS}</style><article class="rp rp-quick">${html}</article>`);
+      if (anchor) mcInsertHTML(anchor, 'beforebegin', html);
+      else mcInsertHTML(box, 'beforebegin', `<style>${HR_REPORT_CSS}</style><article class="rp rp-quick">${html}</article>`);
       aiAddToPrint(kind, html);
       box.remove();
       (art || document.getElementById('modal-box')).querySelector('.rpx')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
     }
-    out.innerHTML = aiFormat(txt) + '<div class="ai-foot">Хиймэл оюуны тусламжтай бэлтгэв. Оноо, түвшинг тестийн аргачлалаар тооцсон.</div>';
+    mcSetHTML(out, aiFormat(txt) + '<div class="ai-foot">Хиймэл оюуны тусламжтай бэлтгэв. Оноо, түвшинг тестийн аргачлалаар тооцсон.</div>');
     btn.remove(); box.querySelector('.ai-sub')?.remove();
   };
   if (cached) { show(cached); return; }
   if (currentUser?.isAnonymous !== false) { out.innerHTML = '<p>AI дүгнэлт авахын тулд Google бүртгэлээр нэвтэрсэн байх шаардлагатай.</p>'; return; }
-  btn.disabled = true; out.innerHTML = '<p style="color:var(--sub)">' + (kind === 'test' ? 'Дүгнэлт бэлтгэж байна' : 'Дэлгэрэнгүй тайлан бэлтгэж байна, түр хүлээнэ үү') + '<span class="ai-dots"><i></i><i></i><i></i></span></p>';
+  btn.disabled = true; mcSetHTML(out, '<p style="color:var(--sub)">' + (kind === 'test' ? 'Дүгнэлт бэлтгэж байна' : 'Дэлгэрэнгүй тайлан бэлтгэж байна, түр хүлээнэ үү') + '<span class="ai-dots"><i></i><i></i><i></i></span></p>');
   try {
     const { data, error } = await sb.functions.invoke(AI_FN, { body: { kind, text } });
     const val = data && (data.report ? JSON.stringify(data.report) : data.text);
@@ -5336,7 +5373,7 @@ function aiAddToPrint(kind, sec) {
     if (box.querySelector('input[type=radio],input[type=checkbox],textarea,.q-block')) return;
     if (!box.querySelector('.tr-head,.result-block,.ch-card')) return;
     const acts = box.querySelector('.modal-actions'); if (!acts) return;
-    acts.insertAdjacentHTML('beforebegin', aiBoxHtml('test'));
+    mcInsertHTML(acts, 'beforebegin', aiBoxHtml('test'));
   }).observe(box, { childList: true });
 })();
 
@@ -5352,12 +5389,12 @@ function openModal(key) {
   if (t.custom === 'temperament') { openTemperamentTest(); return; }
   if (t.custom === 'mbti16') { openMBTI16Test(); return; }
   const box = document.getElementById('modal-box');
-  box.innerHTML = `
+  mcSetHTML(box, `
     <h3>${t.emo} ${t.title}</h3>
     <p class="msub">${(()=>{ const st=getTestStats(t); return (st.n ? st.n+' асуулт · ' : '')+st.dur; })()} — ${t.stem ? '<b>'+t.stem+'</b>' : 'сүүлийн 2 долоо хоногт хэр олон удаа тохиолдсоныг үнэлнэ үү.'}</p>
     <div id="mq-wrap">${t.qs.map((q,i)=>renderQuestionBlock(t, q, i, 'mq')).join('')}</div>
     <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="scoreModal('${key}')">Дүн харах</button></div>
-  `;
+  `);
   document.getElementById('modal-overlay').classList.add('open');
 }
 setInterval(() => { if (fbQueueGet().length) fbFlushQueue(); }, 60000);
@@ -5377,7 +5414,7 @@ let pvtMode = 'self'; // 'self' = Анхаарал шалгах тест, 'hr' =
 function openPvtTest(mode) {
   pvtMode = mode === 'hr' ? 'hr' : 'self';
   document.getElementById('modal-overlay').classList.add('open');
-  document.getElementById('modal-box').innerHTML = `
+  mcSetHTML(document.getElementById('modal-box'), `
     <h3>⏱️ Сонор сэрэмжийн сорил</h3>
     <p class="msub">Ядаргаа, анхаарал төвлөрлийг хариу үйлдлийн хурдаар хэмжинэ.${pvtMode === 'hr' ? '<br><small>Томилолтын өмнөх үзлэгийн хэсэг тул үр дүн эрх бүхий хүний нөөцийн мэргэжилтэнд харагдана.</small>' : ''}</p>
     <div class="pvt-dur">⏱️ Яг 3 минут (180 секунд) үргэлжилнэ</div>
@@ -5388,7 +5425,7 @@ function openPvtTest(mode) {
       <li>Чимээгүй орчинд, сорил дуустал анхаарлаа бүү сарниул. Үлдсэн хугацаа дэлгэцийн зүүн дээд буланд харагдана.</li>
     </ol>
     <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="startPvtTest()">Сорил эхлүүлэх</button></div>
-  `;
+  `);
 }
 
 function startPvtTest() {
@@ -5396,7 +5433,7 @@ function startPvtTest() {
   pvtRts = []; pvtFalse = 0; pvtTimeouts = 0;
   const tEl = document.getElementById('pvt-time');
   const total = Math.round(PVT.DURATION / 1000);
-  tEl.dataset.v = ''; tEl.innerHTML = `Үлдсэн: <b>${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}</b>`;
+  tEl.dataset.v = ''; mcSetHTML(tEl, `Үлдсэн: <b>${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}</b>`);
   document.getElementById('pvt-bar').style.width = '0%';
   document.getElementById('pvt-overlay').classList.add('open');
   pvtStart = performance.now();
@@ -5413,7 +5450,7 @@ function pvtTickBar() {
   const left = Math.max(0, Math.ceil((PVT.DURATION - elapsed) / 1000));
   const txt = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`;
   const tEl = document.getElementById('pvt-time');
-  if (tEl.dataset.v !== txt) { tEl.dataset.v = txt; tEl.innerHTML = `Үлдсэн: <b>${txt}</b>`; }
+  if (tEl.dataset.v !== txt) { tEl.dataset.v = txt; mcSetHTML(tEl, `Үлдсэн: <b>${txt}</b>`); }
   requestAnimationFrame(pvtTickBar);
 }
 
@@ -5499,7 +5536,7 @@ async function finishPvtTest() {
 
   const ms = v => v != null ? v + ' мс' : '–';
   document.getElementById('modal-overlay').classList.add('open');
-  document.getElementById('modal-box').innerHTML = `
+  mcSetHTML(document.getElementById('modal-box'), `
     <h3>⏱️ Сонор сэрэмжийн сорил — Үр дүн</h3>
     <div class="result-level" style="color:${color};">${level}</div>
     <div class="pvt-stats">
@@ -5513,7 +5550,7 @@ async function finishPvtTest() {
     ${compareHtml}
     <div class="result-block"><b>Тайлбар:</b> Энэ сорил нь ядаргаа, сонор сэрэмжийг хэмждэг. Ангилал нь туршилтын шатны урьдчилсан үнэлгээ. Ядаргаа өндөр гарвал нойр, амралтаа анхаарч, дахин сорил өгөөрэй.</div>
     <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="openPvtTest('${pvtMode}')">Дахин өгөх</button></div>
-  `;
+  `);
 }
 
 
@@ -5597,7 +5634,7 @@ async function loadPvtTrend() {
   } else {
     note = `<div class="pvt-compare ok"><b>Сүүлийн сорил: ${last} алдаа</b> — таны хэвийн үзүүлэлтийн (${base}) хүрээнд байна.</div>`;
   }
-  el.innerHTML = `${legend}<div class="pvt-trend-wrap"><div class="year-chart pvt-chart">${bars}</div></div><div style="margin-top:1.1rem;">${note}</div>`;
+  mcSetHTML(el, `${legend}<div class="pvt-trend-wrap"><div class="year-chart pvt-chart">${bars}</div></div><div style="margin-top:1.1rem;">${note}</div>`);
   // Тасархай шугамыг баганын суурийн бодит байрлалаас тооцож зурна
   if (base !== null) {
     const wrap = el.querySelector('.pvt-trend-wrap');
@@ -5847,15 +5884,15 @@ function hrOpen(html) {
   aiTestCtx = null;
   document.getElementById('modal-overlay').classList.add('open');
   const box = document.getElementById('modal-box');
-  box.innerHTML = html;
+  mcSetHTML(box, html);
   if (AI_SUMMARY_ENABLED && box.querySelector('article.rp')) {
     const kind = /Миний сэтгэл зүйн байдлын тайлан/.test(box.querySelector('article.rp h1')?.textContent || '') ? 'psy' : 'hr';
-    box.querySelector('article.rp').insertAdjacentHTML('afterend', aiBoxHtml(kind));
+    mcInsertHTML(box.querySelector('article.rp'), 'afterend', aiBoxHtml(kind));
   }
   if (box.querySelector('article.rp') && !box.querySelector('.fb-box')) {
     const kind2 = /Миний сэтгэл зүйн байдлын тайлан/.test(box.querySelector('article.rp h1')?.textContent || '') ? 'psy' : 'hr';
     const acts = box.querySelector('.modal-actions');
-    if (acts) acts.insertAdjacentHTML('beforebegin', fbHtml(kind2)); else box.insertAdjacentHTML('beforeend', fbHtml(kind2));
+    if (acts) mcInsertHTML(acts, 'beforebegin', fbHtml(kind2)); else mcInsertHTML(box, 'beforeend', fbHtml(kind2));
   }
   box.scrollTop = 0; box.parentElement && (box.parentElement.scrollTop = 0);
 }
@@ -6553,9 +6590,9 @@ function hrsOpenTest(i) {
   const st = hrsGet() || { start: new Date().toISOString(), done: [] }; hrsSet(st);
   const c = HR_CARDS[i]; if (!c) return hrsFinish();
   hrsCur = c.fn; hrsBusy = false;
-  window[c.fn]();
+  if (HR_CARDS.some(x => x.fn === c.fn) && typeof window[c.fn] === 'function') window[c.fn]();
   const box = document.getElementById('modal-box');
-  box.insertAdjacentHTML('afterbegin', hrsProgressHtml(i, st));
+  mcInsertHTML(box, 'afterbegin', hrsProgressHtml(i, st));
   // Хадгалсан хариултыг сэргээх
   try {
     const d = JSON.parse(localStorage.getItem(hrsKey('d_' + c.fn)) || '{}');
@@ -6567,7 +6604,7 @@ function hrsOpenTest(i) {
   if (act) {
     const [closeB, goB] = act.querySelectorAll('button');
     if (closeB) { closeB.textContent = 'Түр завсарлах'; closeB.setAttribute('onclick', 'hrsPause()'); }
-    if (goB) goB.innerHTML = i === HR_CARDS.length - 1 ? 'Дуусгаад тайлан харах ✓' : 'Дараагийн тест →';
+    if (goB) mcSetHTML(goB, i === HR_CARDS.length - 1 ? 'Дуусгаад тайлан харах ✓' : 'Дараагийн тест →');
   }
 }
 /* Хариулт сонгох бүрт ноорог хадгална */
@@ -7366,13 +7403,13 @@ let tipFilter = 'all';
 function renderTips() {
   const chips = document.getElementById('tp-chips'), grid = document.getElementById('tp-grid');
   if (!grid) return;
-  chips.innerHTML = TIP_CATS.map(([k, l]) => `<button class="tp-chip${tipFilter === k ? ' on' : ''}" onclick="tipFilter='${k}';renderTips()">${l}</button>`).join('');
-  grid.innerHTML = TIPS.filter(t => tipFilter === 'all' || t.cat === tipFilter).map(tipCard).join('');
+  mcSetHTML(chips, TIP_CATS.map(([k, l]) => `<button class="tp-chip${tipFilter === k ? ' on' : ''}" onclick="tipFilter='${k}';renderTips()">${l}</button>`).join(''));
+  mcSetHTML(grid, TIPS.filter(t => tipFilter === 'all' || t.cat === tipFilter).map(tipCard).join(''));
 }
 function renderHomeTips() {
   const el = document.getElementById('home-tips'); if (!el) return;
   const d = Math.floor(Date.now() / 864e5), pick = [0, 1, 2].map(i => TIPS[(d + i * 3) % TIPS.length]);
-  el.innerHTML = pick.map(tipCard).join('');
+  mcSetHTML(el, pick.map(tipCard).join(''));
 }
 let tpBreathTimer = null;
 function openTip(id) {
@@ -7474,7 +7511,7 @@ async function scoreModal(key) {
     if (hasSelfHarmFlag) await sendSelfHarmRiskAlert();
   }
 
-  document.getElementById('modal-box').innerHTML = `
+  mcSetHTML(document.getElementById('modal-box'), `
     ${trHead(t, level, levelKey, total, max)}
     ${hasSelfHarmFlag ? `<div class="disclaimer-note" style="background:var(--red-soft);border-left:3px solid var(--red);padding:1rem;border-radius:8px;margin-bottom:1rem;">
       <b style="color:var(--red);">⚠️ Танд яаралтай дэмжлэг хэрэгтэй байж болзошгүй.</b><br>
@@ -7486,7 +7523,7 @@ async function scoreModal(key) {
     ${rec ? `<section class="t2-card t2-plan"><h4 class="t2-h"><span class="t2-ic">${T2_IC.plan}</span>Танд санал болгох зүйлс</h4>${t2List(rec)}<p class="t2-tip">Хийсэн алхмаа дарж тэмдэглээрэй.</p></section>` : ''}` : buildProReport(key, t, total, max, level, levelKey)}
 
     <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button>${t.personality ? '' : `<button class="modal-close" onclick="printTestAdvice()">🖨️ Хэвлэх / PDF</button>`}${t.personality ? '' : `<button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="closeModal(); goto('pros');">Мэргэжилтэнтэй холбогдох</button>`}</div>
-  `;
+  `);
   if (!t.personality) loadResultHistory(key, max);
 }
 
@@ -7565,7 +7602,7 @@ function renderMultiLabelResult(title, subtitle, results, hasSelfHarmFlag) {
       <div class="qx-bar"><div style="width:${Math.max(2, r.pct)}%;background:${col(r.pct)}"></div></div>
       <div class="qx-sc">${r.yesCount}/${r.total} шинж тэмдэг илэрсэн · ${r.pct}%</div>${multiGuideHtml(r)}</div>`).join('');
   const D = ADVICE[ADVICE_DOMAIN[key]];
-  document.getElementById('modal-box').innerHTML = `
+  mcSetHTML(document.getElementById('modal-box'), `
     ${trHeadText(title, topPct >= 50 ? 'Анхаарах чиглэл: ' + chShort(results[0].label) : 'Онцгой анхаарах шинж илрээгүй', lv)}
     ${hasSelfHarmFlag ? `<div class="disclaimer-note" style="background:var(--red-soft);border-left:3px solid var(--red);padding:1rem;border-radius:12px;margin:14px 0 0;">
       <b style="color:var(--red);">⚠️ Танд яаралтай дэмжлэг хэрэгтэй байж болзошгүй.</b><br>
@@ -7580,7 +7617,7 @@ function renderMultiLabelResult(title, subtitle, results, hasSelfHarmFlag) {
       <div class="t2-box t2-re"><b>${T2_IC.cal}Дахин хэзээ шалгах вэ?</b>${ADVICE_RECHECK[lv]}</div>
       <div class="t2-box t2-seek"><b>${T2_IC.user}Мэргэжилтэнд хэзээ хандах вэ?</b>${topPct >= 50 ? 'Энэ тест олон улсад баталгаажсан хэмжүүр биш тул 50%-иас дээш гарсан чиглэлээ баталгаажсан тестээр нягталж, сэтгэл зүйчтэй ярилцаарай.' : 'Одоогоор тусгай арга хэмжээ шаардлагагүй. Шинж тэмдэг үргэлжилбэл мэргэжилтэнтэй холбогдоорой.'}</div></div>
     <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="modal-close" onclick="printTestAdvice()">🖨️ Хэвлэх / PDF</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="closeModal(); goto('pros');">Мэргэжилтэнтэй холбогдох</button></div>
-  `;
+  `);
 }
 
 const STRESS_SYMPTOMS_QS = [
@@ -7613,12 +7650,12 @@ const STRESS_SUBSCALES = [
 
 function openStressSymptomsTest() {
   document.getElementById('modal-overlay').classList.add('open');
-  document.getElementById('modal-box').innerHTML = `
+  mcSetHTML(document.getElementById('modal-box'), `
     <h3>⚡ Стрессийн шинжүүдийг илрүүлэх тест</h3>
     <p class="msub">19 асуулт — Тийм/Үгүй гэж үнэн зөв хариулна уу. Хариулт бүрээс шалтгаалан хэд хэдэн боломжит шинжийн магадлалыг зэрэг харуулна.</p>
     <div id="mq-wrap">${renderYesNoQuestions(STRESS_SYMPTOMS_QS, 'stq')}</div>
     <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="scoreStressSymptomsTest()">Дүн харах</button></div>
-  `;
+  `);
   document.getElementById('modal-overlay').classList.add('open');
 }
 
@@ -7678,12 +7715,12 @@ const INSOMNIA_SUBSCALES = [
 
 function openInsomniaTest() {
   document.getElementById('modal-overlay').classList.add('open');
-  document.getElementById('modal-box').innerHTML = `
+  mcSetHTML(document.getElementById('modal-box'), `
     <h3>🌙 Нойргүйдлийг илрүүлэх тест</h3>
     <p class="msub">17 асуулт — Тийм/Үгүй гэж үнэн зөв хариулна уу. Хариулт бүрээс шалтгаалан хэд хэдэн боломжит нойрны эмгэгийн магадлалыг зэрэг харуулна.</p>
     <div id="mq-wrap">${renderYesNoQuestions(INSOMNIA_QS, 'inq')}</div>
     <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="scoreInsomniaTest()">Дүн харах</button></div>
-  `;
+  `);
 }
 
 async function scoreInsomniaTest() {
@@ -7727,12 +7764,12 @@ const GENDER_FEMININE_ITEMS = [2,5,8,11,14,17,20,23,26,29,32,35,38,41,44,47,50,5
 
 function openGenderRoleTest() {
   document.getElementById('modal-overlay').classList.add('open');
-  document.getElementById('modal-box').innerHTML = `
+  mcSetHTML(document.getElementById('modal-box'), `
     <h3>⚧️ Бие хүний сэтгэл зүйн хүйсийг тодорхойлох тест</h3>
     <p class="msub">60 үг/шинж чанар — тус бүрийг өөрт хэр тохирохыг Тийм/Үгүй гэж хариулна уу.</p>
     <div id="mq-wrap">${renderYesNoQuestions(GENDER_ROLE_QS, 'gnq')}</div>
     <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="scoreGenderRoleTest()">Дүн харах</button></div>
-  `;
+  `);
 }
 
 async function scoreGenderRoleTest() {
@@ -7769,7 +7806,7 @@ async function scoreGenderRoleTest() {
     loadMonthlyAnalysis();
   }
 
-  document.getElementById('modal-box').innerHTML = `
+  mcSetHTML(document.getElementById('modal-box'), `
     ${trHeadText('Бие хүний сэтгэл зүйн хүйс', resultLabel, 'low')}
     <div style="display:flex;gap:1rem;margin:1rem 0;flex-wrap:wrap;">
       <div style="flex:1;min-width:140px;background:var(--panel-2);border-radius:12px;padding:.9rem;text-align:center;">
@@ -7791,7 +7828,7 @@ async function scoreGenderRoleTest() {
     <div class="result-block"><b>Тайлбар:</b> ${resultDesc}</div>
     ${trAdviceHtml(GENDER_ADVICE[resultLabel])}
     <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button></div>
-  `;
+  `);
 }
 
 const CHARACTER_TRAITS_QS = [
@@ -7915,12 +7952,12 @@ const CHARACTER_TRAITS_VALIDITY = { yes:[32,52,89], no:[12,23,44,65,73,82] };
 
 function openCharacterTraitsTest() {
   document.getElementById('modal-overlay').classList.add('open');
-  document.getElementById('modal-box').innerHTML = `
+  mcSetHTML(document.getElementById('modal-box'), `
     <h3>🎭 "Хүний зан аранши, мөн чанар"-ыг үнэлэх тест</h3>
     <p class="msub">105 асуулт — Тийм/Үгүй гэж үнэн зөв хариулна уу. Хариултаас таны зан төлөвийн 8 чиглэлийн хөгжлийн түвшинг тус тусад нь харуулна.</p>
     <div id="mq-wrap">${renderYesNoQuestions(CHARACTER_TRAITS_QS, 'ctq')}</div>
     <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="scoreCharacterTraitsTest()">Дүн харах</button></div>
-  `;
+  `);
 }
 
 /* В.М.Русаловын темпераментын бүтцийн асуулга (STQ)-ын 8 хэмжүүрийн тайлбар: [сул, хүчтэй] */
@@ -7971,7 +8008,7 @@ async function scoreCharacterTraitsTest() {
     loadMonthlyAnalysis();
   }
 
-  document.getElementById('modal-box').innerHTML = `
+  mcSetHTML(document.getElementById('modal-box'), `
     ${trHeadText('Хүний зан аранши, мөн чанар', 'Таны зан төлөвийн 8 чиглэлийн зураглал', 'low')}
     ${validityFailed ? `<div class="disclaimer-note" style="background:var(--red-soft);border-left:3px solid var(--red);padding:1rem;border-radius:8px;margin-bottom:1rem;">
       <b style="color:var(--red);">⚠️ Хариултын нийцэл сул байна.</b><br>
@@ -7990,7 +8027,7 @@ async function scoreCharacterTraitsTest() {
     }).join('')}
     <div class="disclaimer-note" style="margin-top:.8rem;">Темперамент нь мэдрэлийн тогтолцооны төрөлхийн онцлогтой холбоотой бөгөөд "сайн/муу" гэж үнэлэгддэггүй. Аргачлал: В.М.Русалов (1990), темпераментын бүтцийн асуулга. Монгол хувилбарын норм баталгаажаагүй тул чиг баримжаа болгон ашиглана.</div>
     <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button></div>
-  `;
+  `);
 }
 
 /* ================= ТЕМПЕРАМЕНТ ТОДОРХОЙЛОХ ТЕСТ — Г.Айзенкийн EPI (57 асуулт) =================
@@ -8115,12 +8152,12 @@ function svgEpiCircle(E, N) {
 
 function openTemperamentTest() {
   document.getElementById('modal-overlay').classList.add('open');
-  document.getElementById('modal-box').innerHTML = `
+  mcSetHTML(document.getElementById('modal-box'), `
     <h3>🎭 Темперамент тодорхойлох тест</h3>
     <p class="msub">57 асуулт · 10 минут — Асуулт бүрт "Тийм" эсвэл "Үгүй" гэж хариулна уу.</p>
     <div id="mq-wrap">${EPI_QS.map((q, i) => `<div class="q-block"><div class="q-text">${i + 1}. ${q}</div>
       <div class="q-opts"><label><input type="radio" name="epi${i}" value="1"> Тийм</label><label><input type="radio" name="epi${i}" value="0"> Үгүй</label></div></div>`).join('')}</div>
-    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="scoreTemperamentTest()">Дүн харах</button></div>`;
+    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="scoreTemperamentTest()">Дүн харах</button></div>`);
 }
 
 async function scoreTemperamentTest() {
@@ -8143,7 +8180,7 @@ async function scoreTemperamentTest() {
   const eNote = R.ex > 0 ? '12-оос их: гадагшаа чиглэсэн' : R.ex < 0 ? '12-оос бага: дотогшоо чиглэсэн' : '12: хоёр туйлын голд';
   const nNote = R.un > 0 ? '12-оос их: тэнцвэргүй' : R.un < 0 ? '12-оос бага: тэнцвэртэй' : '12: хоёр туйлын голд';
   const lNote = R.reliable ? `${EPI_LIE_LIMIT}-өөс ихгүй: хариулт найдвартай` : `${EPI_LIE_LIMIT}-өөс их: хариулт бүрэн найдвартай биш байж болзошгүй`;
-  document.getElementById('modal-box').innerHTML = `
+  mcSetHTML(document.getElementById('modal-box'), `
     ${trHeadText('Темперамент тодорхойлох тест', headline, 'low')}
     ${R.reliable ? '' : `<div class="disclaimer-note" style="background:#FCF5EA;border-left:3px solid #9A5F0E;padding:1rem;border-radius:12px;margin:14px 0 0;"><b style="color:#7A4A0B;">⚠️ Сорилд үнэн хариулсан найдварт чанар бага байна (${R.L} / 9).</b><br>Зарим асуултад өөрийгөө бодит байдлаас илүү сайнаар харуулах гэсэн хариулт өгсөн байж болзошгүй тул доорх дүнг болгоомжтой хүлээж аваарай. Хүсвэл тестийг дахин, илүү чин сэтгэлээсээ бөглөөрэй.</div>`}
     <section class="t2-card"><h4 class="t2-h"><span class="t2-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></span>Хариултын хуудас</h4>
@@ -8155,7 +8192,7 @@ async function scoreTemperamentTest() {
     ${R.types.map(k => `<section class="t2-card t2-mean"><h4 class="t2-h"><span class="t2-ic">${T2_IC.bulb}</span>${EPI_NAMES[k]}</h4><p>${TEMPERAMENT_DESC[k]}</p></section>`).join('')}
     ${R.types.length === 1 ? trAdviceHtml(TEMP_ADVICE[main]) : ''}
     <div class="t2-note"><b>Санамж:</b> Энэ бол таны зан төлөвийн онцлог бөгөөд засах шаардлагатай асуудал биш. Хүн бүр өөр өөр хэв шинжтэй байдаг.</div>
-    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="modal-close" onclick="printTestAdvice()">🖨️ Хэвлэх / PDF</button></div>`;
+    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="modal-close" onclick="printTestAdvice()">🖨️ Хэвлэх / PDF</button></div>`);
 }
 
 const TEMPERAMENT_DESC = {
@@ -8337,7 +8374,7 @@ const MBTI_TYPES = {
 
 function openMBTI16Test() {
   document.getElementById('modal-overlay').classList.add('open');
-  document.getElementById('modal-box').innerHTML = `
+  mcSetHTML(document.getElementById('modal-box'), `
     <h3>🧩 Зан төлөвийн 16 хэв шинжийг тодорхойлох тест</h3>
     <p class="msub">Бүх 60 асуултад үнэн зөв хариулна уу. Эцэст нь таны зан төлөв 16 хэв шинжийн алинд хамгийн ойр болохыг тодорхойлж, дэлгэрэнгүй тодорхойлолт гаргана.</p>
     <div id="mq-wrap">
@@ -8351,7 +8388,7 @@ function openMBTI16Test() {
       ${MBTI_JP_QS.map((q,i)=>renderQuestionBlock({}, q, i, 'mjp')).join('')}
     </div>
     <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="scoreMBTI16Test()">Дүн харах</button></div>
-  `;
+  `);
 }
 
 async function scoreMBTI16Test() {
@@ -8397,7 +8434,7 @@ async function scoreMBTI16Test() {
     </div>`;
   }).join('');
 
-  document.getElementById('modal-box').innerHTML = `
+  mcSetHTML(document.getElementById('modal-box'), `
     ${trHeadText('Зан төлөвийн 16 хэв шинж (' + info.group + ')', typeCode + ' — ' + info.nick, 'low')}
     <div class="result-block">${info.desc}</div>
     <div class="ch-card"><div class="ch-title">4 тэнхлэг дээрх таны хандлага</div><div class="ch-sub">Цэг голоос аль хажуу тийш ойр байна, тэр чиглэл тань илүү хүчтэй илэрч байна.</div>${htmlBipolar([
@@ -8411,7 +8448,7 @@ async function scoreMBTI16Test() {
     <div class="result-block"><b>💼 Тохирох карьерийн чиглэл:</b><ul style="margin:.4rem 0 0 1.1rem;padding:0;">${info.career.map(s=>`<li>${s}</li>`).join('')}</ul></div>
     <div class="t2-note"><b>Санамж:</b> Энэ бол таны зан төлөвийн онцлог бөгөөд засах шаардлагатай асуудал биш. Хүн бүр өөр өөр хэв шинжтэй байдаг.</div>
     <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Хаах</button></div>
-  `;
+  `);
 }
 
 /* ================= FEED (Facebook маягийн нийтийн пост + сэтгэгдэл, Supabase-тэй холбогдсон) ================= */
@@ -8492,9 +8529,9 @@ function postPreviewHTML(p) {
 function renderFeed(){
   const html = feedState.map(p=>postHTML(p)).join('') || '<div style="color:var(--sub);text-align:center;padding:2rem 0;">Одоогоор бичлэг байхгүй байна. Эхнийхийг та бичээрэй!</div>';
   const fullEl = document.getElementById('feed-list-full');
-  if (fullEl) fullEl.innerHTML = html;
+  if (fullEl) mcSetHTML(fullEl, html);
   const previewEl = document.getElementById('feed-preview');
-  if (previewEl) previewEl.innerHTML = feedState.slice(0,2).map(postPreviewHTML).join('') || '<div style="color:var(--sub);font-size:.85rem;">Одоогоор бичлэг байхгүй байна.</div>';
+  if (previewEl) mcSetHTML(previewEl, feedState.slice(0,2).map(postPreviewHTML).join('') || '<div style="color:var(--sub);font-size:.85rem;">Одоогоор бичлэг байхгүй байна.</div>');
 }
 
 async function loadPosts() {
@@ -8650,7 +8687,7 @@ function renderPros() {
   if (priceSort==='desc') list = [...list].sort((a,b)=>b.price-a.price);
   const el = document.getElementById('pro-list-full');
   if (list.length===0){ el.innerHTML='<div style="color:var(--sub);text-align:center;padding:2rem 0;">Тохирох мэргэжилтэн олдсонгүй.</div>'; return; }
-  el.innerHTML = list.map(p => `
+  mcSetHTML(el, list.map(p => `
     <div class="pro-card">
       <div class="pro-top">
         <div class="pro-avatar">👩‍⚕️</div>
@@ -8662,7 +8699,7 @@ function renderPros() {
       <div class="pro-actions">
         <button class="txt" onclick="openChat('${p.id}','${escAttr(p.name)}')">💬 Чатаар холбогдох</button>
       </div>
-    </div>`).join('');
+    </div>`).join(''));
 }
 async function loadPros() {
   const { data, error } = await sb.from('professionals').select('*').order('rating', { ascending:false });
@@ -8987,7 +9024,7 @@ async function loadNotifItems() {
   items.sort((a,b) => b.ts - a.ts);
   items = items.slice(0, 8);
 
-  listEl.innerHTML = items.length ? items.map(notifItemHtml).join('') : '<div class="notif-empty">Одоогоор мэдэгдэл алга.</div>';
+  mcSetHTML(listEl, items.length ? items.map(notifItemHtml).join('') : '<div class="notif-empty">Одоогоор мэдэгдэл алга.</div>');
 }
 
 
@@ -9008,16 +9045,16 @@ async function loadProPortal() {
     return;
   }
   if (!data || !data.length) {
-    el.innerHTML = `
+    mcSetHTML(el, `
       <div class="section-card">
         <div class="section-head"><h3>🔒 Танд мэргэжилтний эрх алга</h3></div>
         <p style="font-size:.85rem;color:var(--sub);margin:0;">Хэрэв та манай платформын бодит мэргэжилтэн бөгөөд хэрэглэгчидтэй чатлах эрх авах шаардлагатай бол, одоогийн энэ имэйлээрээ (${currentUser.email || 'бүртгэлгүй'}) админтай холбогдоно уу.</p>
-      </div>`;
+      </div>`);
     return;
   }
   myProId = data[0].id;
   myProName = data[0].name;
-  el.innerHTML = `
+  mcSetHTML(el, `
     <div class="section-card">
       <div class="section-head"><h3>👋 Тавтай морил, ${myProName}!</h3></div>
       <p style="font-size:.85rem;color:var(--sub);margin:0;">Танд ирсэн зөвлөгөөний хүсэлтүүд доор жагсаагдана. Нэг мөрийг дарж, хариулаарай. Хэрэглэгчтэй чатлах явцад "Онлайн зөвлөгөөг зөвшөөрөх" товч дарж, видео дуудлага идэвхжүүлж болно.</p>
@@ -9026,7 +9063,7 @@ async function loadProPortal() {
       <div class="section-head"><h3>💬 Ирсэн хүсэлтүүд</h3></div>
       <div id="pro-chat-threads"></div>
     </div>
-  `;
+  `);
   loadProChatThreads();
 }
 
@@ -9045,7 +9082,7 @@ async function loadRiskAlertsForPro() {
   const { data, error } = await sb.from('risk_alerts').select('*').order('created_at', { ascending:false }).limit(50);
   if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж чадсангүй (SQL хүснэгт тохируулагдаагүй байж болзошгүй).</div>'; return; }
   if (!data || !data.length) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор эрсдэлийн дохио алга.</div>'; return; }
-  el.innerHTML = data.map(a => `
+  mcSetHTML(el, data.map(a => `
     <div class="unit-row" style="align-items:flex-start;${a.acknowledged?'opacity:.55;':''}">
       <div style="flex:1;">
         <div style="font-weight:700;font-size:.85rem;">${riskAlertLabel(a.reason)}</div>
@@ -9056,7 +9093,7 @@ async function loadRiskAlertsForPro() {
         ? `<span style="font-size:.75rem;color:var(--sub);">✓ Хүлээж авсан</span>`
         : `<button class="modal-close" style="margin:0;" onclick="acknowledgeRiskAlert('${a.id}')">Хүлээж авав</button>`}
     </div>
-  `).join('');
+  `).join(''));
 }
 
 async function acknowledgeRiskAlert(id) {
@@ -9089,18 +9126,18 @@ async function loadProChatThreads() {
   (data || []).forEach(m => { if (!threads[m.user_id]) threads[m.user_id] = m; });
   const list = Object.entries(threads);
   if (!list.length) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор танд бичсэн хэн ч алга.</div>'; return; }
-  el.innerHTML = list.map(([uid, m]) => `
+  mcSetHTML(el, list.map(([uid, m]) => `
     <div class="unit-row" style="cursor:pointer;" onclick="openProChat('${uid}')">
       <div class="unit-name">Нэрээ нуусан хэрэглэгч #${uid.slice(0,8)}…</div>
       <div style="color:var(--sub);font-size:.78rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.sender === 'user' ? '👤' : '✅'} ${esc(m.body)}</div>
     </div>
-  `).join('');
+  `).join(''));
 }
 
 function openProChat(uid) {
   currentProChatUserId = uid;
   document.getElementById('modal-overlay').classList.add('open');
-  document.getElementById('modal-box').innerHTML = `
+  mcSetHTML(document.getElementById('modal-box'), `
     <h3>💬 Нэрээ нуусан хэрэглэгч #${uid.slice(0,8)}…</h3>
     <div id="pro-chat-messages" style="max-height:320px;overflow-y:auto;border:1px solid var(--line);border-radius:12px;padding:.8rem;margin:.8rem 0;background:var(--panel-2);"></div>
     <div style="display:flex;gap:.5rem;">
@@ -9109,7 +9146,7 @@ function openProChat(uid) {
     </div>
     <div id="pro-online-consult-btn" style="margin-top:.9rem;"></div>
     <div class="modal-actions" style="margin-top:.9rem;"><button class="modal-close" onclick="closeProChat()">Хаах</button></div>
-  `;
+  `);
   loadProChatMessages();
   subscribeProChatRealtime();
   renderProOnlineConsultButton();
@@ -9120,12 +9157,12 @@ async function renderProOnlineConsultButton() {
   if (!el || !currentProChatUserId || !myProId) return;
   const session = await getVideoSessionStatus(currentProChatUserId, myProId);
   if (session?.status === 'approved' && session.video_room) {
-    el.innerHTML = `
+    mcSetHTML(el, `
       <div style="text-align:center;color:var(--gold);font-size:.85rem;font-weight:700;margin-bottom:.5rem;">🟢 Онлайн зөвлөгөө зөвшөөрөгдсөн</div>
       <a href="${session.video_room}" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;text-decoration:none;background:var(--gold);color:#fff;border-radius:12px;padding:.75rem;font-size:.92rem;font-weight:700;margin-bottom:.5rem;">🎥 Дуудлагад нэгдэх</a>
-      <button onclick="proRevokeOnlineConsult('${currentProChatUserId}','${myProId}')" style="width:100%;background:none;border:1px solid var(--red,#c0392b);color:var(--red,#c0392b);border-radius:12px;padding:.6rem;font-size:.85rem;cursor:pointer;">Зөвшөөрлийг цуцлах</button>`;
+      <button onclick="proRevokeOnlineConsult('${currentProChatUserId}','${myProId}')" style="width:100%;background:none;border:1px solid var(--red,#c0392b);color:var(--red,#c0392b);border-radius:12px;padding:.6rem;font-size:.85rem;cursor:pointer;">Зөвшөөрлийг цуцлах</button>`);
   } else {
-    el.innerHTML = `<button onclick="proApproveOnlineConsult('${currentProChatUserId}','${myProId}')" style="width:100%;background:var(--gold);color:#fff;border:none;border-radius:12px;padding:.75rem;font-size:.92rem;font-weight:700;cursor:pointer;">🎥 Онлайн зөвлөгөөг зөвшөөрөх</button>`;
+    mcSetHTML(el, `<button onclick="proApproveOnlineConsult('${currentProChatUserId}','${myProId}')" style="width:100%;background:var(--gold);color:#fff;border:none;border-radius:12px;padding:.75rem;font-size:.92rem;font-weight:700;cursor:pointer;">🎥 Онлайн зөвлөгөөг зөвшөөрөх</button>`);
   }
 }
 
@@ -9137,13 +9174,13 @@ async function loadProChatMessages() {
     .order('created_at', { ascending: true });
   if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалахад алдаа гарлаа.</div>'; return; }
   if (!data.length) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;text-align:center;">Мессеж алга.</div>'; return; }
-  el.innerHTML = data.map(m => `
+  mcSetHTML(el, data.map(m => `
     <div style="display:flex;justify-content:${m.sender !== 'user' ? 'flex-end' : 'flex-start'};margin-bottom:.5rem;">
       <div style="max-width:75%;padding:.5rem .8rem;border-radius:12px;font-size:.85rem;
         background:${m.sender !== 'user' ? 'var(--gold)' : '#fff'};
         color:${m.sender !== 'user' ? '#fff' : 'var(--cream)'};
         border:1px solid var(--line);">${esc(m.body)}</div>
-    </div>`).join('');
+    </div>`).join(''));
   el.scrollTop = el.scrollHeight;
 }
 
@@ -9188,7 +9225,7 @@ function openChat(proId, name) {
   currentChatProId = proId;
   currentChatProName = name;
   document.getElementById('modal-overlay').classList.add('open');
-  document.getElementById('modal-box').innerHTML = `
+  mcSetHTML(document.getElementById('modal-box'), `
     <h3>💬 ${name}-тэй чатлах</h3>
     <p class="msub">Таны мессежийг зөвхөн энэ мэргэжилтэн болон таны эрх бүхий админ харна. Нэрээ нуусан хэвээр байна.</p>
     <div id="chat-messages" style="max-height:320px;overflow-y:auto;border:1px solid var(--line);border-radius:12px;padding:.8rem;margin:.8rem 0;background:var(--panel-2);"></div>
@@ -9198,7 +9235,7 @@ function openChat(proId, name) {
     </div>
     <div id="chat-online-consult-btn" style="margin-top:.9rem;"></div>
     <div class="modal-actions" style="margin-top:.9rem;"><button class="modal-close" onclick="closeChat()">Хаах</button></div>
-  `;
+  `);
   loadChatMessages();
   subscribeChatRealtime();
   renderUserOnlineConsultButton();
@@ -9209,7 +9246,7 @@ async function renderUserOnlineConsultButton() {
   if (!el || !currentUser?.id || !currentChatProId) return;
   const session = await getVideoSessionStatus(currentUser.id, currentChatProId);
   if (session?.status === 'approved' && session.video_room) {
-    el.innerHTML = `<a href="${session.video_room}" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;text-decoration:none;background:var(--gold);color:#fff;border-radius:12px;padding:.75rem;font-size:.92rem;font-weight:700;">🎥 Онлайн зөвлөгөө — Дуудлагад нэгдэх</a>`;
+    mcSetHTML(el, `<a href="${session.video_room}" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;text-decoration:none;background:var(--gold);color:#fff;border-radius:12px;padding:.75rem;font-size:.92rem;font-weight:700;">🎥 Онлайн зөвлөгөө — Дуудлагад нэгдэх</a>`);
   } else {
     el.innerHTML = `<div style="text-align:center;background:var(--panel-2);color:var(--sub);border-radius:12px;padding:.75rem;font-size:.88rem;opacity:.6;cursor:not-allowed;">🎥 Онлайн зөвлөгөө <span style="display:block;font-size:.72rem;margin-top:.2rem;">Мэргэжилтэн зөвшөөрсний дараа идэвхжинэ</span></div>`;
   }
@@ -9232,13 +9269,13 @@ function renderChatMessages(msgs) {
     el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;text-align:center;padding:1rem 0;">Мессеж алга. Эхний мессежээ бичээрэй 👇</div>';
     return;
   }
-  el.innerHTML = msgs.map(m => `
+  mcSetHTML(el, msgs.map(m => `
     <div style="display:flex;justify-content:${m.sender === 'user' ? 'flex-end' : 'flex-start'};margin-bottom:.5rem;">
       <div style="max-width:75%;padding:.5rem .8rem;border-radius:12px;font-size:.85rem;
         background:${m.sender === 'user' ? 'var(--gold)' : '#fff'};
         color:${m.sender === 'user' ? '#fff' : 'var(--cream)'};
         border:1px solid var(--line);">${esc(m.body)}</div>
-    </div>`).join('');
+    </div>`).join(''));
   el.scrollTop = el.scrollHeight;
 }
 
@@ -9358,9 +9395,9 @@ async function loadUnitStress() {
     el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Хангалттай олон хүн тест бөглөсний дараа нэгжийн дүн энд харагдана.</div>';
     return;
   }
-  el.innerHTML = data.map(u => `
+  mcSetHTML(el, data.map(u => `
     <div class="unit-row"><div class="unit-name">${BRANCH_LABELS[u.branch] || esc(u.branch)}</div><div class="unit-track"><div class="unit-fill" style="width:${u.avg_stress_pct}%;"></div></div><div class="unit-pct">${u.avg_stress_pct}%</div></div>
-  `).join('');
+  `).join(''));
 }
 
 /* ================= ADMIN ================= */
@@ -9369,7 +9406,7 @@ const ADMIN_ITEMS = [
   {icon:'💳',label:'Төлбөр'}, {icon:'📊',label:'Статистик'}, {icon:'📰',label:'Нийтлэл'}, {icon:'🎓',label:'Сургалт'},
   {icon:'🪖',label:'Цэргийн төрөл харах'},
 ];
-document.getElementById('admin-grid').innerHTML = ADMIN_ITEMS.map(a => `
+mcSetHTML(document.getElementById('admin-grid'), ADMIN_ITEMS.map(a => `
   <div class="admin-card" onclick="${
     a.label === 'Хэрэглэгч' ? "showAdminUsersView()" :
     a.label === 'Тест' ? "showAdminTestResultsView()" :
@@ -9379,7 +9416,7 @@ document.getElementById('admin-grid').innerHTML = ADMIN_ITEMS.map(a => `
     a.label === 'Цэргийн төрөл харах' ? "adminPreviewOnboarding()" :
     `showToast('${a.label} — demo хувилбарт зөвхөн харагдацтай, production дээр бүрэн удирдах боломжтой.', 'info')`
   }"><div class="admin-icon">${a.icon}</div><div class="admin-lbl">${a.label}</div></div>
-`).join('');
+`).join(''));
 /* Эрсдэлийн дохионд тооцох тестүүд (сүүлийн дүн нь "high" түвшинд бол) */
 const ADM_RISK_TESTS = ['phq9','gutral_soril','gad7','tugeemel_tugshilt','pcl5','cbi','audit','arhiny_hamaarl','mansuuruulah_bodis','sleep'];
 let admRiskRows = [], admRiskFilter = 'all';
@@ -9437,7 +9474,7 @@ function renderAdminRiskList() {
     <div class="ar-bar">${chip('all', 'Бүгд', all.length)}${chip('crit', 'Яаралтай', all.filter(u => u.crit).length)}${chip('open', 'Шинэ', all.filter(u => u.open).length)}
       <input id="adm-risk-q" type="search" placeholder="Нэр, код хайх" value="${esc(q)}" oninput="renderAdminRiskList()">
       <select id="adm-risk-branch" onchange="renderAdminRiskList()"><option value="">Бүх төрөл</option>${brOpts}</select></div>`;
-  if (!all.length) { el.innerHTML = head + '<div style="color:var(--sub);font-size:.85rem;margin-top:.6rem;">Одоогоор эрсдэлтэй гэж дүгнэгдсэн алба хаагч алга.</div>'; return; }
+  if (!all.length) { mcSetHTML(el, head + '<div style="color:var(--sub);font-size:.85rem;margin-top:.6rem;">Одоогоор эрсдэлтэй гэж дүгнэгдсэн алба хаагч алга.</div>'); return; }
   const rows = list.map(u => {
     const name = u.id?.real_name ? `${esc(u.id.real_name)}${u.id.rank ? ' · ' + esc(u.id.rank) : ''}` : '<span class="ar-noname">Бодит нэр бүртгүүлээгүй</span>';
     const meta = [esc(u.handle || '—'), esc(BRANCH_LABELS[u.user?.branch] || ''), esc(ROLE_LABELS?.[u.user?.personnel_type] || '')].filter(Boolean).join(' · ');
@@ -9450,7 +9487,7 @@ function renderAdminRiskList() {
         ${u.open ? `<button class="modal-close" style="margin:0;white-space:nowrap" onclick="adminAckUserAlerts('${u.uid}')">Хүлээж авсан</button>` : ''}</div>
       <div class="ar-tags">${tags}</div></div>`;
   }).join('');
-  el.innerHTML = head + (rows || '<div style="color:var(--sub);font-size:.85rem;margin-top:.6rem;">Шүүлтүүрт тохирох алба хаагч алга.</div>');
+  mcSetHTML(el, head + (rows || '<div style="color:var(--sub);font-size:.85rem;margin-top:.6rem;">Шүүлтүүрт тохирох алба хаагч алга.</div>'));
 }
 async function adminAckUserAlerts(uid) {
   const { error } = await sb.from('risk_alerts').update({ acknowledged:true, acknowledged_by: currentUser.id, acknowledged_at: new Date().toISOString() }).eq('user_id', uid).eq('acknowledged', false);
@@ -9553,7 +9590,7 @@ async function loadAdminTestResultsList() {
   if (!el) return;
   el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалж байна...</div>';
   const { data, error } = await sb.from('test_results').select('*, users(anon_handle, branch, personnel_type)').order('created_at', { ascending:false }).limit(3000);
-  if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Жагсаалт татахад алдаа гарлаа: ' + esc(error.message) + '</div>'; console.error('loadAdminTestResultsList error:', error); return; }
+  if (error) { mcSetHTML(el, '<div style="color:var(--sub);font-size:.85rem;">Жагсаалт татахад алдаа гарлаа: ' + esc(error.message) + '</div>'); console.error('loadAdminTestResultsList error:', error); return; }
   if (!data || !data.length) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор ямар ч тестийн үр дүн алга.</div>'; return; }
   const byUser = {};
   data.forEach(r => { (byUser[r.user_id] ||= { user: r.users, results: [] }).results.push(r); });
@@ -9573,14 +9610,14 @@ function renderAdminTestResultsList() {
   if (branchFilter) list = list.filter(u => u.user?.branch === branchFilter);
   if (q) list = list.filter(u => (u.user?.anon_handle || '').toLowerCase().includes(q));
   if (!list.length) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Тохирох үр дүн олдсонгүй.</div>'; return; }
-  el.innerHTML = list.map(u => `
+  mcSetHTML(el, list.map(u => `
     <div class="comment-row" style="padding:.7rem 0;border-top:1px solid var(--line);">
       <div style="font-weight:700;font-size:.88rem;">${esc(u.user?.anon_handle) || '—'} <span style="font-weight:400;color:var(--sub);font-size:.78rem;">${esc(BRANCH_LABELS[u.user?.branch]) || ''}${u.user?.personnel_type ? ' · '+esc(ROLE_LABELS[u.user.personnel_type]||u.user.personnel_type) : ''}</span> <span style="color:var(--sub);font-size:.75rem;">(${u.results.length} тест)</span></div>
       <div style="margin-top:.4rem;">
         ${u.results.map(r => `<div style="font-size:.82rem;color:var(--sub);padding-left:.5rem;border-left:2px solid var(--line);margin:.15rem 0;">• ${esc(TESTS[r.test_key]?.title || EXTRA_TEST_TITLES[r.test_key] || r.test_key)} — ${r.score}${r.max_score!=null?('/'+r.max_score):''} ${r.level?('('+esc(r.level)+')'):''} · ${timeAgo(r.created_at)}</div>`).join('')}
       </div>
     </div>
-  `).join('');
+  `).join(''));
 }
 
 /* ================= АДМИН: Бүх сэтгэгдлийг удирдах (харах/устгах) ================= */
@@ -9592,7 +9629,7 @@ async function loadAdminPosts() {
   const { data, error } = await sb.from('posts').select('*').order('created_at', { ascending:false }).limit(200);
   if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Жагсаалт татахад алдаа гарлаа.</div>'; console.error('loadAdminPosts error:', error); return; }
   if (!data || data.length===0) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор пост алга.</div>'; return; }
-  el.innerHTML = data.map(p => `
+  mcSetHTML(el, data.map(p => `
     <div class="comment-row" style="display:flex;gap:.5rem;padding:.6rem 0;border-top:1px solid var(--line);align-items:flex-start;">
       <div class="post-avatar" style="width:26px;height:26px;font-size:.75rem;flex-shrink:0;">🪖</div>
       <div style="flex:1;min-width:0;">
@@ -9601,7 +9638,7 @@ async function loadAdminPosts() {
       </div>
       <button onclick="adminDeletePost('${p.id}')" title="Устгах" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>
     </div>
-  `).join('');
+  `).join(''));
 }
 async function adminDeletePost(postId) {
   if (!confirm('Энэ постыг устгах уу? Постын доорх бүх сэтгэгдэл ч мөн устана.')) return;
@@ -9621,7 +9658,7 @@ async function loadAdminComments() {
   const { data, error } = await sb.from('comments').select('*').order('created_at', { ascending:false }).limit(200);
   if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Жагсаалт татахад алдаа гарлаа.</div>'; console.error('loadAdminComments error:', error); return; }
   if (!data || data.length===0) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор сэтгэгдэл алга.</div>'; return; }
-  el.innerHTML = data.map(c => `
+  mcSetHTML(el, data.map(c => `
     <div class="comment-row" style="display:flex;gap:.5rem;padding:.6rem 0;border-top:1px solid var(--line);align-items:flex-start;">
       <div class="post-avatar" style="width:26px;height:26px;font-size:.75rem;flex-shrink:0;">🪖</div>
       <div style="flex:1;min-width:0;">
@@ -9630,7 +9667,7 @@ async function loadAdminComments() {
       </div>
       <button onclick="adminDeleteComment('${c.id}')" title="Устгах" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>
     </div>
-  `).join('');
+  `).join(''));
 }
 async function adminDeleteComment(commentId) {
   if (!confirm('Энэ сэтгэгдлийг устгах уу?')) return;
@@ -9654,7 +9691,7 @@ async function loadAdminProfessionals() {
   }
   PROS = data || [];
   if (!data || !data.length) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор мэргэжилтэн бүртгэгдээгүй байна.</div>'; return; }
-  el.innerHTML = data.map(p => `
+  mcSetHTML(el, data.map(p => `
     <div class="unit-row">
       <div class="unit-name" style="width:auto;flex:1;">
         <b>${esc(p.name)}</b> <span style="color:var(--sub);font-weight:400;">— ${esc(p.spec)}, ${esc(p.location)}, ${p.price.toLocaleString()}₮, ★${p.rating}</span>
@@ -9663,10 +9700,10 @@ async function loadAdminProfessionals() {
       <button class="modal-close" style="padding:.3rem .8rem;font-size:.78rem;" onclick='editProfessional(${JSON.stringify(p).replace(/'/g, "&apos;")})'>Засах</button>
       <button class="modal-close" style="padding:.3rem .8rem;font-size:.78rem;margin-left:.4rem;color:var(--red);border-color:rgba(192,69,58,.4);" onclick="deleteProfessional('${p.id}')">Устгах</button>
     </div>
-  `).join('');
+  `).join(''));
   const linkSelect = document.getElementById('pro-link-select');
   if (linkSelect) {
-    linkSelect.innerHTML = data.map(p => `<option value="${p.id}">${esc(p.name)}${p.auth_user_id ? ' (холбогдсон)' : ''}</option>`).join('');
+    mcSetHTML(linkSelect, data.map(p => `<option value="${p.id}">${esc(p.name)}${p.auth_user_id ? ' (холбогдсон)' : ''}</option>`).join(''));
   }
 }
 
@@ -9712,7 +9749,7 @@ async function loadAdminHrList() {
   const { data, error } = await sb.from('hr_specialists').select('*').order('created_at', { ascending:false });
   if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Жагсаалт татахад алдаа гарлаа.</div>'; return; }
   if (!data || !data.length) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор бүртгэсэн хүний нөөцийн мэргэжилтэн алга.</div>'; return; }
-  el.innerHTML = data.map(h => `
+  mcSetHTML(el, data.map(h => `
     <div class="comment-row" style="display:flex;gap:.5rem;padding:.5rem 0;border-top:1px solid var(--line);align-items:center;">
       <div style="flex:1;min-width:0;">
         <div style="font-size:.85rem;font-weight:700;">${esc(h.name)} <span style="font-weight:400;color:var(--sub);">${esc(h.unit)}</span></div>
@@ -9720,7 +9757,7 @@ async function loadAdminHrList() {
       </div>
       <button onclick="adminDeleteHrSpecialist('${h.id}')" title="Устгах" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>
     </div>
-  `).join('');
+  `).join(''));
 }
 
 async function adminDeleteHrSpecialist(id) {
@@ -9819,21 +9856,21 @@ async function loadAdminChatThreads() {
   });
   const list = Object.entries(threads);
   if (!list.length) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор чат алга.</div>'; return; }
-  el.innerHTML = list.map(([key, m]) => {
+  mcSetHTML(el, list.map(([key, m]) => {
     const [uid, proId] = key.split('|');
     const proName = (PROS.find(p => String(p.id) === String(proId)) || {}).name || ('Мэргэжилтэн #' + proId);
     return `<div class="unit-row" style="cursor:pointer;" onclick="openAdminChat('${uid}','${proId}','${escAttr(proName)}')">
       <div class="unit-name">Anonymous ${uid.slice(0,8)}… → ${esc(proName)}</div>
       <div style="color:var(--sub);font-size:.78rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.sender === 'user' ? '👤' : '👩‍⚕️'} ${esc(m.body)}</div>
     </div>`;
-  }).join('');
+  }).join(''));
 }
 
 function openAdminChat(uid, proId, proName) {
   currentAdminChatUserId = uid;
   currentAdminChatProId = proId;
   document.getElementById('modal-overlay').classList.add('open');
-  document.getElementById('modal-box').innerHTML = `
+  mcSetHTML(document.getElementById('modal-box'), `
     <h3>💬 ${esc(proName)}-ийн нэрийн өмнөөс хариулах</h3>
     <p class="msub">Хэрэглэгч: Anonymous ${uid.slice(0,8)}…</p>
     <div id="admin-chat-messages" style="max-height:320px;overflow-y:auto;border:1px solid var(--line);border-radius:12px;padding:.8rem;margin:.8rem 0;background:var(--panel-2);"></div>
@@ -9842,7 +9879,7 @@ function openAdminChat(uid, proId, proName) {
       <button class="connect-btn" style="width:auto;padding:.6rem 1.1rem;" onclick="sendAdminChatMessage()">Илгээх</button>
     </div>
     <div class="modal-actions" style="margin-top:.9rem;"><button class="modal-close" onclick="closeAdminChat()">Хаах</button></div>
-  `;
+  `);
   loadAdminChatMessages();
   subscribeAdminChatRealtime();
 }
@@ -9855,13 +9892,13 @@ async function loadAdminChatMessages() {
     .order('created_at', { ascending: true });
   if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Ачаалахад алдаа гарлаа.</div>'; return; }
   if (!data.length) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;text-align:center;">Мессеж алга.</div>'; return; }
-  el.innerHTML = data.map(m => `
+  mcSetHTML(el, data.map(m => `
     <div style="display:flex;justify-content:${m.sender === 'admin' ? 'flex-end' : 'flex-start'};margin-bottom:.5rem;">
       <div style="max-width:75%;padding:.5rem .8rem;border-radius:12px;font-size:.85rem;
         background:${m.sender === 'admin' ? 'var(--gold)' : '#fff'};
         color:${m.sender === 'admin' ? '#fff' : 'var(--cream)'};
         border:1px solid var(--line);">${esc(m.body)}</div>
-    </div>`).join('');
+    </div>`).join(''));
   el.scrollTop = el.scrollHeight;
 }
 
@@ -9953,8 +9990,8 @@ function renderRegisteredUsers() {
   } else {
     body = table(all.filter(u => u.provider === regUsersFilter));
   }
-  el.innerHTML = (regUsersHasProvider ? summary + tabs : `<div class="privacy-note" style="margin-bottom:.9rem;">Нэвтэрсэн аргаар (Google / Facebook) ангилахын тулд Supabase дээр <b>get_registered_users_v2</b> SQL функцийг нэмнэ үү.</div>`) + body +
-    `<div class="privacy-note" style="margin-top:.9rem;">Энэ жагсаалт зөвхөн баталгаажсан админд харагдана.</div>`;
+  mcSetHTML(el, (regUsersHasProvider ? summary + tabs : `<div class="privacy-note" style="margin-bottom:.9rem;">Нэвтэрсэн аргаар (Google / Facebook) ангилахын тулд Supabase дээр <b>get_registered_users_v2</b> SQL функцийг нэмнэ үү.</div>`) + body +
+    `<div class="privacy-note" style="margin-top:.9rem;">Энэ жагсаалт зөвхөн баталгаажсан админд харагдана.</div>`);
 }
 
 async function loadCompositionStats() {
@@ -9977,8 +10014,8 @@ async function loadCompositionStats() {
     return `<div class="unit-row"><div class="unit-name">${labels[k]||k}</div><div class="unit-track"><div class="unit-fill" style="width:${pct}%;"></div></div><div class="unit-pct">${c}</div></div>`;
   }).join('') || '<div style="color:var(--sub);font-size:.85rem;">Одоогоор өгөгдөл алга.</div>';
 
-  branchEl.innerHTML = '<p style="font-weight:800;font-size:.85rem;margin-bottom:.6rem;">Цэргийн төрлөөр</p>' + renderBars(branchCounts, BRANCH_LABELS, branchTotal);
-  roleEl.innerHTML = '<p style="font-weight:800;font-size:.85rem;margin-bottom:.6rem;">Албан хаагчийн төрлөөр</p>' + renderBars(roleCounts, ROLE_LABELS, roleTotal);
+  mcSetHTML(branchEl, '<p style="font-weight:800;font-size:.85rem;margin-bottom:.6rem;">Цэргийн төрлөөр</p>' + renderBars(branchCounts, BRANCH_LABELS, branchTotal));
+  mcSetHTML(roleEl, '<p style="font-weight:800;font-size:.85rem;margin-bottom:.6rem;">Албан хаагчийн төрлөөр</p>' + renderBars(roleCounts, ROLE_LABELS, roleTotal));
 }
 
 /* ================= Тестийн дүн — цэргийн ангиар (админ) ================= */
@@ -9989,8 +10026,8 @@ async function populateTestBranchStatsSelect() {
   const sel = document.getElementById('test-branch-stats-select');
   if (!sel) return;
   const entries = Object.entries(TESTS).sort((a,b) => a[1].title.localeCompare(b[1].title, 'mn'));
-  sel.innerHTML = '<option value="">— Тест сонгоно уу —</option>' +
-    entries.map(([key, t]) => `<option value="${key}">${t.emo ? t.emo+' ' : ''}${t.title}</option>`).join('');
+  mcSetHTML(sel, '<option value="">— Тест сонгоно уу —</option>' +
+    entries.map(([key, t]) => `<option value="${key}">${t.emo ? t.emo+' ' : ''}${t.title}</option>`).join(''));
 
   // Хамгийн олон хүн бөглөсөн тестийг олж, түүгээр анхны үзүүлэлтийг шууд харуулна
   const { data, error } = await sb.from('test_results').select('test_key').limit(5000);
@@ -10018,7 +10055,7 @@ async function loadTestBranchStats() {
     .order('created_at', { ascending:false })
     .limit(2000);
 
-  if (error) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Дүн татахад алдаа гарлаа: ' + error.message + '</div>'; console.error('loadTestBranchStats error:', error); return; }
+  if (error) { mcSetHTML(el, '<div style="color:var(--sub);font-size:.85rem;">Дүн татахад алдаа гарлаа: ' + error.message + '</div>'); console.error('loadTestBranchStats error:', error); return; }
   if (!data || data.length === 0) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Энэ тестийг одоогоор хэн ч бөглөөгүй байна.</div>'; return; }
 
   // Салбар тус бүрээр бүлэглэнэ
@@ -10041,7 +10078,7 @@ async function loadTestBranchStats() {
   testBranchChartInstances.forEach(c => c.destroy());
   testBranchChartInstances = [];
 
-  el.innerHTML = `
+  mcSetHTML(el, `
     <div style="font-size:.85rem;font-weight:800;margin-bottom:.8rem;">Нийт бөглөсөн: ${totalCount} хүн</div>
     <div style="display:flex;flex-wrap:wrap;gap:1.2rem;">
     ${branches.map(([bKey, g], idx) => {
@@ -10055,7 +10092,7 @@ async function loadTestBranchStats() {
         </div>`;
     }).join('')}
     </div>
-  `;
+  `);
 
   branches.forEach(([bKey, g], idx) => {
     const canvas = document.getElementById(`test-branch-pie-${idx}`);
@@ -10076,8 +10113,53 @@ async function loadTestBranchStats() {
   });
 }
 
+/* ================= ИДЭВХГҮЙ ҮЕД АВТОМАТААР ГАРАХ (30 минут) ================= */
+const MC_IDLE_MS = 30 * 60 * 1000, MC_IDLE_WARN_MS = 60 * 1000, MC_IDLE_KEY = 'mc_last_act', MC_IDLE_OUT = 'mc_idle_out';
+let mcIdleWarned = false, mcIdleTimer = null;
+function mcIdleGet() { try { return Number(localStorage.getItem(MC_IDLE_KEY)) || 0; } catch (e) { return 0; } }
+function mcIdleTouch(force) {
+  const now = Date.now(); mcIdleWarned = false;
+  if (!force && now - mcIdleGet() < 15000) return;
+  try { localStorage.setItem(MC_IDLE_KEY, String(now)); } catch (e) {}
+}
+async function mcRealSession() {
+  try { const { data } = await sb.auth.getSession(); const u = data?.session?.user; return u && !u.is_anonymous ? u : null; } catch (e) { return null; }
+}
+async function mcIdleLogout() {
+  if (mcIdleTimer) { clearInterval(mcIdleTimer); mcIdleTimer = null; }
+  try { localStorage.setItem(MC_IDLE_OUT, '1'); localStorage.removeItem(MC_IDLE_KEY); } catch (e) {}
+  await logoutAndRestart();
+}
+/* Хуудас ачаалахад: өмнөх идэвхээс хойш 30 минут өнгөрсөн бөгөөд шинээр нэвтрээгүй бол гаргана */
+async function mcIdleCheckOnLoad() {
+  const u = await mcRealSession(); if (!u) return false;
+  const last = mcIdleGet(), signedIn = u.last_sign_in_at ? new Date(u.last_sign_in_at).getTime() : 0;
+  if (last && Date.now() - last > MC_IDLE_MS && signedIn < last) { await mcIdleLogout(); return true; }
+  mcIdleTouch(true); return false;
+}
+function mcIdleStart() {
+  ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'wheel'].forEach(ev => window.addEventListener(ev, () => mcIdleTouch(false), { passive: true, capture: true }));
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) mcIdleTick(); });
+  mcIdleTimer = setInterval(mcIdleTick, 20000);
+}
+async function mcIdleTick() {
+  const last = mcIdleGet(); if (!last) return;
+  const idle = Date.now() - last;
+  if (idle >= MC_IDLE_MS) { if (await mcRealSession()) mcIdleLogout(); return; }
+  if (idle >= MC_IDLE_MS - MC_IDLE_WARN_MS && !mcIdleWarned && await mcRealSession()) {
+    mcIdleWarned = true;
+    showToast('Та удаан идэвхгүй байна. Аюулгүй байдлын үүднээс 1 минутын дараа системээс гарна. Үргэлжлүүлэх бол дэлгэц дээр дарна уу.', 'warn', 15000);
+  }
+}
+function mcIdleNotice() {
+  try { if (localStorage.getItem(MC_IDLE_OUT)) { localStorage.removeItem(MC_IDLE_OUT);
+    setTimeout(() => showToast('30 минут идэвхгүй байсан тул аюулгүй байдлын үүднээс системээс гарлаа. Дахин нэвтэрнэ үү.', 'info', 8000), 600); } } catch (e) {}
+}
+
 /* ================= INIT: эхлээд хэрэглэгч бэлдээд, дараа нь бүх мэдээллийг ачаална ================= */
 async function init() {
+  if (await mcIdleCheckOnLoad()) return;
+  mcIdleStart(); mcIdleNotice();
   await ensureUser();
   applyUserToTopbar();
   await checkAdminStatus();

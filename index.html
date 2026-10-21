@@ -1836,15 +1836,15 @@ function esc(str) {
     .replace(/'/g, '&#39;');
 }
 /* ===== Аюулгүй HTML оруулах цэг: сайтын бүх динамик HTML энэ хоёр функцээр дамжина =====
-   HTML-ийг идэвхгүй <template> дотор задалж (скрипт ажиллахгүй, зураг ачаалагдахгүй), сайтад ашиглагддаггүй
+   HTML-ийг идэвхгүй баримт бичигт (DOMParser) задалж (скрипт ажиллахгүй, зураг ачаалагдахгүй), сайтад ашиглагддаггүй
    аюултай элемент, үйлдэл, холбоосыг хасаад дараа нь хуудсанд оруулна. Хэрэглэгчийн текстийг esc()-ээр
    escape хийдэгтэй нийлээд хадгалагдсан XSS-ээс давхар хамгаална. */
 const MC_ALLOWED_ON = new Set(['onclick', 'onchange', 'oninput', 'onkeydown']);
 const MC_BAD_TAGS = 'script,iframe,frame,frameset,object,embed,applet,base,meta,link,form,portal';
 const MC_URL_ATTRS = new Set(['href', 'src', 'action', 'formaction', 'xlink:href', 'poster', 'background']);
 function mcClean(html) {
-  const t = document.createElement('template');
-  t.innerHTML = html == null ? '' : String(html);
+  const doc = new DOMParser().parseFromString('<!doctype html><body><template>' + (html == null ? '' : String(html)) + '</template>', 'text/html');
+  const t = doc.querySelector('template') || doc.createElement('template');
   const walkClean = root => {
     root.querySelectorAll(MC_BAD_TAGS).forEach(n => n.remove());
     root.querySelectorAll('*').forEach(el => {
@@ -1859,6 +1859,18 @@ function mcClean(html) {
   };
   walkClean(t.content);
   return t.content;
+}
+/* Хэвлэх цонх: document.write ашиглахгүй, агуулгыг цэвэрлэгчээр (mcClean) дамжуулж DOM-оор бүтээнэ */
+function mcPrintWindow(title, css, bodyHtml) {
+  const w = window.open('', '_blank');
+  if (!w) { showToast('Шинэ цонх нээгдсэнгүй — хөтчийн popup хоригийг зөвшөөрнө үү.', 'warn'); return; }
+  const d = w.document;
+  d.documentElement.lang = 'mn';
+  const meta = d.createElement('meta'); meta.setAttribute('charset', 'utf-8'); d.head.appendChild(meta);
+  d.title = title;
+  const st = d.createElement('style'); st.textContent = css; d.head.appendChild(st);
+  d.body.replaceChildren(d.importNode(mcClean(bodyHtml), true));
+  setTimeout(() => { try { w.focus(); w.print(); } catch (e) {} }, 400);
 }
 function mcSetHTML(el, html) {
   if (!el) return html;
@@ -2400,7 +2412,7 @@ async function loadHrResultsInner() {
       return `
       <div class="comment-row" style="display:flex;flex-direction:column;gap:.3rem;padding:.7rem 0;border-top:1px solid var(--line);">
         <div style="font-weight:700;font-size:.88rem;">${esc(u.user?.anon_handle) || '—'} <span style="font-weight:400;color:var(--sub);font-size:.78rem;">${esc(BRANCH_LABELS?.[u.user?.branch] || u.user?.branch || '')} ${u.user?.personnel_type ? '· '+esc(ROLE_LABELS?.[u.user.personnel_type] || u.user.personnel_type) : ''}</span>${flag ? ' <span style="font-size:.72rem;font-weight:800;color:var(--red);background:var(--red-soft);border-radius:100px;padding:.1rem .5rem;margin-left:.3rem;">Анхаарах</span>' : ''}
-          <button class="modal-close" style="float:right;padding:.25rem .7rem;font-size:.75rem;" onclick="openHrReport('${esc(uid)}')">📄 Сэтгэл зүйн байдлын нэгдсэн тайлан</button></div>
+          <button class="modal-close" style="float:right;padding:.25rem .7rem;font-size:.75rem;" onclick="openHrReport('${escAttr(uid)}')">📄 Сэтгэл зүйн байдлын нэгдсэн тайлан</button></div>
         ${rows.map(r => `<div style="font-size:.82rem;color:${hrIsFlag(r) ? 'var(--red)' : 'var(--sub)'};padding-left:.5rem;">• ${esc(HR_TEST_TITLES[r.test_key] || r.test_key)} — ${esc(hrFmtScore(r))} · ${timeAgo(r.created_at)}</div>`).join('')}
       </div>`;
     }).join(''));
@@ -3191,8 +3203,8 @@ async function loadAdminDocuments() {
         <div style="font-size:.85rem;font-weight:700;">${esc(d.title)}</div>
         <div style="font-size:.78rem;color:var(--sub);">${d.category === 'guide' ? 'Гарын авлага' : d.category === 'military_test' ? 'Цэргийн алба хаагчдаас авах тест' : 'Тушаал'} · ${timeAgo(d.created_at)}</div>
       </div>
-      <button onclick="editDocumentTitle('${d.id}', '${escAttr(d.title||'')}')" title="Засах" style="background:none;border:none;color:var(--gold);cursor:pointer;font-size:.85rem;flex-shrink:0;">✏️</button>
-      <button onclick="adminDeleteDocument('${d.id}','${escAttr(d.storage_path)}')" title="Устгах" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>
+      <button onclick="editDocumentTitle('${escAttr(d.id)}', '${escAttr(d.title||'')}')" title="Засах" style="background:none;border:none;color:var(--gold);cursor:pointer;font-size:.85rem;flex-shrink:0;">✏️</button>
+      <button onclick="adminDeleteDocument('${escAttr(d.id)}','${escAttr(d.storage_path)}')" title="Устгах" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>
     </div>
   `).join(''));
 }
@@ -7182,13 +7194,8 @@ async function openHrReport(uid) {
     <button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="printHrReport()">🖨️ Хэвлэх / PDF</button></div>`);
 }
 function printHrReport() {
-  const w = window.open('', '_blank');
-  if (!w) { showToast('Шинэ цонх нээгдсэнгүй — хөтчийн popup хоригийг зөвшөөрнө үү.', 'warn'); return; }
-  w.document.write(`<!doctype html><html lang="mn"><head><meta charset="utf-8"><title>Сэтгэл зүйн байдлын нэгдсэн тайлан — Mil-Care</title>
-    <style>${HR_REPORT_CSS}
-@page{size:A4;margin:12mm}body{margin:0;padding:0;background:#fff}</style></head>
-    <body>${hrReportLast}<script>window.onload=function(){setTimeout(function(){window.print();},200);};<\/script></body></html>`);
-  w.document.close();
+  mcPrintWindow('Сэтгэл зүйн байдлын нэгдсэн тайлан — Mil-Care', `${HR_REPORT_CSS}
+@page{size:A4;margin:12mm}body{margin:0;padding:0;background:#fff}`, hrReportLast);
 }
 
 /* ================= МИНИЙ СЭТГЭЛ ЗҮЙН БАЙДЛЫН ХУВИЙН ТАЙЛАН =================
@@ -7309,13 +7316,8 @@ async function openPsyReport() {
     <button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="printPsyReport()">🖨️ Хэвлэх / PDF</button></div>`);
 }
 function printPsyReport() {
-  const w = window.open('', '_blank');
-  if (!w) { showToast('Шинэ цонх нээгдсэнгүй — хөтчийн popup хоригийг зөвшөөрнө үү.', 'warn'); return; }
-  w.document.write(`<!doctype html><html lang="mn"><head><meta charset="utf-8"><title>Миний сэтгэл зүйн байдлын тайлан — Mil-Care</title>
-    <style>${HR_REPORT_CSS}.rp-sc-v.s{color:#3F7A5E}.rp-sc-v.w{color:#9A5F0E}.rp-sc-v.r{color:#B42318}.rp-sc-v.n{color:#0A677A}
-    @page{size:A4;margin:12mm}body{margin:0;padding:0;background:#fff}</style></head>
-    <body>${psyReportLast}<script>window.onload=function(){setTimeout(function(){window.print();},200);};<\/script></body></html>`);
-  w.document.close();
+  mcPrintWindow('Миний сэтгэл зүйн байдлын тайлан — Mil-Care', `${HR_REPORT_CSS}.rp-sc-v.s{color:#3F7A5E}.rp-sc-v.w{color:#9A5F0E}.rp-sc-v.r{color:#B42318}.rp-sc-v.n{color:#0A677A}
+    @page{size:A4;margin:12mm}body{margin:0;padding:0;background:#fff}`, psyReportLast);
 }
 
 /* ================= СЭТГЭЛ ЗҮЙН ЗӨВЛӨМЖ (зурагт карт) =================
@@ -8565,7 +8567,7 @@ function commentHTML(c) {
       <div style="font-size:.78rem;font-weight:700;">${esc(c.anon_handle)}<span style="font-weight:400;color:var(--sub);margin-left:.5rem;">${timeAgo(c.created_at)}</span></div>
       <div style="font-size:.85rem;word-break:break-word;">${esc(c.text)}</div>
     </div>
-    ${isMine ? `<button onclick="deleteComment('${c.id}','${c.post_id}')" title="Устгах" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>` : ''}
+    ${isMine ? `<button onclick="deleteComment('${escAttr(c.id)}','${escAttr(c.post_id)}')" title="Устгах" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>` : ''}
   </div>`;
 }
 
@@ -8582,12 +8584,12 @@ function postHTML(p) {
   return `
   <div class="post" id="post-${p.id}">
     <div class="post-head"><div class="post-avatar">🪖${emo ? `<span class="post-mood-badge">${esc(emo)}</span>` : ''}</div><div><div class="post-name">${esc(p.anon_handle)}</div><div class="post-time">${timeAgo(p.created_at)}</div></div>
-      ${isMine ? `<button onclick="deletePost('${p.id}')" title="Устгах" style="margin-left:auto;background:none;border:none;color:var(--sub);cursor:pointer;">🗑</button>` : ''}
+      ${isMine ? `<button onclick="deletePost('${escAttr(p.id)}')" title="Устгах" style="margin-left:auto;background:none;border:none;color:var(--sub);cursor:pointer;">🗑</button>` : ''}
     </div>
     <p class="post-text">${esc(body)}</p>
     <div style="display:flex;align-items:center;justify-content:space-between;padding:.3rem 0;">
       ${reactionSummaryHTML(p.id)}
-      <div class="post-action" onclick="toggleComments('${p.id}')" style="cursor:pointer;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5A8.5 8.5 0 1 1 21 11.5z"/></svg>${comments.length} сэтгэгдэл</div>
+      <div class="post-action" onclick="toggleComments('${escAttr(p.id)}')" style="cursor:pointer;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5A8.5 8.5 0 1 1 21 11.5z"/></svg>${comments.length} сэтгэгдэл</div>
     </div>
     <div class="post-actions">
       ${reactionTriggerHTML(p.id)}
@@ -8595,8 +8597,8 @@ function postHTML(p) {
     <div class="comment-section" id="comments-${p.id}" style="display:${isOpen?'block':'none'};margin-top:.6rem;">
       <div id="comment-list-${p.id}">${comments.map(commentHTML).join('') || '<div style="color:var(--sub);font-size:.8rem;padding:.4rem 0;">Одоогоор сэтгэгдэл алга. Эхнийхийг үлдээгээрэй!</div>'}</div>
       <div style="display:flex;gap:.5rem;margin-top:.6rem;">
-        <input type="text" id="comment-input-${p.id}" placeholder="Сэтгэгдэл бичих..." onkeydown="if(event.key==='Enter'){addComment('${p.id}');}" style="flex:1;border:1px solid var(--line);border-radius:10px;padding:.5rem .8rem;font-family:inherit;font-size:.85rem;background:#fff;color:var(--cream);">
-        <button class="connect-btn" style="width:auto;padding:.5rem 1rem;font-size:.85rem;" onclick="addComment('${p.id}')">Илгээх</button>
+        <input type="text" id="comment-input-${p.id}" placeholder="Сэтгэгдэл бичих..." onkeydown="if(event.key==='Enter'){addComment('${escAttr(p.id)}');}" style="flex:1;border:1px solid var(--line);border-radius:10px;padding:.5rem .8rem;font-family:inherit;font-size:.85rem;background:#fff;color:var(--cream);">
+        <button class="connect-btn" style="width:auto;padding:.5rem 1rem;font-size:.85rem;" onclick="addComment('${escAttr(p.id)}')">Илгээх</button>
       </div>
     </div>
   </div>`;
@@ -8757,9 +8759,9 @@ function reactionTriggerHTML(postId) {
   const r = mine ? REACTION_MAP[mine] : null;
   return `
   <div class="reaction-wrap">
-    <button class="support-btn" style="${r ? 'color:var(--red);border-color:var(--red);' : ''}" onclick="toggleReactionPopup('${postId}', event)">${r ? `${r.emo} ДЭМЖСЭН` : '👍 ДЭМЖИХ'}</button>
+    <button class="support-btn" style="${r ? 'color:var(--red);border-color:var(--red);' : ''}" onclick="toggleReactionPopup('${escAttr(postId)}', event)">${r ? `${r.emo} ДЭМЖСЭН` : '👍 ДЭМЖИХ'}</button>
     <div class="reaction-popup" id="reaction-popup-${postId}" onclick="event.stopPropagation();">
-      ${REACTIONS.map(r => `<span class="r-emo ${mine===r.key?'mine':''}" title="${r.label}" onclick="setReaction('${postId}','${r.key}')">${r.emo}</span>`).join('')}
+      ${REACTIONS.map(r => `<span class="r-emo ${mine===r.key?'mine':''}" title="${r.label}" onclick="setReaction('${escAttr(postId)}','${r.key}')">${r.emo}</span>`).join('')}
     </div>
   </div>`;
 }
@@ -8787,7 +8789,7 @@ function renderPros() {
         <div class="pro-price">${p.price.toLocaleString()}₮</div>
       </div>
       <div class="pro-actions">
-        <button class="txt" onclick="openChat('${p.id}','${escAttr(p.name)}')">💬 Чатаар холбогдох</button>
+        <button class="txt" onclick="openChat('${escAttr(p.id)}','${escAttr(p.name)}')">💬 Чатаар холбогдох</button>
       </div>
     </div>`).join(''));
 }
@@ -9032,7 +9034,7 @@ async function loadNotifItems() {
       sub: c.text,
       time: timeAgo(c.created_at),
       ts: new Date(c.created_at).getTime(),
-      onclick: `toggleNotifDropdown(); goto('diary'); setTimeout(()=>{const el=document.getElementById('post-${c.post_id}'); if(el){el.scrollIntoView({behavior:'smooth',block:'center'}); if(!openCommentPosts.has('${c.post_id}')){toggleComments('${c.post_id}');}}}, 300);`,
+      onclick: `toggleNotifDropdown(); goto('diary'); setTimeout(()=>{const el=document.getElementById('post-${escAttr(c.post_id)}'); if(el){el.scrollIntoView({behavior:'smooth',block:'center'}); if(!openCommentPosts.has('${escAttr(c.post_id)}')){toggleComments('${escAttr(c.post_id)}');}}}, 300);`,
     }));
 
     const { data: likes } = await sb.from('post_likes').select('*').in('post_id', myPostIds).neq('user_id', currentUser.id).order('created_at', { ascending:false }).limit(6);
@@ -9044,7 +9046,7 @@ async function loadNotifItems() {
         sub: splitPostText(myPostText[l.post_id] || '').body,
         time: timeAgo(l.created_at),
         ts: new Date(l.created_at).getTime(),
-        onclick: `toggleNotifDropdown(); goto('diary'); setTimeout(()=>{const el=document.getElementById('post-${l.post_id}'); if(el) el.scrollIntoView({behavior:'smooth',block:'center'});}, 300);`,
+        onclick: `toggleNotifDropdown(); goto('diary'); setTimeout(()=>{const el=document.getElementById('post-${escAttr(l.post_id)}'); if(el) el.scrollIntoView({behavior:'smooth',block:'center'});}, 300);`,
       });
     });
   }
@@ -9066,7 +9068,7 @@ async function loadNotifItems() {
           sub: m.body,
           time: timeAgo(m.created_at),
           ts: new Date(m.created_at).getTime(),
-          onclick: `toggleNotifDropdown(); goto('pros'); setTimeout(()=>openChat('${proId}', '${escAttr(pro?.name||'')}'), 200);`,
+          onclick: `toggleNotifDropdown(); goto('pros'); setTimeout(()=>openChat('${escAttr(proId)}', '${escAttr(pro?.name||'')}'), 200);`,
         });
       }
     }
@@ -9094,7 +9096,7 @@ async function loadNotifItems() {
       sub: `#${uid.slice(0,8)}… — ${m.body}`,
       time: timeAgo(m.created_at),
       ts: new Date(m.created_at).getTime(),
-      onclick: `toggleNotifDropdown(); goto('proportal'); setTimeout(()=>openProChat('${uid}'), 200);`,
+      onclick: `toggleNotifDropdown(); goto('proportal'); setTimeout(()=>openProChat('${escAttr(uid)}'), 200);`,
     }));
   }
 
@@ -9181,7 +9183,7 @@ async function loadRiskAlertsForPro() {
       </div>
       ${a.acknowledged
         ? `<span style="font-size:.75rem;color:var(--sub);">✓ Хүлээж авсан</span>`
-        : `<button class="modal-close" style="margin:0;" onclick="acknowledgeRiskAlert('${a.id}')">Хүлээж авав</button>`}
+        : `<button class="modal-close" style="margin:0;" onclick="acknowledgeRiskAlert('${escAttr(a.id)}')">Хүлээж авав</button>`}
     </div>
   `).join(''));
 }
@@ -9217,7 +9219,7 @@ async function loadProChatThreads() {
   const list = Object.entries(threads);
   if (!list.length) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор танд бичсэн хэн ч алга.</div>'; return; }
   mcSetHTML(el, list.map(([uid, m]) => `
-    <div class="unit-row" style="cursor:pointer;" onclick="openProChat('${uid}')">
+    <div class="unit-row" style="cursor:pointer;" onclick="openProChat('${escAttr(uid)}')">
       <div class="unit-name">Нэрээ нуусан хэрэглэгч #${uid.slice(0,8)}…</div>
       <div style="color:var(--sub);font-size:.78rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.sender === 'user' ? '👤' : '✅'} ${esc(m.body)}</div>
     </div>
@@ -9250,9 +9252,9 @@ async function renderProOnlineConsultButton() {
     mcSetHTML(el, `
       <div style="text-align:center;color:var(--gold);font-size:.85rem;font-weight:700;margin-bottom:.5rem;">🟢 Онлайн зөвлөгөө зөвшөөрөгдсөн</div>
       <a href="${escAttr(mcSafeRoomUrl(session.video_room))}" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;text-decoration:none;background:var(--gold);color:#fff;border-radius:12px;padding:.75rem;font-size:.92rem;font-weight:700;margin-bottom:.5rem;">🎥 Дуудлагад нэгдэх</a>
-      <button onclick="proRevokeOnlineConsult('${currentProChatUserId}','${myProId}')" style="width:100%;background:none;border:1px solid var(--red,#c0392b);color:var(--red,#c0392b);border-radius:12px;padding:.6rem;font-size:.85rem;cursor:pointer;">Зөвшөөрлийг цуцлах</button>`);
+      <button onclick="proRevokeOnlineConsult('${escAttr(currentProChatUserId)}','${escAttr(myProId)}')" style="width:100%;background:none;border:1px solid var(--red,#c0392b);color:var(--red,#c0392b);border-radius:12px;padding:.6rem;font-size:.85rem;cursor:pointer;">Зөвшөөрлийг цуцлах</button>`);
   } else {
-    mcSetHTML(el, `<button onclick="proApproveOnlineConsult('${currentProChatUserId}','${myProId}')" style="width:100%;background:var(--gold);color:#fff;border:none;border-radius:12px;padding:.75rem;font-size:.92rem;font-weight:700;cursor:pointer;">🎥 Онлайн зөвлөгөөг зөвшөөрөх</button>`);
+    mcSetHTML(el, `<button onclick="proApproveOnlineConsult('${escAttr(currentProChatUserId)}','${escAttr(myProId)}')" style="width:100%;background:var(--gold);color:#fff;border:none;border-radius:12px;padding:.75rem;font-size:.92rem;font-weight:700;cursor:pointer;">🎥 Онлайн зөвлөгөөг зөвшөөрөх</button>`);
   }
 }
 
@@ -9582,7 +9584,7 @@ function renderAdminRiskList() {
     ].join('');
     return `<div class="ar-row${u.crit ? ' crit' : ''}">
       <div class="ar-top"><div><div class="ar-name">${u.crit ? '<span class="ar-badge">Яаралтай</span>' : ''}${name}</div><div class="ar-meta">${meta}</div></div>
-        ${u.open ? `<button class="modal-close" style="margin:0;white-space:nowrap" onclick="adminAckUserAlerts('${u.uid}')">Хүлээж авсан</button>` : ''}</div>
+        ${u.open ? `<button class="modal-close" style="margin:0;white-space:nowrap" onclick="adminAckUserAlerts('${escAttr(u.uid)}')">Хүлээж авсан</button>` : ''}</div>
       <div class="ar-tags">${tags}</div></div>`;
   }).join('');
   mcSetHTML(el, head + (rows || '<div style="color:var(--sub);font-size:.85rem;margin-top:.6rem;">Шүүлтүүрт тохирох алба хаагч алга.</div>'));
@@ -9734,7 +9736,7 @@ async function loadAdminPosts() {
         <div style="font-size:.78rem;font-weight:700;">${esc(p.anon_handle)}<span style="font-weight:400;color:var(--sub);margin-left:.5rem;">${timeAgo(p.created_at)}</span></div>
         <div style="font-size:.85rem;word-break:break-word;">${esc(p.text)}</div>
       </div>
-      <button onclick="adminDeletePost('${p.id}')" title="Устгах" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>
+      <button onclick="adminDeletePost('${escAttr(p.id)}')" title="Устгах" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>
     </div>
   `).join(''));
 }
@@ -9763,7 +9765,7 @@ async function loadAdminComments() {
         <div style="font-size:.78rem;font-weight:700;">${esc(c.anon_handle)}<span style="font-weight:400;color:var(--sub);margin-left:.5rem;">${timeAgo(c.created_at)}</span></div>
         <div style="font-size:.85rem;word-break:break-word;">${esc(c.text)}</div>
       </div>
-      <button onclick="adminDeleteComment('${c.id}')" title="Устгах" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>
+      <button onclick="adminDeleteComment('${escAttr(c.id)}')" title="Устгах" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>
     </div>
   `).join(''));
 }
@@ -9796,7 +9798,7 @@ async function loadAdminProfessionals() {
         ${p.auth_user_id ? '<span style="color:var(--gold);font-size:.72rem;font-weight:800;"> ✓ Нэвтрэх эрхтэй</span>' : '<span style="color:var(--sub);font-size:.72rem;"> · Нэвтрэх эрхгүй</span>'}
       </div>
       <button class="modal-close" style="padding:.3rem .8rem;font-size:.78rem;" onclick='editProfessional(${JSON.stringify(p).replace(/'/g, "&apos;")})'>Засах</button>
-      <button class="modal-close" style="padding:.3rem .8rem;font-size:.78rem;margin-left:.4rem;color:var(--red);border-color:rgba(192,69,58,.4);" onclick="deleteProfessional('${p.id}')">Устгах</button>
+      <button class="modal-close" style="padding:.3rem .8rem;font-size:.78rem;margin-left:.4rem;color:var(--red);border-color:rgba(192,69,58,.4);" onclick="deleteProfessional('${escAttr(p.id)}')">Устгах</button>
     </div>
   `).join(''));
   const linkSelect = document.getElementById('pro-link-select');
@@ -9853,7 +9855,7 @@ async function loadAdminHrList() {
         <div style="font-size:.85rem;font-weight:700;">${esc(h.name)} <span style="font-weight:400;color:var(--sub);">${esc(h.unit)}</span></div>
         ${h.auth_user_id ? '<span style="color:var(--gold);font-size:.72rem;font-weight:800;">✓ Нэвтрэх эрхтэй</span>' : '<span style="color:var(--sub);font-size:.72rem;">· Нэвтрэх эрхгүй</span>'}
       </div>
-      <button onclick="adminDeleteHrSpecialist('${h.id}')" title="Устгах" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>
+      <button onclick="adminDeleteHrSpecialist('${escAttr(h.id)}')" title="Устгах" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>
     </div>
   `).join(''));
 }
@@ -9957,7 +9959,7 @@ async function loadAdminChatThreads() {
   mcSetHTML(el, list.map(([key, m]) => {
     const [uid, proId] = key.split('|');
     const proName = (PROS.find(p => String(p.id) === String(proId)) || {}).name || ('Мэргэжилтэн #' + proId);
-    return `<div class="unit-row" style="cursor:pointer;" onclick="openAdminChat('${uid}','${proId}','${escAttr(proName)}')">
+    return `<div class="unit-row" style="cursor:pointer;" onclick="openAdminChat('${escAttr(uid)}','${escAttr(proId)}','${escAttr(proName)}')">
       <div class="unit-name">Anonymous ${uid.slice(0,8)}… → ${esc(proName)}</div>
       <div style="color:var(--sub);font-size:.78rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.sender === 'user' ? '👤' : '👩‍⚕️'} ${esc(m.body)}</div>
     </div>`;

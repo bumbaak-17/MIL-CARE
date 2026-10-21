@@ -576,6 +576,11 @@
   .qx-chip.mx-none{background:#EEF3F3;color:#5A6B70;font-weight:600}
   .metric-src{font-size:.74rem;color:var(--sub);margin-top:.35rem}.metric-src a{color:inherit;font-weight:700}
   .metric-help{font-size:.76rem;color:var(--sub);margin:0 0 1rem;line-height:1.5}
+  .mfa-p{font-size:.86rem;color:var(--sub);line-height:1.6;margin:0 0 .8rem}.mfa-ol{font-size:.86rem;line-height:1.7;margin:0 0 .8rem;padding-left:1.2rem}
+  .mfa-qr{display:flex;justify-content:center;margin:.4rem 0 .6rem}.mfa-qr img{width:200px;height:200px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px}
+  .mfa-sec{font-size:.78rem;color:var(--sub);text-align:center;margin:0 0 1rem;word-break:break-all}.mfa-sec code{font-size:.82rem;letter-spacing:.06em}
+  .mfa-row{display:flex;gap:.6rem;flex-wrap:wrap}.mfa-row input{flex:1;min-width:150px;border:1px solid var(--line);border-radius:12px;padding:.65rem .9rem;font:700 1.15rem Inter,sans-serif;letter-spacing:.3em;text-align:center}
+  .mfa-msg{font-size:.82rem;color:var(--red);margin-top:.5rem;min-height:1.2em}
   .mx-it{padding:.75rem 0;border-bottom:1px solid #E6EEEE}.mx-it:last-of-type{border-bottom:0}
   .mx-top{display:flex;justify-content:space-between;align-items:center;gap:8px}.mx-n{font-weight:700;font-size:.86rem}
   .mx-dir{font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap}
@@ -1545,6 +1550,7 @@
       <div id="view-admin" class="view">
         <div class="page-head"><h2>Админ систем</h2><p>Платформын удирдлагын самбар.</p></div>
 
+        <div class="section-card" id="admin-mfa-card" style="display:none;"></div>
         <div class="section-card" id="admin-login-card">
           <div class="section-head"><h3>Админ эрх</h3></div>
           <p style="font-size:.85rem;color:var(--sub);margin:0;">Танд админ эрх байхгүй байна. Хэрэв та MIL-CARE-ийн админ мөн бол, өөрийн <span class="g-only">Google</span><span class="fb-only">Google эсвэл Facebook</span> бүртгэлээр нэвтэрсэн эсэхээ шалгаад дахин оролдоно уу — эрх нь автоматаар танигдана.</p>
@@ -2213,16 +2219,99 @@ async function loadProfilePage() {
 
 /* ================= ADMIN: имэйл+нууц үгээр нэвтрэх ================= */
 let isAdmin = false;
+let mcAdminPending = false; // админ мөн, гэхдээ хоёр алхамт баталгаажуулалт хийгдээгүй
 async function checkAdminStatus() {
   const { data: sessionData } = await sb.auth.getSession();
-  const uid = sessionData?.session?.user?.id;
-  if (!uid) { isAdmin = false; } else {
-    const { data, error } = await sb.from('admins').select('user_id').eq('user_id', uid).maybeSingle();
-    isAdmin = !!data && !error;
+  const user = sessionData?.session?.user, uid = user?.id;
+  isAdmin = false; mcAdminPending = false;
+  if (uid) {
+    const cand = await sb.rpc('mc_am_i_admin');
+    if (cand.error) {
+      // Өгөгдлийн сангийн MFA тохиргоо хийгдээгүй үед: хуучин горим
+      const { data, error } = await sb.from('admins').select('user_id').eq('user_id', uid).maybeSingle();
+      isAdmin = !!data && !error;
+    } else if (cand.data === true && !user.is_anonymous) {
+      let level = null;
+      try { const { data: a } = await sb.auth.mfa.getAuthenticatorAssuranceLevel(); level = a?.currentLevel; } catch (e) {}
+      if (level === 'aal2') {
+        const { data, error } = await sb.from('admins').select('user_id').eq('user_id', uid).maybeSingle();
+        isAdmin = !!data && !error;
+      }
+      mcAdminPending = !isAdmin;
+    }
   }
   const navItem = document.getElementById('admin-navitem');
-  if (navItem) navItem.style.display = isAdmin ? 'flex' : 'none';
+  if (navItem) navItem.style.display = (isAdmin || mcAdminPending) ? 'flex' : 'none';
+  const mfaCard = document.getElementById('admin-mfa-card');
+  if (mfaCard && !mcAdminPending) mfaCard.style.display = 'none';
   updatePsyCornerVisibility();
+}
+
+/* ================= АДМИНЫ ХОЁР АЛХАМТ БАТАЛГААЖУУЛАЛТ (TOTP) ================= */
+let mcMfaFactor = null, mcMfaBusy = false;
+async function mcShowAdminMfa() {
+  const card = document.getElementById('admin-mfa-card'); if (!card || mcMfaBusy) return;
+  if (card.style.display === 'block' && mcMfaFactor) return; // аль хэдийн харагдаж байна
+  mcMfaBusy = true; try { await mcShowAdminMfaInner(card); } finally { mcMfaBusy = false; }
+}
+async function mcShowAdminMfaInner(card) {
+  document.getElementById('admin-login-card').style.display = 'none';
+  document.getElementById('admin-panel').style.display = 'none';
+  card.style.display = 'block';
+  mcSetHTML(card, '<div class="section-head"><h3>🔐 Хоёр алхамт баталгаажуулалт</h3></div><p class="mfa-p">Ачаалж байна...</p>');
+  try {
+    const { data: f, error: lfErr } = await sb.auth.mfa.listFactors();
+    if (lfErr) throw lfErr;
+    const verified = (f?.totp || []).filter(x => x.status === 'verified');
+    if (verified.length) {
+      mcMfaFactor = verified[0].id;
+      mcSetHTML(card, `<div class="section-head"><h3>🔐 Хоёр алхамт баталгаажуулалт</h3></div>
+        <p class="mfa-p">Админы хэсэгт орохын тулд утсан дээрх баталгаажуулах апп (Google Authenticator, Microsoft Authenticator г.м.) дахь Mil-Care-ийн 6 оронтой кодыг оруулна уу.</p>
+        ${mcMfaFormHtml()}`);
+    } else {
+      for (const x of (f?.all || []).filter(x => x.factor_type === 'totp' && x.status !== 'verified')) { try { await sb.auth.mfa.unenroll({ factorId: x.id }); } catch (e) {} }
+      const { data, error } = await sb.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'Mil-Care админ ' + new Date().toISOString().slice(0, 10) });
+      if (error) throw error;
+      mcMfaFactor = data.id;
+      mcSetHTML(card, `<div class="section-head"><h3>🔐 Хоёр алхамт баталгаажуулалтыг идэвхжүүлэх</h3></div>
+        <p class="mfa-p">Админы эрх бүх алба хаагчийн мэдээлэлд хандах тул Google нэвтрэлтээс гадна утасны кодоор давхар хамгаална. Энэ тохиргоог зөвхөн нэг удаа хийнэ.</p>
+        <ol class="mfa-ol"><li>Утсандаа Google Authenticator эсвэл Microsoft Authenticator аппыг суулгана.</li>
+          <li>Аппын "+" товчийг дараад доорх QR кодыг уншуулна.</li>
+          <li>Апп дээр гарсан 6 оронтой кодыг доор оруулна.</li></ol>
+        <div class="mfa-qr"><img id="mfa-qr-img" alt="QR код"></div>
+        <p class="mfa-sec">QR код уншуулж чадахгүй бол аппад дараах түлхүүрийг гараар оруулна уу:<br><code id="mfa-secret"></code></p>
+        ${mcMfaFormHtml()}`);
+      const img = document.getElementById('mfa-qr-img'); if (img) img.src = data.totp.qr_code;
+      const sec = document.getElementById('mfa-secret'); if (sec) sec.textContent = data.totp.secret;
+    }
+    setTimeout(() => document.getElementById('mfa-code')?.focus(), 50);
+  } catch (e) {
+    console.error('MFA error:', e);
+    mcSetHTML(card, `<div class="section-head"><h3>🔐 Хоёр алхамт баталгаажуулалт</h3></div>
+      <p class="mfa-p">Баталгаажуулалтыг эхлүүлж чадсангүй. Supabase-ийн Authentication → Multi-Factor хэсэгт TOTP идэвхтэй эсэхийг шалгаад хуудсаа дахин ачаална уу.</p>`);
+  }
+}
+function mcMfaFormHtml() {
+  return `<div class="mfa-row"><input type="text" id="mfa-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000"
+      onkeydown="if(event.key==='Enter') mcVerifyAdminMfa()">
+    <button class="connect-btn" id="mfa-btn" style="width:auto;padding:.6rem 1.3rem;" onclick="mcVerifyAdminMfa()">Баталгаажуулах</button></div>
+    <div class="mfa-msg" id="mfa-msg"></div>`;
+}
+async function mcVerifyAdminMfa() {
+  const inp = document.getElementById('mfa-code'), msg = document.getElementById('mfa-msg'), btn = document.getElementById('mfa-btn');
+  const code = (inp?.value || '').replace(/\D/g, '');
+  if (code.length !== 6) { if (msg) msg.textContent = '6 оронтой кодоо бүтэн оруулна уу.'; return; }
+  if (!mcMfaFactor) return;
+  if (btn) btn.disabled = true; if (msg) msg.textContent = 'Шалгаж байна...';
+  const { error } = await sb.auth.mfa.challengeAndVerify({ factorId: mcMfaFactor, code });
+  if (error) {
+    if (btn) btn.disabled = false;
+    if (msg) msg.textContent = 'Код буруу эсвэл хугацаа нь дууссан байна. Апп дээрх шинэ кодыг оруулна уу.';
+    if (inp) { inp.value = ''; inp.focus(); }
+    return;
+  }
+  if (msg) msg.textContent = 'Амжилттай баталгаажлаа.';
+  location.reload();
 }
 function updatePsyCornerVisibility() {
   const el = document.getElementById('psy-corner-navitem');
@@ -2354,6 +2443,7 @@ function goto(view, pushState) {
   document.getElementById('view-' + view).classList.add('active');
   document.getElementById('sidebar').classList.remove('open');
   window.scrollTo({top:0, behavior:'smooth'});
+  if (view === 'admin' && mcAdminPending) mcShowAdminMfa();
   if (view === 'profile') loadProfilePage();
   if (view === 'memory') { renderMemLifeExList(); }
   if (view === 'iqtest') { renderIqChecklist(); }
@@ -10175,6 +10265,10 @@ async function init() {
   // хэрэглэгчийн бодит branch/role-ийг өөрчлөхгүйгээр onboarding урсгалыг л дахин үзүүлнэ
   const forcePreview = new URLSearchParams(location.search).get('onboarding') === '1';
 
+  if (mcAdminPending && !forcePreview) {
+    goto('admin'); // goto нь баталгаажуулалтын цонхыг харуулна
+    return;
+  }
   if (isAdmin && !forcePreview) {
     // Админ эрхтэй бол onboarding (цэргийн төрөл сонгох) шаардлагагүй, шууд админ панель руу орно
     document.getElementById('admin-login-card').style.display = 'none';

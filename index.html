@@ -1422,7 +1422,7 @@
       </div>
 
       <div id="view-individual-exercise" class="view">
-        <div class="page-head"><h2>Ганцаарчилсан уулзалтын үед хийгдэх дасгал</h2><p>Ганцаарчилсан уулзалтын үед ашиглах дасгалын PDF баримт бичгүүд. Зөвхөн админ, бүртгэлтэй сэтгэл зүйчдэд харагдана.</p></div>
+        <div class="page-head"><h2>Ганцаарчилсан уулзалтын үед хийгдэх дасгал</h2><p>Ганцаарчилсан уулзалтын үед ашиглах дасгал, постерууд. Зөвхөн админ, бүртгэлтэй сэтгэл зүйчдэд харагдана.</p></div>
         <button class="modal-close" style="margin-bottom:1.2rem;" onclick="goto('psy-corner')">← Сэтгэл зүйчдийн булан руу буцах</button>
         <div id="individual-exercise-list"></div>
       </div>
@@ -1693,16 +1693,16 @@
           <div class="section-card">
             <div class="section-head collapsible" onclick="toggleAdminSection('docs-mod')"><h3>📄 Тушаал, баримт бичиг удирдах</h3><span class="collapse-arrow" id="docs-mod-arrow">▾</span></div>
             <div class="collapsible-body" id="docs-mod-body">
-              <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Энд байршуулсан PDF баримт бичгүүд Сэтгэл зүйчдийн булангийн сонгосон хэсэгт админ болон бүртгэлтэй сэтгэл зүйчдэд харагдана.</p>
+              <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Энд байршуулсан PDF баримт бичиг, зураг (постер) Сэтгэл зүйчдийн булангийн сонгосон хэсэгт админ болон бүртгэлтэй сэтгэл зүйчдэд харагдана.</p>
               <div class="filter-bar" style="margin-bottom:.7rem;">
-                <input type="text" id="doc-upload-title" placeholder="Баримт бичгийн нэр (жишээ: Сэтгэл зүйн хангалтыг зохион байгуулах заавар)" style="flex:1;min-width:220px;border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
+                <input type="text" id="doc-upload-title" placeholder="Нэр (жишээ: Сэтгэл зүйн хангалтыг зохион байгуулах заавар). Олон файл сонгож болно." style="flex:1;min-width:220px;border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
                 <select id="doc-upload-category" style="border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
                   <option value="tushaal">Тушаал</option>
                   <option value="guide">Гарын авлага</option>
                   <option value="military_test">Цэргийн алба хаагчдаас авах тест</option>
                   <option value="individual_exercise">Ганцаарчилсан уулзалтын үед хийгдэх дасгал</option>
                 </select>
-                <input type="file" id="doc-upload-file" accept="application/pdf" style="border:1px solid var(--line);border-radius:12px;padding:.5rem .6rem;font-family:inherit;font-size:.85rem;background:#fff;color:var(--cream);">
+                <input type="file" id="doc-upload-file" multiple accept="application/pdf,image/jpeg,image/png,image/webp" style="border:1px solid var(--line);border-radius:12px;padding:.5rem .6rem;font-family:inherit;font-size:.85rem;background:#fff;color:var(--cream);">
               </div>
               <button class="connect-btn" style="width:auto;padding:.6rem 1.4rem;" onclick="uploadAdminDocument()">Байршуулах</button>
               <div id="doc-upload-msg" style="font-size:.82rem;margin-top:.7rem;"></div>
@@ -3157,6 +3157,19 @@ const PROJECTIVE_METHODS = [{"num": 1, "title": "ЗАН ЧАНАРЫН ОНЦЛ�
 
 /* ================= ТУШААЛ: сэтгэл зүйчдийн буланд байршуулсан PDF баримт бичгүүд ================= */
 const DOCS_BUCKET = 'psy-documents';
+const DOC_TYPES = { 'application/pdf': 'pdf', 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+function docIsImage(path) { return /\.(jpe?g|png|webp)$/i.test(path || ''); }
+function docExt(path) { const m = /\.([a-z0-9]+)$/i.exec(path || ''); return m ? m[1].toLowerCase() : 'pdf'; }
+// Зургийн жижиг хувилбарыг (signed URL) жагсаалтад суулгана
+async function fillDocThumbs(el, list) {
+  const imgs = (list || []).filter(d => docIsImage(d.storage_path));
+  if (!imgs.length) return;
+  const { data } = await sb.storage.from(DOCS_BUCKET).createSignedUrls(imgs.map(d => d.storage_path), 300);
+  (data || []).forEach(r => {
+    if (!r.signedUrl) return;
+    el.querySelectorAll('img[data-doc-thumb]').forEach(im => { if (im.dataset.docThumb === r.path) im.src = r.signedUrl; });
+  });
+}
 async function loadOrders(category, elId, subElId) {
   category = category || 'tushaal';
   elId = elId || 'orders-list';
@@ -3171,15 +3184,16 @@ async function loadOrders(category, elId, subElId) {
   if (!data || data.length===0) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;padding:.6rem 0;">Одоогоор баримт бичиг байршуулаагүй байна.</div>'; return; }
   mcSetHTML(el, data.map(d => `
     <div class="section-card" style="display:flex;align-items:center;gap:.8rem;margin-bottom:.8rem;">
-      <div style="font-size:1.6rem;flex-shrink:0;">${category === 'guide' ? '📘' : category === 'military_test' ? '🎖️' : category === 'individual_exercise' ? '💬' : '📄'}</div>
+      ${docIsImage(d.storage_path) ? `<img data-doc-thumb="${escAttr(d.storage_path)}" alt="" onclick="viewOrderDoc('${escAttr(d.storage_path)}')" style="width:64px;height:84px;object-fit:cover;border-radius:8px;border:1px solid var(--line);background:var(--line);flex-shrink:0;cursor:pointer;">` : `<div style="font-size:1.6rem;flex-shrink:0;">${category === 'guide' ? '📘' : category === 'military_test' ? '🎖️' : category === 'individual_exercise' ? '💬' : '📄'}</div>`}
       <div style="flex:1;min-width:0;">
         <div style="font-weight:700;font-size:.92rem;">${esc(d.title)}</div>
-        <div style="font-size:.78rem;color:var(--sub);">${d.file_size ? (Math.round(d.file_size/1024)) + ' KB' : ''}</div>
+        <div style="font-size:.78rem;color:var(--sub);">${docIsImage(d.storage_path) ? 'Зураг · ' : ''}${d.file_size ? (Math.round(d.file_size/1024)) + ' KB' : ''}</div>
       </div>
       <button class="modal-close" style="width:auto;padding:.5rem 1rem;font-size:.85rem;flex-shrink:0;" onclick="viewOrderDoc('${escAttr(d.storage_path)}')">Харах</button>
       <button class="connect-btn" style="width:auto;padding:.5rem 1rem;font-size:.85rem;flex-shrink:0;" onclick="downloadOrderDoc('${escAttr(d.storage_path)}','${escAttr(d.title||'document')}')">Татах</button>
     </div>
   `).join(''));
+  fillDocThumbs(el, data);
 }
 async function viewOrderDoc(storagePath) {
   const { data, error } = await sb.storage.from(DOCS_BUCKET).createSignedUrl(storagePath, 300);
@@ -3187,7 +3201,7 @@ async function viewOrderDoc(storagePath) {
   window.open(data.signedUrl, '_blank', 'noopener');
 }
 async function downloadOrderDoc(storagePath, title) {
-  const { data, error } = await sb.storage.from(DOCS_BUCKET).createSignedUrl(storagePath, 300, { download: title + '.pdf' });
+  const { data, error } = await sb.storage.from(DOCS_BUCKET).createSignedUrl(storagePath, 300, { download: title + '.' + docExt(storagePath) });
   if (error) { showToast('Татахад алдаа гарлаа: ' + error.message, 'error'); return; }
   window.location.href = data.signedUrl;
 }
@@ -3202,7 +3216,7 @@ async function loadAdminDocuments() {
   if (!data || data.length===0) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор баримт бичиг байршуулаагүй байна.</div>'; return; }
   mcSetHTML(el, data.map(d => `
     <div class="comment-row" style="display:flex;gap:.5rem;padding:.6rem 0;border-top:1px solid var(--line);align-items:center;">
-      <div style="font-size:1.3rem;flex-shrink:0;">${d.category === 'guide' ? '📘' : d.category === 'military_test' ? '🎖️' : d.category === 'individual_exercise' ? '💬' : '📄'}</div>
+      <div style="font-size:1.3rem;flex-shrink:0;">${docIsImage(d.storage_path) ? '🖼️' : d.category === 'guide' ? '📘' : d.category === 'military_test' ? '🎖️' : d.category === 'individual_exercise' ? '💬' : '📄'}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-size:.85rem;font-weight:700;">${esc(d.title)}</div>
         <div style="font-size:.78rem;color:var(--sub);">${d.category === 'guide' ? 'Гарын авлага' : d.category === 'military_test' ? 'Цэргийн алба хаагчдаас авах тест' : d.category === 'individual_exercise' ? 'Ганцаарчилсан уулзалтын үед хийгдэх дасгал' : 'Тушаал'} · ${timeAgo(d.created_at)}</div>
@@ -3227,22 +3241,33 @@ async function uploadAdminDocument() {
   const titleInput = document.getElementById('doc-upload-title');
   const categoryInput = document.getElementById('doc-upload-category');
   const msg = document.getElementById('doc-upload-msg');
-  const file = fileInput.files[0];
+  const files = Array.from(fileInput.files || []);
   const title = titleInput.value.trim();
   const category = categoryInput.value;
-  if (!file) { msg.style.color = 'var(--red)'; msg.textContent = 'PDF файл сонгоно уу.'; return; }
-  if (file.type !== 'application/pdf') { msg.style.color = 'var(--red)'; msg.textContent = 'Зөвхөн PDF файл байршуулах боломжтой.'; return; }
-  if (!title) { msg.style.color = 'var(--red)'; msg.textContent = 'Баримт бичгийн нэрийг оруулна уу.'; return; }
-  msg.style.color = 'var(--sub)'; msg.textContent = 'Байршуулж байна...';
-  const fileExt = (file.name.split('.').pop() || 'pdf').toLowerCase().replace(/[^a-z0-9]/g, '') || 'pdf';
-  const storagePath = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${fileExt}`;
-  const { error: upErr } = await sb.storage.from(DOCS_BUCKET).upload(storagePath, file, { contentType: 'application/pdf' });
-  if (upErr) { msg.style.color = 'var(--red)'; msg.textContent = 'Байршуулахад алдаа гарлаа: ' + upErr.message; return; }
-  const { error: insErr } = await sb.from('psy_documents').insert({ title, category, storage_path: storagePath, file_size: file.size, uploaded_by: currentUser?.id });
-  if (insErr) { msg.style.color = 'var(--red)'; msg.textContent = 'Мэдээлэл хадгалахад алдаа гарлаа: ' + insErr.message; return; }
-  msg.style.color = 'var(--gold)'; msg.textContent = 'Амжилттай байршууллаа!';
-  showToast('Баримт бичиг байршууллаа.', 'success');
-  fileInput.value = ''; titleInput.value = '';
+  if (!files.length) { msg.style.color = 'var(--red)'; msg.textContent = 'PDF эсвэл зураг сонгоно уу.'; return; }
+  const bad = files.filter(f => !DOC_TYPES[f.type]);
+  if (bad.length) { msg.style.color = 'var(--red)'; msg.textContent = 'PDF эсвэл зураг (JPG, PNG, WEBP) байршуулах боломжтой: ' + bad.map(f => f.name).join(', '); return; }
+  const nameOf = (f, i) => title ? (files.length > 1 ? `${title} ${i + 1}` : title) : (f.name.replace(/\.[^.]+$/, '').trim() || 'Баримт бичиг');
+  let ok = 0; const failed = [];
+  // Сүүлийн файлаас эхэлж хадгална — жагсаалт шинэ нь дээрээ байдаг тул эхний файл хамгийн дээр харагдана
+  for (let k = files.length - 1; k >= 0; k--) {
+    const f = files[k];
+    msg.style.color = 'var(--sub)'; msg.textContent = `Байршуулж байна... ${files.length - k}/${files.length}`;
+    const storagePath = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${DOC_TYPES[f.type]}`;
+    const { error: upErr } = await sb.storage.from(DOCS_BUCKET).upload(storagePath, f, { contentType: f.type });
+    if (upErr) { failed.push(f.name + ': ' + upErr.message); continue; }
+    const { error: insErr } = await sb.from('psy_documents').insert({ title: nameOf(f, k), category, storage_path: storagePath, file_size: f.size, uploaded_by: currentUser?.id });
+    if (insErr) { await sb.storage.from(DOCS_BUCKET).remove([storagePath]); failed.push(f.name + ': ' + insErr.message); continue; }
+    ok++;
+  }
+  if (failed.length) {
+    msg.style.color = 'var(--red)';
+    msg.textContent = `${ok} файл байршлаа. Байршаагүй: ` + failed.join('; ');
+  } else {
+    msg.style.color = 'var(--gold)'; msg.textContent = files.length > 1 ? `${ok} файл амжилттай байршууллаа!` : 'Амжилттай байршууллаа!';
+    fileInput.value = ''; titleInput.value = '';
+  }
+  if (ok) showToast(`${ok} файл байршууллаа.`, 'success');
   loadAdminDocuments();
 }
 async function adminDeleteDocument(docId, storagePath) {

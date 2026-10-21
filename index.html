@@ -3,11 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://zsceezpxjigxdcwfrlkm.supabase.co; media-src 'self' data: blob: https://zsceezpxjigxdcwfrlkm.supabase.co; connect-src 'self' https://zsceezpxjigxdcwfrlkm.supabase.co wss://zsceezpxjigxdcwfrlkm.supabase.co; worker-src 'self' blob:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>MIL-CARE — Сэтгэл зүйн дэмжлэгийн платформ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js" integrity="sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js" integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <style>
   html:not(.fb-on) .fb-only{display:none !important;}
   html.fb-on .g-only{display:none !important;}
@@ -1043,6 +1045,9 @@
 .tp-chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
 .tp-chip{border:1px solid #D6E1E0;background:#fff;color:#2C3F45;border-radius:20px;padding:7px 14px;font:600 .85rem Inter,sans-serif;cursor:pointer}
 .tp-chip.on{background:#0D3B46;color:#fff;border-color:#0D3B46}
+.tp-duty{display:flex;gap:12px;align-items:flex-start;margin:16px 0 0;padding:12px 14px;border-radius:12px;background:#EEF0E6;border-left:4px solid #4F5D2F}
+.tp-duty b{display:block;color:#3F4A27;font-size:.86rem;margin-bottom:2px}.tp-duty p{margin:0;color:#2C3F45;font-size:.88rem;line-height:1.55}
+.tp-duty-ic{flex:0 0 32px;height:32px;border-radius:9px;background:#4F5D2F;color:#fff;display:grid;place-items:center}.tp-duty-ic svg{width:18px;height:18px}
 .tp-chip:focus-visible,.tp-card:focus-visible{outline:3px solid #F2B544;outline-offset:2px}
 .vl-sec{margin:0 0 22px}
 .vl-h{display:flex;align-items:center;gap:10px;margin:0 0 12px;font-size:1.05rem;font-weight:800;color:var(--cream)}
@@ -1310,7 +1315,7 @@
 
       <!-- ================= TESTS ================= -->
       <div id="view-tips" class="view">
-        <div class="page-head"><h2>Сэтгэл зүйн зөвлөмж</h2><p>Стресс, нойр, сэтгэл санаа, харилцаанд тустай, өдөр тутамдаа хэрэглэх энгийн аргууд. Картыг дарж алхам алхмаар хараарай.</p></div>
+        <div class="page-head"><h2>Сэтгэл зүйн зөвлөмж</h2><p>Стресс, нойр, сэтгэл санаа, харилцаанд тустай, алба хаагчийн өдөр тутмын болон албан үүргийн нөхцөлд хэрэглэх энгийн аргууд. Картыг дарж алхам алхмаар хараарай.</p></div>
         <div class="vl-sec" id="tp-videos">
           <div class="vl-h">🎬 Видео хичээл <span>ШИНЭ</span></div>
           <div class="vl-card">
@@ -1917,7 +1922,15 @@ function renderAuthSection() {
   `;
 }
 
+/* Гарах үед энэ төхөөрөмж дээр үлдсэн мэдрэг өгөгдлийг (хариултын ноорог, тайлангийн кэш, илгээгдээгүй үнэлгээ) устгана */
+function clearLocalSensitive() {
+  try {
+    Object.keys(localStorage).forEach(k => { if (/^(mc_hrs_|aiSum:|fbQueue)/.test(k)) localStorage.removeItem(k); });
+    sessionStorage.clear();
+  } catch (e) {}
+}
 async function signOutUser() {
+  clearLocalSensitive();
   await sb.auth.signOut();
   location.reload();
 }
@@ -1934,6 +1947,7 @@ function confirmLogout() {
   logoutAndRestart();
 }
 async function logoutAndRestart() {
+  clearLocalSensitive();
   await sb.auth.signOut();
   location.href = location.pathname; // ?onboarding зэрэг хуучин query параметрийг цэвэрлээд шинээр ачаална
 }
@@ -2178,6 +2192,7 @@ function updatePsyCornerVisibility() {
   if (el) el.style.display = (isAdmin || myProId) ? 'flex' : 'none';
 }
 async function adminLogout() {
+  clearLocalSensitive();
   await sb.auth.signOut();
   isAdmin = false;
   document.getElementById('admin-navitem').style.display = 'none';
@@ -3026,7 +3041,7 @@ async function loadOrders(category, elId, subElId) {
 async function viewOrderDoc(storagePath) {
   const { data, error } = await sb.storage.from(DOCS_BUCKET).createSignedUrl(storagePath, 300);
   if (error) { showToast('Нээхэд алдаа гарлаа: ' + error.message, 'error'); return; }
-  window.open(data.signedUrl, '_blank');
+  window.open(data.signedUrl, '_blank', 'noopener');
 }
 async function downloadOrderDoc(storagePath, title) {
   const { data, error } = await sb.storage.from(DOCS_BUCKET).createSignedUrl(storagePath, 300, { download: title + '.pdf' });
@@ -4653,7 +4668,7 @@ async function scoreCombinedTests() {
   // Тестүүдийн дүн
   const lvCls = r => r.levelKey === 'high' ? 'h' : r.levelKey === 'medium' ? 'm' : 'l';
   const rows = results.map(r => `<div class="qx-row">
-      <div class="qx-top"><span class="qx-n">${r.t.emo} ${qName(r).charAt(0).toUpperCase() + qName(r).slice(1)}</span><span class="qx-chip ${lvCls(r)}">${r.level}</span></div>
+      <div class="qx-top"><span class="qx-n">${r.t.emo} ${qName(r).charAt(0).toUpperCase() + qName(r).slice(1)}</span><span class="qx-chip ${lvCls(r)}">${esc(r.level)}</span></div>
       <div class="qx-bar"><div style="width:${Math.max(3, r.well)}%;background:${r.well >= 70 ? '#3F7A5E' : r.well >= 50 ? '#C08A2E' : '#B42318'}"></div></div>
       <div class="qx-sc">${Math.round(r.total)} / ${Math.round(r.max)} оноо · тогтвортой байдал ${r.well}%</div></div>`).join('');
   const testsCard = `<section class="t2-card"><h4 class="t2-h"><span class="t2-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></span>Тестүүдийн дүн</h4>${rows}
@@ -6645,9 +6660,9 @@ function hrFmtScore(r) {
   const sc = r.test_key === 'hr_brs' ? Number(r.score).toFixed(2) : r.score;
   const stage1 = ['hr_pcptsd5','hr_phq2','hr_gad2'].includes(r.test_key);
   const lbl = stage1 ? (r.level === 'pos' ? 'Эерэг → бүтэн асуулга өгсөн' : 'Сөрөг')
-    : r.test_key === 'hr_pvt_b' ? ({ low:'Хэвийн', mid:'Бага зэргийн ядаргаа', high:'Ядаргаа өндөр' }[r.level] || r.level) + ' (алдаа / оролдлого)'
-    : (HR_LEVEL_LABELS[r.level] || r.level);
-  return `${sc}${r.max_score != null ? ' / ' + r.max_score : ''}${r.level ? ' · ' + lbl : ''}`;
+    : r.test_key === 'hr_pvt_b' ? ({ low:'Хэвийн', mid:'Бага зэргийн ядаргаа', high:'Ядаргаа өндөр' }[r.level] || esc(r.level)) + ' (алдаа / оролдлого)'
+    : (HR_LEVEL_LABELS[r.level] || esc(r.level));
+  return `${esc(sc)}${r.max_score != null ? ' / ' + r.max_score : ''}${r.level ? ' · ' + lbl : ''}`;
 }
 
 /* ================= ХҮНИЙ НӨӨЦИЙН НЭГДСЭН ТАЙЛАН =================
@@ -7078,7 +7093,7 @@ function psyRowInfo(r) {
     const p = Number(r.score);
     const OLD = { 'Органик бус нойргүйдэл':'a', 'Органик бус нойрсох эмгэг':'b', 'Хар дарж зүүдлэх эмгэг':'e', 'Нойрны бусад органик бус эмгэг':'f' };
     const sub = [...STRESS_SUBSCALES, ...INSOMNIA_SUBSCALES].find(x => x.label === r.level || x.label === chShort(r.level) || x.key === OLD[r.level]), G = sub && MULTI_GUIDE[sub.key];
-    return { tone: p >= 70 ? 'r' : p >= 50 ? 'w' : 's', label: p >= 50 ? `${chShort(r.level)} — ${p}%` : 'Онцгой анхаарах шинж илрээгүй', score: '',
+    return { tone: p >= 70 ? 'r' : p >= 50 ? 'w' : 's', label: p >= 50 ? `${esc(chShort(r.level))} — ${p}%` : 'Онцгой анхаарах шинж илрээгүй', score: '',
       tier: p >= 50 && G ? { meaning: G.m, care: G.care, seek: G.seek } : null };
   }
   if (k === 'attention_scale') return { tone: r.level === 'high' ? 'w' : 's', label: r.level === 'high' ? 'Анхаарал сарних магадлал өндөр' : 'Хэвийн', score: `${r.score} / ${r.max_score}` };
@@ -7179,25 +7194,51 @@ function printPsyReport() {
 /* ================= СЭТГЭЛ ЗҮЙН ЗӨВЛӨМЖ (зурагт карт) =================
    Агуулга нь сайтын тестүүдийн нотолгоонд суурилсан зөвлөмжүүдээс (ДЭМБ, CBT, CBT-I, PFA) энгийн хэлбэрээр.
    Зургууд нь Mil-Care-д зориулж кодоор зурсан эх бүтээл (зохиогчийн эрхийн асуудалгүй). */
-const TP_C = { deep:'#0D3B46', teal:'#0A677A', mint:'#CFE6E1', mist:'#EDF3F2', sand:'#F3E7D3', sun:'#F2B544', coral:'#E58B6D', skin:'#E9B98F', hair:'#2E2A28', sage:'#7FB59B', night:'#1E3550', lav:'#B9B4E0', white:'#FFFFFF' };
+const TP_C = { olive:'#5E6B3D', oliveD:'#3F4A27', boot:'#2A2A24', deep:'#0D3B46', teal:'#0A677A', mint:'#CFE6E1', mist:'#EDF3F2', sand:'#F3E7D3', sun:'#F2B544', coral:'#E58B6D', skin:'#E9B98F', hair:'#2E2A28', sage:'#7FB59B', night:'#1E3550', lav:'#B9B4E0', white:'#FFFFFF' };
 /* Энгийн хүний дүрс: x,y = хөлний доод цэг */
 function tpPerson(x, y, o = {}) {
-  const c = o.shirt || TP_C.teal, s = o.scale || 1, arm = o.arm || 'down';
+  const c = TP_C.olive, s = o.scale || 1, arm = o.arm || 'down'; // хээрийн дүрэмт хувцас
   const arms = arm === 'up' ? `<path d="M-14 -58 L-30 -86 M14 -58 L30 -86" stroke="${c}" stroke-width="9" stroke-linecap="round"/>`
     : arm === 'chest' ? `<path d="M-14 -58 Q-6 -46 2 -60 M14 -58 Q6 -46 -2 -60" stroke="${c}" stroke-width="9" stroke-linecap="round" fill="none"/>`
     : arm === 'wave' ? `<path d="M-14 -58 L-24 -34 M14 -58 L30 -84" stroke="${c}" stroke-width="9" stroke-linecap="round"/>`
     : arm === 'write' ? `<path d="M-14 -58 L-6 -36 L14 -38 M14 -58 L22 -40" stroke="${c}" stroke-width="9" stroke-linecap="round" fill="none"/>`
     : `<path d="M-14 -58 L-22 -30 M14 -58 L22 -30" stroke="${c}" stroke-width="9" stroke-linecap="round"/>`;
-  const legs = o.sit ? `<path d="M-8 -26 L-8 -14 L14 -14 L14 0 M8 -26 L8 -14 L28 -14 L28 0" stroke="${TP_C.deep}" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`
-    : `<path d="M-7 -26 L-9 0 M7 -26 L9 0" stroke="${TP_C.deep}" stroke-width="9" stroke-linecap="round"/>`;
+  const legs = o.sit ? `<path d="M-8 -26 L-8 -14 L14 -14 L14 0 M8 -26 L8 -14 L28 -14 L28 0" stroke="${TP_C.oliveD}" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M10 0 h8 M24 0 h8" stroke="${TP_C.boot}" stroke-width="6" stroke-linecap="round"/>`
+    : `<path d="M-7 -26 L-9 0 M7 -26 L9 0" stroke="${TP_C.oliveD}" stroke-width="9" stroke-linecap="round"/><path d="M-13 1 h8 M5 1 h8" stroke="${TP_C.boot}" stroke-width="6" stroke-linecap="round"/>`;
   const face = o.eyes === 'closed' ? `<path d="M-7 -82 q3 3 6 0 M3 -82 q3 3 6 0" stroke="${TP_C.deep}" stroke-width="2" fill="none" stroke-linecap="round"/>`
     : `<circle cx="-5" cy="-82" r="1.8" fill="${TP_C.deep}"/><circle cx="5" cy="-82" r="1.8" fill="${TP_C.deep}"/>`;
   const mouth = o.mouth === 'o' ? `<ellipse cx="0" cy="-74" rx="3" ry="3.5" fill="${TP_C.deep}"/>` : o.mouth === 'flat' ? `<path d="M-4 -74 h8" stroke="${TP_C.deep}" stroke-width="2" stroke-linecap="round"/>` : `<path d="M-5 -75 q5 5 10 0" stroke="${TP_C.deep}" stroke-width="2" fill="none" stroke-linecap="round"/>`;
-  return `<g transform="translate(${x} ${y}) scale(${s})">${legs}<rect x="-16" y="-64" width="32" height="42" rx="13" fill="${c}"/>${arms}
-    <circle cx="0" cy="-82" r="16" fill="${TP_C.skin}"/><path d="M-16 -86 q2 -16 16 -16 q14 0 16 14 q-10 -6 -32 2z" fill="${o.hairc || TP_C.hair}"/>${face}${mouth}</g>`;
+  const uni = `<rect x="-16" y="-64" width="32" height="42" rx="13" fill="${c}"/><path d="M0 -62 v38" stroke="${TP_C.oliveD}" stroke-width="1.5" opacity=".7"/>
+    <rect x="-12" y="-54" width="8" height="7" rx="1.5" fill="none" stroke="${TP_C.oliveD}" stroke-width="1.5" opacity=".8"/><rect x="4" y="-54" width="8" height="7" rx="1.5" fill="none" stroke="${TP_C.oliveD}" stroke-width="1.5" opacity=".8"/>
+    <rect x="-16" y="-30" width="32" height="5" fill="${TP_C.oliveD}"/><rect x="-3" y="-30.5" width="6" height="6" rx="1" fill="#C9A44A"/>`;
+  const cap = `<path d="M-16 -89 q1 -15 16 -15 q15 0 16 15z" fill="${TP_C.oliveD}"/><rect x="-17" y="-91" width="34" height="4.5" rx="2.2" fill="${TP_C.oliveD}"/>
+    <path d="M6 -89 h14 q2 3 -3 4 h-11z" fill="${TP_C.oliveD}"/><circle cx="0" cy="-97" r="2.6" fill="#C9A44A"/>`;
+  return `<g transform="translate(${x} ${y}) scale(${s})">${legs}${uni}${arms}
+    <circle cx="0" cy="-80" r="16" fill="${TP_C.skin}"/>${cap}${face}${mouth}</g>`;
 }
 function tpSvg(bg, inner, label) { return `<svg viewBox="0 0 320 180" role="img" aria-label="${label}" preserveAspectRatio="xMidYMid slice"><rect width="320" height="180" fill="${bg}"/>${inner}</svg>`; }
 const TP_SCENES = {
+  tactical: () => tpSvg('#EEF0E6', `<rect x="0" y="152" width="320" height="28" fill="#DCE0CC"/>
+    <rect x="170" y="34" width="104" height="104" rx="8" fill="none" stroke="${TP_C.olive}" stroke-width="4" stroke-dasharray="6 6"/>
+    ${[[222,26,'ав 4','middle'],[280,94,'барь 4','start'],[222,156,'гарга 4','middle'],[162,94,'хүлээ 4','end']].map(([x,y,t,an]) => `<text x="${x}" y="${y}" text-anchor="${an}" font-size="11" font-weight="700" fill="${TP_C.oliveD}">${t}</text>`).join('')}
+    <circle cx="170" cy="34" r="6" fill="${TP_C.sun}"/><text x="222" y="94" text-anchor="middle" font-size="18" font-weight="800" fill="${TP_C.oliveD}">4·4·4·4</text>
+    ${tpPerson(84, 160, { arm:'down', mouth:'flat' })}`, 'Тактикийн дөрвөлжин амьсгал'),
+  buddy: () => tpSvg('#EEF1EA', `<rect x="0" y="152" width="320" height="28" fill="#DDE3D3"/>
+    <rect x="150" y="24" width="112" height="36" rx="12" fill="#fff" stroke="#CBD3BC" stroke-width="2"/><path d="M178 60 l-6 12 l16 -12z" fill="#fff"/>
+    <text x="206" y="47" text-anchor="middle" font-size="11" font-weight="700" fill="${TP_C.oliveD}">Ярилцах уу?</text>
+    ${tpPerson(120, 156, { arm:'down', mouth:'flat', eyes:'closed' })}${tpPerson(186, 156, { arm:'wave' })}
+    <path d="M150 104 q-10 -10 -20 -6" stroke="${TP_C.olive}" stroke-width="9" stroke-linecap="round" fill="none"/>`, 'Хамт алба хаагчаа дэмжих'),
+  fieldsleep: () => tpSvg(TP_C.night, `<circle cx="262" cy="40" r="18" fill="#F6E7B0"/><circle cx="271" cy="34" r="16" fill="${TP_C.night}"/>
+    ${[[40,28],[96,46],[150,22],[200,60]].map(([x,y]) => `<circle cx="${x}" cy="${y}" r="1.8" fill="#fff" opacity=".8"/>`).join('')}
+    <path d="M0 160 h320 v20 H0z" fill="#2C3B2A"/><path d="M60 160 L130 78 L200 160z" fill="${TP_C.olive}"/><path d="M130 78 L130 160" stroke="${TP_C.oliveD}" stroke-width="3"/>
+    <path d="M112 160 L130 112 L148 160z" fill="${TP_C.oliveD}"/>
+    <rect x="222" y="104" width="62" height="34" rx="10" fill="#fff" opacity=".92"/><text x="253" y="126" text-anchor="middle" font-size="14" font-weight="800" fill="${TP_C.night}">20′</text>
+    <text x="168" y="98" font-size="16" font-weight="800" fill="#fff" opacity=".8">z</text><text x="182" y="84" font-size="12" font-weight="800" fill="#fff" opacity=".55">z</text>`, 'Хээрийн майханд амрах'),
+  homecoming: () => tpSvg('#F4EFE4', `<rect x="0" y="152" width="320" height="28" fill="#E6DCC6"/>
+    <path d="M196 92 L246 54 L296 92 V152 H196z" fill="#fff" stroke="#D9CBB0" stroke-width="2"/><path d="M188 96 L246 50 L304 96" stroke="${TP_C.coral}" stroke-width="6" stroke-linecap="round" fill="none"/>
+    <rect x="234" y="114" width="24" height="38" rx="3" fill="${TP_C.sand}"/><rect x="208" y="104" width="18" height="16" rx="2" fill="${TP_C.mint}"/><rect x="266" y="104" width="18" height="16" rx="2" fill="${TP_C.mint}"/>
+    <path d="M150 52 q8 -12 16 0 q8 -12 16 0 q0 11 -16 20 q-16 -9 -16 -20z" fill="${TP_C.coral}"/>
+    <rect x="70" y="86" width="22" height="34" rx="6" fill="${TP_C.oliveD}"/>${tpPerson(104, 156, { arm:'wave' })}`, 'Гэртээ эргэн ирэх'),
   breath: () => tpSvg(TP_C.mist, `<circle cx="215" cy="88" r="62" fill="${TP_C.mint}"/><circle cx="215" cy="88" r="44" fill="#B5DAD2"/><circle cx="215" cy="88" r="26" fill="${TP_C.teal}" opacity=".85"/>
     <text x="215" y="93" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">4 · 6</text>
     <path d="M70 70 q20 -14 40 0" stroke="${TP_C.teal}" stroke-width="3" fill="none" stroke-linecap="round" opacity=".6"/><path d="M64 56 q26 -18 52 0" stroke="${TP_C.teal}" stroke-width="3" fill="none" stroke-linecap="round" opacity=".35"/>
@@ -7256,39 +7297,64 @@ const TP_IC = {
 };
 function tpIcon(k) { return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${TP_IC[k] || TP_IC.check}</svg>`; }
 const TIPS = [
+  { id:'tactical', src:"Тактикийн (дөрвөлжин) амьсгал — Grossman & Christensen (2004), «On Combat». Цэрэг, цагдаа, аврагчдын бэлтгэлд өргөн хэрэглэгддэг.", cat:'duty', title:'Тактикийн амьсгал', short:'Буудлага, шалгалт, хүнд даалгаврын өмнө сэтгэлээ хурдан тогтоох.', min:2,
+    why:'Хүчтэй ачааллын үед зүрх хурдан цохилж, гар чичирч, анхаарал сарнидаг. Амьсгалыг тэнцүү хэмнэлтэй болгоход бие хурдан тайвширч, анхаарал төвлөрдөг. Нүдээ нээлттэй, зогсож буй байдалтай ч хийж болно.',
+    steps:[['nose','4 секунд амьсгаа ав','Хамраараа, гэдсээрээ гүнзгий амьсгална.'],['pause','4 секунд барь','Амьсгаагаа зөөлөн түр барина.'],['mouth','4 секунд гарга','Амаараа аажмаар гаргана.'],['pause','4 секунд хүлээ','Дараагийн амьсгалын өмнө түр зогсоно.'],['repeat','3–4 удаа давт','Нийтдээ нэг минут орчим болно.']],
+    duty:'Буудлага, шалгалт, илтгэл тавихын өмнө, харуулд гарахдаа, хурцадмал яриа эхлэхийн өмнө хэрэглээрэй.' },
+  { id:'buddy', src:"АНУ-ын армийн «ACE» (Ask, Care, Escort) сургалт; Nash ба бусад (2010), «Combat and Operational Stress First Aid»; ДЭМБ (2011), Сэтгэл зүйн анхны тусламж.", cat:'duty', title:'Хамт алба хаагчаа дэмжих', short:'Хажууд тань байгаа хүнд хэцүү байгааг анзаарч, дэмжлэг үзүүлэх.', min:5,
+    why:'Алба хаагчид хүндрэлээ ихэвчлэн хамгийн түрүүнд хамт алба хаагчдадаа илэрхийлдэг. Анзаарч, асууж, хамт мэргэжилтэн дээр очих нь хүнд үеийг даван туулахад хамгийн их тусалдаг.',
+    steps:[['eye','Өөрчлөлтийг анзаар','Ганцаардах, амархан уурлах, нойргүй болох, архи их уух, "би хэнд ч хэрэггүй" гэх мэт үг хэлэх.'],['chat','Шууд, энгийнээр асуу','"Сүүлийн үед чамд хэцүү байгаа юм шиг санагдлаа. Ярилцах уу?"'],['heart','Анхааралтай сонс','Зөвлөгөө өгөх гэж яарахаас илүү сонсож, буруутгалгүй хүлээж авах нь чухал.'],['people','Хамт мэргэжилтэн дээр оч','Сэтгэл зүйч, эмч эсвэл итгэдэг захирагчтай нь холбож өгч, ганцааранг нь үлдээлгүй хамт байгаарай.']],
+    duty:'Байр, хээрийн сургуулилт, томилолтын үед хажуудах хүнээ хамгийн сайн мэддэг хүн бол та. Нэг энгийн асуулт хүний амьдралыг өөрчилж чадна.' },
+  { id:'fieldsleep', src:"АНУ-ын армийн FM 7-22 (2020), «Holistic Health and Fitness» — нойрны бэлэн байдал; Good ба бусад (2020), «Sleep in the United States Military», Neuropsychopharmacology.", cat:'duty', title:'Хээрийн нөхцөлд нойроо хамгаалах', short:'Сургуулилт, жижүүр, шөнийн ээлжийн үед нойрны дутагдлаас сэргийлэх.', min:5,
+    why:'Нойр дутахад анхаарал, шийдвэр гаргах чадвар, урвалын хурд мэдэгдэхүйц буурдаг. Нөхцөл хязгаартай үед ч нойроо зөв зохион байгуулбал ажлын чадвараа хадгалж чадна.',
+    steps:[['bed','Боломж гарвал унт','Хүнд даалгаврын өмнө нойроо нөхөж, сул цагаа амралтад зарцуулаарай.'],['timer','Богино нойр: 20–30 минут','Эсвэл бүтэн 90 минут. Сэрсний дараа 15 минут орчим сэргэсний дараа хариуцлагатай ажилд ороорой.'],['moon','Гэрэл, чимээг хаа','Нүдний боолт, чихний бөглөө ашиглаарай.'],['cup','Кофеиныг зөв хэрэглэ','Унтахаас 6 цагийн өмнөөс кофе, эрчим хүчний ундаа уухгүй байхыг хичээгээрэй.'],['calendar','Дэглэмээ тогтмолжуул','Боломжтой үед өдөр бүр ижил цагт унтаж, сэрж хэвшээрэй.']],
+    duty:'Хээрийн сургуулилт, харуул, жижүүр, шөнийн ээлжийн үед ялангуяа хэрэгтэй.' },
+  { id:'homecoming', src:"Adler ба бусад (2009), Journal of Consulting and Clinical Psychology — томилолтоос буцаж ирсэн алба хаагчдад зориулсан «Battlemind» сургалт.", cat:'duty', title:'Томилолтоос буцаж ирэхэд', short:'Энхийг сахиулах ажиллагаа, урт хугацааны сургуулилтын дараа гэр бүл, өдөр тутмын амьдралдаа эргэн дасах.', min:10,
+    why:'Урт хугацааны томилолтод бие, сэтгэл байнгын сонор сэрэмжтэй байдалд дасдаг. Гэртээ ирсний дараа энэ нь амархан уурлах, нойр муудах, гэр бүлээсээ хөндий санагдах байдлаар илэрч болно. Энэ бол дасан зохицох хэвийн үйл явц бөгөөд ихэвчлэн хэдэн долоо хоногийн дотор аажмаар намждаг.',
+    steps:[['shield','Сонор сэрэмжээ анзаар','Олон хүнтэй газар тайван бус байх, хурдан жолоодох зэрэг нь томилолтын үеийн дадал байж болно.'],['chat','Гэр бүлдээ цаг гарга','Таныг эзгүйд гэр бүлийнхэн тань ч өөрчлөгдсөн. Өдөр тутмын хэмнэлдээ аажмаар нэгдээрэй.'],['cup','Архиар тайвшрахаас татгалз','Архи нойр, сэтгэл санааг улам муутгадаг.'],['people','Хамт явсан нөхөдтэйгөө холбоотой бай','Ижил зүйлийг туулсан хүмүүстэй ярилцах нь их тустай.'],['calendar','Сарын дараа өөрийгөө шалга','Нойр муудах, амархан уурлах, хар дарж зүүдлэх байдал үргэлжилсээр байвал сэтгэл зүйчтэй уулзаарай.']] },
   { id:'breath', src:"Удаан, хэмнэлтэй амьсгал (минутад ~6 амьсгал) — Lehrer & Gevirtz (2014), Frontiers in Psychology; Zaccaro ба бусад (2018), Frontiers in Human Neuroscience.", cat:'stress', title:'Тайвшруулах амьсгалын дасгал', short:'Сэтгэл түгшиж, бухимдсан үед биеэ 2 минутад тайвшруулах.', min:2, interactive:true,
     why:'Амьсгаагаа удаан гаргахад зүрхний цохилт удааширч, бие "аюулгүй байна" гэсэн дохио авдаг. Хаана ч, хэнд ч мэдэгдэлгүй хийж болно.',
-    steps:[['nose','Хамраараа 4 секунд амьсгаа ав','Гэдэс бага зэрэг түрэгдэнэ, мөрөө өргөх хэрэггүй.'],['mouth','Амаараа 6 секунд аажмаар гарга','Лаа үлээх гэж байгаа мэт уруулаа бага зэрэг жимийж гаргана.'],['repeat','5–10 удаа давт','Нийтдээ 1–2 минут. Толгой эргэвэл хэвийн амьсгалдаа шилжээрэй.'],['timer','Өдөрт 2–3 удаа дадлага хий','Тайван үедээ сурсан арга стресстэй үед илүү сайн ажилладаг.']] },
+    steps:[['nose','Хамраараа 4 секунд амьсгаа ав','Гэдэс бага зэрэг түрэгдэнэ, мөрөө өргөх хэрэггүй.'],['mouth','Амаараа 6 секунд аажмаар гарга','Лаа үлээх гэж байгаа мэт уруулаа бага зэрэг жимийж гаргана.'],['repeat','5–10 удаа давт','Нийтдээ 1–2 минут. Толгой эргэвэл хэвийн амьсгалдаа шилжээрэй.'],['timer','Өдөрт 2–3 удаа дадлага хий','Тайван үедээ сурсан арга стресстэй үед илүү сайн ажилладаг.']] ,
+    duty:'Харуул, жижүүрийн үед, хурцадмал яриа эсвэл хүнд даалгаврын өмнө, дараа нь хэрэглээрэй.' },
   { id:'ground', src:"Мэдрэхүйгээр одоо цагт буцаж ирэх (grounding) арга — сэтгэл зүйн эмчилгээний практикт өргөн хэрэглэгддэг; ДЭМБ (2020), «Doing What Matters in Times of Stress».", cat:'stress', title:'5-4-3-2-1 дасгал', short:'Айдас, түгшүүр, хүнд дурсамж хүчтэй болоход одоо цагтаа буцаж ирэх.', min:3,
     why:'Мэдрэхүйгээ ээлжлэн ашиглахад анхаарал санаа зовнилоос салж, одоогийн бодит орчин руу шилждэг.',
-    steps:[['eye','Харагдаж буй 5 зүйлийг нэрлэ','Эргэн тойрноо хараад чимээгүй эсвэл чангаар нэрлэ.'],['hand','Мэдрэгдэж буй 4 зүйл','Хувцас, сандал, ширээ, хөлийн доорх шал…'],['ear','Сонсогдож буй 3 дуу','Алсын машин, сэнс, өөрийн амьсгал…'],['smell','Үнэртэж буй 2 зүйл','Мэдрэгдэхгүй бол дуртай үнэрээ санаарай.'],['taste','Амтлагдаж буй 1 зүйл','Ус балгах эсвэл амандаа байгаа амтыг мэдэр.']] },
+    steps:[['eye','Харагдаж буй 5 зүйлийг нэрлэ','Эргэн тойрноо хараад чимээгүй эсвэл чангаар нэрлэ.'],['hand','Мэдрэгдэж буй 4 зүйл','Хувцас, сандал, ширээ, хөлийн доорх шал…'],['ear','Сонсогдож буй 3 дуу','Алсын машин, сэнс, өөрийн амьсгал…'],['smell','Үнэртэж буй 2 зүйл','Мэдрэгдэхгүй бол дуртай үнэрээ санаарай.'],['taste','Амтлагдаж буй 1 зүйл','Ус балгах эсвэл амандаа байгаа амтыг мэдэр.']] ,
+    duty:'Сургуулилт, ажиллагааны үеийн хүнд дүр зураг, чимээ санаанд тань гэнэт орж ирэхэд хэрэглээрэй.' },
   { id:'muscle', src:"Прогрессив булчин сулруулах арга — Jacobson (1938); Bernstein & Borkovec (1973). Энд товчилсон хувилбараар.", cat:'stress', title:'Булчин сулруулах дасгал', short:'Биед хуримтлагдсан хурцадмал байдлыг 10 минутад тайлах.', min:10,
     why:'Стрессийн үед булчин өөрийн мэдэлгүй чангардаг. Зориуд чангалж, дараа нь сулруулахад бие тайвширч, нойр хүрэхэд ч тусалдаг.',
-    steps:[['muscle','Нэг хэсгийн булчингаа 5 секунд чангал','Гараа нударга болгох, мөрөө чих рүү өргөх гэх мэт.'],['pause','10 секунд бүрэн сулла','Сулрах мэдрэмжийг анзаар.'],['repeat','Хөлөөс толгой хүртэл ээлжлэн','Хөл, гуя, гэдэс, гар, мөр, нүүр.'],['moon','Унтахын өмнө хийвэл илүү үр дүнтэй','Өвдөж буй хэсгийг хүчээр чангалах хэрэггүй.']] },
+    steps:[['muscle','Нэг хэсгийн булчингаа 5 секунд чангал','Гараа нударга болгох, мөрөө чих рүү өргөх гэх мэт.'],['pause','10 секунд бүрэн сулла','Сулрах мэдрэмжийг анзаар.'],['repeat','Хөлөөс толгой хүртэл ээлжлэн','Хөл, гуя, гэдэс, гар, мөр, нүүр.'],['moon','Унтахын өмнө хийвэл илүү үр дүнтэй','Өвдөж буй хэсгийг хүчээр чангалах хэрэггүй.']] ,
+    duty:'Хээрийн сургуулилт, алсын явган марш, хүнд ачааны дараа эсвэл унтахын өмнө хийгээрэй.' },
   { id:'sleep', src:"Нойргүйдлийн сэтгэл зүйн эмчилгээ (CBT-I): өдөөгч хяналт — Bootzin (1972); Америкийн нойрны анагаах ухааны академийн удирдамж (Edinger ба бусад, 2021).", cat:'sleep', title:'Сайн нойрны 6 дүрэм', short:'Нойргүйдэл, шөнө сэрэх, өглөө ядарч босохоос сэргийлэх.', min:5,
     why:'Нойрны дэглэм нь сэтгэл санаа, анхаарал, дархлааны үндэс. Эдгээр дүрэм нь нойргүйдлийн эмчилгээний гол хэсэг юм.',
-    steps:[['clock','Өдөр бүр нэг цагт бос','Амралтын өдөр ч 1 цагаас илүү өөрчлөхгүй.'],['bed','Орондоо зөвхөн унтах үедээ ор','Утас, кино үзэх, ажил хийхийг орноосоо гадуур хийвэл бие тань орыг нойртой холбож, хурдан унтдаг болно.'],['timer','20 минутад унтаж чадахгүй бол бос','Бүдэг гэрэлд тайван зүйл хийгээд нойр хүрэхэд буцаж хэвт.'],['cup','Үдээс хойш кофе, энергийн ундаа уухгүй','Архи ч нойрны чанарыг муутгадаг.'],['phone','Унтахаас 1 цагийн өмнө дэлгэцээ унтраа','Гэрэл, мэдээ тархийг сэргээдэг.'],['sun','Өглөө гэрэлд гар, өдөр бага унт','Өдрийн нойр 20–30 минутаас хэтрэхгүй.']] },
+    steps:[['clock','Өдөр бүр нэг цагт бос','Амралтын өдөр ч 1 цагаас илүү өөрчлөхгүй.'],['bed','Орондоо зөвхөн унтах үедээ ор','Утас, кино үзэх, ажил хийхийг орноосоо гадуур хийвэл бие тань орыг нойртой холбож, хурдан унтдаг болно.'],['timer','20 минутад унтаж чадахгүй бол бос','Бүдэг гэрэлд тайван зүйл хийгээд нойр хүрэхэд буцаж хэвт.'],['cup','Үдээс хойш кофе, энергийн ундаа уухгүй','Архи ч нойрны чанарыг муутгадаг.'],['phone','Унтахаас 1 цагийн өмнө дэлгэцээ унтраа','Гэрэл, мэдээ тархийг сэргээдэг.'],['sun','Өглөө гэрэлд гар, өдөр бага унт','Өдрийн нойр 20–30 минутаас хэтрэхгүй.']] ,
+    duty:'Шөнийн ээлж, жижүүрийн дараа өдөр унтах шаардлагатай бол өрөөгөө харанхуйлж, нэг ижил дэглэм баримтлаарай. Хээрийн нөхцөлд "Хээрийн нөхцөлд нойроо хамгаалах" зөвлөмжийг үзээрэй.' },
   { id:'worry', src:"«Санаа зовох цаг» — Borkovec ба бусад (1983); танин мэдэхүйн зан үйлийн эмчилгээний бодлоо шалгах арга (Beck).", cat:'mood', title:'Санаа зовнилоо цэгцлэх', short:'Нэг бодол толгойд эргэлдээд салахгүй байхад.', min:15,
     why:'Санаа зовнилыг цаасан дээр буулгахад тархи "мартчих вий" гэж барьж байхаа больдог. Өөрчилж чадах, чадахгүйгээр ангилах нь хүчээ зөв зүйлд зарцуулахад тусална.',
-    steps:[['pen','Санаа зовоож буй бүхнээ бич','Жижиг, том гэлгүй бүгдийг нь.'],['list','"Өөрчилж чадна" ба "Чадахгүй" гэж хоёр хуваа','Чадах зүйлд нэг жижиг алхам төлөвлө.'],['clock','Өдөрт 15 минутын "санаа зовох цаг" тогтоо','Бусад үед бодол төрвөл "цагтаа бодъё" гэж хойшлуул.'],['check','Бодлоо баримтаар шалга','"Үүнийг юу баталж байна, юу үгүйсгэж байна?" гэж өөрөөсөө асуу.']] },
+    steps:[['pen','Санаа зовоож буй бүхнээ бич','Жижиг, том гэлгүй бүгдийг нь.'],['list','"Өөрчилж чадна" ба "Чадахгүй" гэж хоёр хуваа','Чадах зүйлд нэг жижиг алхам төлөвлө.'],['clock','Өдөрт 15 минутын "санаа зовох цаг" тогтоо','Бусад үед бодол төрвөл "цагтаа бодъё" гэж хойшлуул.'],['check','Бодлоо баримтаар шалга','"Үүнийг юу баталж байна, юу үгүйсгэж байна?" гэж өөрөөсөө асуу.']] ,
+    duty:'Гэр бүлээсээ хол алба хааж байхдаа санаа зовох зүйл ихсэхэд өдрийн тогтсон нэг цагт бичиж цэгцлээрэй.' },
   { id:'move', src:"Зан үйлийн идэвхжүүлэлт (Behavioral Activation) — Cuijpers ба бусад (2007); Их Британийн NICE удирдамж, сэтгэл гутрал (2022).", cat:'mood', title:'Жижиг алхмаар эхлэх', short:'Юу ч хийх хүсэлгүй, сэтгэл санаа унасан үед.', min:20,
     why:'Сэтгэл санаа сайжрахыг хүлээхээс илүү эхлээд жижиг зүйл хийх нь сэтгэл санааг сайжруулдаг. Энэ бол сэтгэл гутралын үед хамгийн нотолгоотой аргуудын нэг.',
-    steps:[['list','Өнөөдөр хийх 1–2 жижиг зүйл сонго','Богино алхалт, найз руу залгах, дуртай хоол хийх.'],['walk','20–30 минут гадаа алх','Өглөөний гэрэл ялангуяа тустай.'],['people','Нэг хүнтэй уулз эсвэл ярь','Богино ч гэсэн харилцаа сэтгэл санааг дэмждэг.'],['check','Хийсэн бүрээ тэмдэглэ','Жижиг амжилт ч тоологдоно.']] },
+    steps:[['list','Өнөөдөр хийх 1–2 жижиг зүйл сонго','Богино алхалт, найз руу залгах, дуртай хоол хийх.'],['walk','20–30 минут гадаа алх','Өглөөний гэрэл ялангуяа тустай.'],['people','Нэг хүнтэй уулз эсвэл ярь','Богино ч гэсэн харилцаа сэтгэл санааг дэмждэг.'],['check','Хийсэн бүрээ тэмдэглэ','Жижиг амжилт ч тоологдоно.']] ,
+    duty:'Биеийн тамирын хичээлээс гадна өөрийн дуртай хөдөлгөөнийг хамт алба хаагчидтайгаа хамт хийгээрэй.' },
   { id:'anger', src:"Уур зохицуулах танин мэдэхүйн зан үйлийн арга («түр зогсох», «Би» мэдэгдэл) — Deffenbacher (2011); APA, «Controlling anger before it controls you».", cat:'relation', title:'Уураа зохицуулах', short:'Огцом үг хэлж, хожим харамсахаас сэргийлэх.', min:2,
     why:'Уур хүрэх үед бодох чадвар түр буурдаг. Хэдхэн секунд зогсоход хариу үйлдлээ сонгох боломж гардаг.',
-    steps:[['pause','Эхний шинжийг тань','Зүрх хүчтэй цохилох, дуу чангарах, нударга зангидах.'],['timer','Зогсоод 10 хүртэл тоол','Шаардлагатай бол тухайн газраас түр гар.'],['nose','Удаан амьсгал ав','4 секунд авч, 6 секунд гарга.'],['chat','"Би…" гэж эхэлж ярь','"Би … үед бухимдаж байна, учир нь …" гэж тайван хэл.']] },
+    steps:[['pause','Эхний шинжийг тань','Зүрх хүчтэй цохилох, дуу чангарах, нударга зангидах.'],['timer','Зогсоод 10 хүртэл тоол','Шаардлагатай бол тухайн газраас түр гар.'],['nose','Удаан амьсгал ав','4 секунд авч, 6 секунд гарга.'],['chat','"Би…" гэж эхэлж ярь','"Би … үед бухимдаж байна, учир нь …" гэж тайван хэл.']] ,
+    duty:'Захирагч эсвэл хамт алба хаагчтайгаа санал зөрөхөд хариу хэлэхээсээ өмнө түр зогсоод, асуудлыг дараа нь тайван орчинд ярилцаарай.' },
   { id:'support', src:"ДЭМБ (2011), Сэтгэл зүйн анхны тусламж (Psychological First Aid); амиа хорлох тухай асуух нь эрсдэлийг нэмэгдүүлдэггүй — Dazzi ба бусад (2014).", cat:'relation', title:'Хэцүү үед дэмжлэг хүсэх', short:'Хэцүү үед ганцаараа даах хэрэггүй. Хэнд, хэрхэн хандах вэ.', min:5,
     why:'Ойр дотны хүмүүсийн дэмжлэг бол хэцүү үеийг даван туулах хамгийн хүчтэй хамгаалалт. Тусламж хүсэх нь сул дорой байдал биш.',
-    steps:[['people','Итгэдэг 1–2 хүнээ тодорхойл','Найз, гэр бүл, хамт ажиллагч.'],['chat','Энгийнээр эхэл','"Сүүлийн үед надад хэцүү байна, ярилцаж болох уу?"'],['heart','Бусдыг ч асуу','"Чи сайн уу?" гэх энгийн асуулт хүний амь аварч болно.'],['phonecall','Мэргэжилтэнтэй холбогд','Өөрийгөө гэмтээх бодол төрвөл сэтгэл зүйч, эмч зэрэг мэргэжилтэнтэй шууд холбогдоорой.']] },
+    steps:[['people','Итгэдэг 1–2 хүнээ тодорхойл','Найз, гэр бүл, хамт ажиллагч.'],['chat','Энгийнээр эхэл','"Сүүлийн үед надад хэцүү байна, ярилцаж болох уу?"'],['heart','Бусдыг ч асуу','"Чи сайн уу?" гэх энгийн асуулт хүний амь аварч болно.'],['phonecall','Мэргэжилтэнтэй холбогд','Өөрийгөө гэмтээх бодол төрвөл сэтгэл зүйч, эмч зэрэг мэргэжилтэнтэй шууд холбогдоорой.']] ,
+    duty:'Хамт алба хаагч, захирагч, ангийн сэтгэл зүйч бол таны дэмжлэгийн хүрээ. Тусламж хүсэх нь цэргийн нэр төрд огт харшлахгүй.' },
   { id:'burnout', src:"ДЭМБ (2019), ICD-11 — ажлаас халшрал; Maslach & Leiter (2016). Хувь хүний аргаас гадна ажлын нөхцөлийн өөрчлөлт илүү үр дүнтэй.", cat:'work', title:'Ажлаас халшрахаас сэргийлэх', short:'Ядаргаа хуримтлагдаж, ажилдаа дургүй болж эхэлсэн үед.', min:10,
     why:'Ажлын ачаалал ба амралтын тэнцвэр алдагдахад ядаргаа хуримтлагддаг. Жижиг дадлууд энэ тэнцвэрийг сэргээнэ.',
-    steps:[['list','Ажлаа "чухал" ба "яаралтай"-гаар эрэмбэл','Заавал биш ажлыг хойшлуул эсвэл хуваарил.'],['battery','Ажлын дараа "унтраах" цаг тогтоо','Тодорхой цагаас хойш ажлын мессеж шалгахгүй.'],['heart','Өдөрт 20–30 минут өөртөө зарцуул','Ажилтай огт холбоогүй зүйл.'],['chat','Ачааллаа удирдлагатайгаа ярь','Санал болгох хэлбэрээр, тодорхой.']] },
+    steps:[['list','Ажлаа "чухал" ба "яаралтай"-гаар эрэмбэл','Заавал биш ажлыг хойшлуул эсвэл хуваарил.'],['battery','Ажлын дараа "унтраах" цаг тогтоо','Тодорхой цагаас хойш ажлын мессеж шалгахгүй.'],['heart','Өдөрт 20–30 минут өөртөө зарцуул','Ажилтай огт холбоогүй зүйл.'],['chat','Ачааллаа удирдлагатайгаа ярь','Санал болгох хэлбэрээр, тодорхой.']] ,
+    duty:'Жижүүр, ээлжийн хуваарь хэт ачаалалтай байвал захирагчтайгаа ярилцаж, хуваарийг тэнцвэржүүлэх боломжийг хамтдаа хайгаарай.' },
   { id:'grat', src:"Талархлын тэмдэглэл — Emmons & McCullough (2003). Нөлөө нь харьцангуй бага тул туслах арга болгон хэрэглэнэ.", cat:'mood', title:'Талархлын тэмдэглэл', short:'Өдөр бүр 3 минут зарцуулж, сэтгэл ханамжаа нэмэгдүүлэх.', min:3,
     why:'Сайн зүйлсийг ухамсартайгаар тэмдэглэх нь сэтгэл ханамжийг нэмэгдүүлж, сөрөг бодлыг тэнцвэржүүлдэг нь судалгаагаар батлагдсан.',
-    steps:[['moon','Унтахын өмнө 3 минут гарга','Өдөр бүр нэг цагт.'],['pen','Сайн болсон 3 зүйл бич','Жижиг ч хамаагүй: халуун цай, найзын мессеж.'],['star','"Яагаад болсон бэ?" гэж нэм','Өөрийн оролцоог анзаар.'],['calendar','2 долоо хоног тасралтгүй хий','Өөрчлөлтийг дараа нь эргэж уншаарай.']] },
+    steps:[['moon','Унтахын өмнө 3 минут гарга','Өдөр бүр нэг цагт.'],['pen','Сайн болсон 3 зүйл бич','Жижиг ч хамаагүй: халуун цай, найзын мессеж.'],['star','"Яагаад болсон бэ?" гэж нэм','Өөрийн оролцоог анзаар.'],['calendar','2 долоо хоног тасралтгүй хий','Өөрчлөлтийг дараа нь эргэж уншаарай.']] ,
+    duty:'Өдрийн төгсгөлд, унтахын өмнө тухайн өдөр албанд сайн болсон нэг зүйлээ тэмдэглээрэй.' },
 ];
-const TIP_CATS = [['all','Бүгд'],['stress','Стресс, түгшүүр'],['sleep','Нойр'],['mood','Сэтгэл санаа'],['relation','Харилцаа'],['work','Ажил']];
-const TIP_TONE = { stress:'#0A677A', sleep:'#3B5878', mood:'#3F7A5E', relation:'#B4553A', work:'#9A5F0E' };
+const TIP_CATS = [['all','Бүгд'],['duty','Албан үүрэгт'],['stress','Стресс, түгшүүр'],['sleep','Нойр'],['mood','Сэтгэл санаа'],['relation','Харилцаа'],['work','Ажил']];
+const TIP_TONE = { duty:'#4F5D2F', stress:'#0A677A', sleep:'#3B5878', mood:'#3F7A5E', relation:'#B4553A', work:'#9A5F0E' };
 function tipCard(t) {
   const cat = TIP_CATS.find(c => c[0] === t.cat)[1];
   return `<button class="tp-card" onclick="openTip('${t.id}')" aria-label="${t.title}">
@@ -7318,6 +7384,7 @@ function openTip(id) {
       <button class="connect-btn" style="width:auto;padding:.55rem 1.3rem" id="tp-bbtn" onclick="tpBreath()">Дасгал эхлүүлэх</button></div>` : ''}
     <h4 class="tp-sh">Хэрхэн хийх вэ</h4>
     <ol class="tp-steps">${t.steps.map(([ic, h, d], i) => `<li><span class="tp-ic" style="color:${TIP_TONE[t.cat]}">${tpIcon(ic)}<b>${i + 1}</b></span><div><strong>${h}</strong><p>${d}</p></div></li>`).join('')}</ol>
+    ${t.duty ? `<div class="tp-duty"><span class="tp-duty-ic">${tpIcon('shield')}</span><div><b>Албан үүрэгт</b><p>${t.duty}</p></div></div>` : ''}
     ${t.src ? `<p class="tp-src"><b>Эх сурвалж:</b> ${t.src}</p>` : ''}
     <div class="tp-note">Эдгээр нь өөрийгөө дэмжих аргууд. Байдал тань 2 долоо хоногоос удаан үргэлжилж, өдөр тутмын амьдралд саад болж байвал сэтгэл зүйчтэй уулзаарай. Яаралтай үед мэргэжилтэнтэй шууд холбогдоорой.</div>
   </div><div class="modal-actions"><button class="modal-close" onclick="tpStop();closeModal()">Хаах</button><button class="modal-close" onclick="tpStop();closeModal();goto('pros')">Мэргэжилтэнтэй холбогдох</button><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem" onclick="tpStop();closeModal();goto('tests')">Тест бөглөх</button></div>`);
@@ -8968,7 +9035,7 @@ function riskAlertLabel(reason) {
   if (reason === 'trend_7d') return '🟠 7 хоногийн доогуур сэтгэл санаа';
   if (reason === 'trend_14d') return '🟠 14 хоногийн доогуур сэтгэл санаа';
   if (reason === 'trend_30d') return '🟠 1 сарын доогуур сэтгэл санаа';
-  return reason;
+  return esc(reason);
 }
 
 async function loadRiskAlertsForPro() {
@@ -9055,7 +9122,7 @@ async function renderProOnlineConsultButton() {
   if (session?.status === 'approved' && session.video_room) {
     el.innerHTML = `
       <div style="text-align:center;color:var(--gold);font-size:.85rem;font-weight:700;margin-bottom:.5rem;">🟢 Онлайн зөвлөгөө зөвшөөрөгдсөн</div>
-      <a href="${session.video_room}" target="_blank" style="display:block;text-align:center;text-decoration:none;background:var(--gold);color:#fff;border-radius:12px;padding:.75rem;font-size:.92rem;font-weight:700;margin-bottom:.5rem;">🎥 Дуудлагад нэгдэх</a>
+      <a href="${session.video_room}" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;text-decoration:none;background:var(--gold);color:#fff;border-radius:12px;padding:.75rem;font-size:.92rem;font-weight:700;margin-bottom:.5rem;">🎥 Дуудлагад нэгдэх</a>
       <button onclick="proRevokeOnlineConsult('${currentProChatUserId}','${myProId}')" style="width:100%;background:none;border:1px solid var(--red,#c0392b);color:var(--red,#c0392b);border-radius:12px;padding:.6rem;font-size:.85rem;cursor:pointer;">Зөвшөөрлийг цуцлах</button>`;
   } else {
     el.innerHTML = `<button onclick="proApproveOnlineConsult('${currentProChatUserId}','${myProId}')" style="width:100%;background:var(--gold);color:#fff;border:none;border-radius:12px;padding:.75rem;font-size:.92rem;font-weight:700;cursor:pointer;">🎥 Онлайн зөвлөгөөг зөвшөөрөх</button>`;
@@ -9142,7 +9209,7 @@ async function renderUserOnlineConsultButton() {
   if (!el || !currentUser?.id || !currentChatProId) return;
   const session = await getVideoSessionStatus(currentUser.id, currentChatProId);
   if (session?.status === 'approved' && session.video_room) {
-    el.innerHTML = `<a href="${session.video_room}" target="_blank" style="display:block;text-align:center;text-decoration:none;background:var(--gold);color:#fff;border-radius:12px;padding:.75rem;font-size:.92rem;font-weight:700;">🎥 Онлайн зөвлөгөө — Дуудлагад нэгдэх</a>`;
+    el.innerHTML = `<a href="${session.video_room}" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;text-decoration:none;background:var(--gold);color:#fff;border-radius:12px;padding:.75rem;font-size:.92rem;font-weight:700;">🎥 Онлайн зөвлөгөө — Дуудлагад нэгдэх</a>`;
   } else {
     el.innerHTML = `<div style="text-align:center;background:var(--panel-2);color:var(--sub);border-radius:12px;padding:.75rem;font-size:.88rem;opacity:.6;cursor:not-allowed;">🎥 Онлайн зөвлөгөө <span style="display:block;font-size:.72rem;margin-top:.2rem;">Мэргэжилтэн зөвшөөрсний дараа идэвхжинэ</span></div>`;
   }
@@ -9288,11 +9355,11 @@ async function loadUnitStress() {
     return;
   }
   if (!data || !data.length) {
-    el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор хангалттай тестийн өгөгдөл алга.</div>';
+    el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Хангалттай олон хүн тест бөглөсний дараа нэгжийн дүн энд харагдана.</div>';
     return;
   }
   el.innerHTML = data.map(u => `
-    <div class="unit-row"><div class="unit-name">${BRANCH_LABELS[u.branch] || u.branch}</div><div class="unit-track"><div class="unit-fill" style="width:${u.avg_stress_pct}%;"></div></div><div class="unit-pct">${u.avg_stress_pct}%</div></div>
+    <div class="unit-row"><div class="unit-name">${BRANCH_LABELS[u.branch] || esc(u.branch)}</div><div class="unit-track"><div class="unit-fill" style="width:${u.avg_stress_pct}%;"></div></div><div class="unit-pct">${u.avg_stress_pct}%</div></div>
   `).join('');
 }
 

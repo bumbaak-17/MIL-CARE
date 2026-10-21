@@ -12,8 +12,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js" integrity="sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js" integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <style>
-  html:not(.fb-on) .fb-only{display:none !important;}
-  html.fb-on .g-only{display:none !important;}
   :root{
     /* Дизайны токен: гүн, итгэлтэй "signal navy" үндсэн өнгө, хүрлийн акцент,
        монгол кирилл (Өө/Үү-г оролцуулаад) бүрэн дэмждэг Inter фонт */
@@ -1111,16 +1109,12 @@
 
     <div id="ob-step-auth">
       <p class="ob-step-title">1. Нэвтрэх</p>
-      <p class="ob-step-sub g-only">Аюулгүй, найдвартай байлгах үүднээс баталгаажсан Google бүртгэлээр нэвтэрнэ.</p><p class="ob-step-sub fb-only">Аюулгүй, найдвартай байлгах үүднээс баталгаажсан Google эсвэл Facebook бүртгэлээр нэвтэрнэ.</p>
-      <button type="button" onclick="obGoogleAuth()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:.6rem;border:1px solid var(--line);border-radius:12px;padding:.8rem .9rem;background:#fff;color:#3c4043;font-family:inherit;font-size:.97rem;font-weight:600;cursor:pointer;margin-bottom:.6rem;">
+      <p class="ob-step-sub">Аюулгүй, найдвартай байлгах үүднээс баталгаажсан Google бүртгэлээр нэвтэрнэ.</p>
+      <button type="button" onclick="obGoogleAuth()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:.6rem;border:1px solid var(--line);border-radius:12px;padding:.8rem .9rem;background:#fff;color:#3c4043;font-family:inherit;font-size:.97rem;font-weight:600;cursor:pointer;margin-bottom:1rem;">
         <svg width="19" height="19" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.9-2.26 5.36-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
         Google (Gmail) бүртгэлээр нэвтрэх
       </button>
-      <button type="button" class="fb-only" onclick="obFacebookAuth()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:.6rem;border:1px solid #1877F2;border-radius:12px;padding:.8rem .9rem;background:#1877F2;color:#fff;font-family:inherit;font-size:.97rem;font-weight:600;cursor:pointer;margin-bottom:1rem;">
-        <svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#fff"/><path fill="#1877F2" d="M13.4 24v-8.4h2.8l.4-3.3h-3.2v-2.1c0-.95.27-1.6 1.63-1.6h1.74V5.65a23 23 0 0 0-2.54-.13c-2.52 0-4.24 1.54-4.24 4.36v2.42H7.17v3.3H10V24z"/></svg>
-        Facebook бүртгэлээр нэвтрэх
-      </button>
-      <p class="g-only" style="font-size:.76rem;color:var(--sub);text-align:center;margin:0;">Нэвтэрсэн бүртгэл тань автоматаар хадгалагдана — дараа удаа нэвтрэхэд мөн адил товч дарахад л хангалттай.</p><p class="fb-only" style="font-size:.76rem;color:var(--sub);text-align:center;margin:0;">Дараа удаа нэвтрэхдээ анх сонгосон товчоо (Google эсвэл Facebook) дарна уу — өөр товч дарвал тусдаа шинэ бүртгэл үүсч болно.</p>
+      <p style="font-size:.76rem;color:var(--sub);text-align:center;margin:0;">Нэвтэрсэн бүртгэл тань автоматаар хадгалагдана — дараа удаа нэвтрэхэд мөн адил товч дарахад л хангалттай.</p>
       <div id="ob-auth-msg" style="font-size:.82rem;margin-top:.9rem;text-align:center;"></div>
     </div>
 
@@ -1390,6 +1384,11 @@
             <div class="quick-title">Цэргийн гэрээт, хугацаат алба хаагчдаас авах тест</div>
             <div class="quick-sub" id="military-test-count-sub">Тестийн материал</div>
           </div>
+          <div class="quick-card" onclick="goto('individual-exercise')">
+            <div class="quick-icon">💬</div>
+            <div class="quick-title">Ганцаарчилсан уулзалтын үед хийгдэх дасгал</div>
+            <div class="quick-sub" id="individual-exercise-count-sub">Дасгалын материал</div>
+          </div>
         </div>
       </div>
 
@@ -1420,6 +1419,12 @@
         <div class="page-head"><h2>Цэргийн гэрээт болон хугацаат цэргийн алба хаагчдаас авах тест</h2><p>Цэргийн гэрээт болон хугацаат цэргийн алба хаагчдад зориулсан тестийн материал, PDF баримт бичгүүд. Зөвхөн админ, бүртгэлтэй сэтгэл зүйчдэд харагдана.</p></div>
         <button class="modal-close" style="margin-bottom:1.2rem;" onclick="goto('psy-corner')">← Сэтгэл зүйчдийн булан руу буцах</button>
         <div id="military-test-list"></div>
+      </div>
+
+      <div id="view-individual-exercise" class="view">
+        <div class="page-head"><h2>Ганцаарчилсан уулзалтын үед хийгдэх дасгал</h2><p>Ганцаарчилсан уулзалтын үед ашиглах дасгалын PDF баримт бичгүүд. Зөвхөн админ, бүртгэлтэй сэтгэл зүйчдэд харагдана.</p></div>
+        <button class="modal-close" style="margin-bottom:1.2rem;" onclick="goto('psy-corner')">← Сэтгэл зүйчдийн булан руу буцах</button>
+        <div id="individual-exercise-list"></div>
       </div>
 
       <div id="view-projective" class="view">
@@ -1553,7 +1558,7 @@
         <div class="section-card" id="admin-mfa-card" style="display:none;"></div>
         <div class="section-card" id="admin-login-card">
           <div class="section-head"><h3>Админ эрх</h3></div>
-          <p style="font-size:.85rem;color:var(--sub);margin:0;">Танд админ эрх байхгүй байна. Хэрэв та MIL-CARE-ийн админ мөн бол, өөрийн <span class="g-only">Google</span><span class="fb-only">Google эсвэл Facebook</span> бүртгэлээр нэвтэрсэн эсэхээ шалгаад дахин оролдоно уу — эрх нь автоматаар танигдана.</p>
+          <p style="font-size:.85rem;color:var(--sub);margin:0;">Танд админ эрх байхгүй байна. Хэрэв та MIL-CARE-ийн админ мөн бол, өөрийн Google бүртгэлээр нэвтэрсэн эсэхээ шалгаад дахин оролдоно уу — эрх нь автоматаар танигдана.</p>
         </div>
 
         <div id="admin-panel" style="display:none;">
@@ -1561,7 +1566,7 @@
           <div class="section-card" id="admin-registered-users-section" style="display:none;">
             <button class="modal-close" style="margin-bottom:1rem;" onclick="hideAdminUsersView()">← Буцах</button>
             <div class="section-head"><h3>📧 Хэрэглэгч (зөвхөн админ)</h3></div>
-            <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Google болон Facebook бүртгэлээр нэвтэрсэн хэрэглэгчдийн жагсаалт — нэвтэрсэн аргаар нь тус тусад нь ангилсан.</p>
+            <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Google бүртгэлээр нэвтэрсэн хэрэглэгчдийн жагсаалт — нэвтэрсэн аргаар нь тус тусад нь ангилсан.</p>
             <div id="registered-users-list"></div>
           </div>
           <div class="section-card" id="admin-test-results-section" style="display:none;">
@@ -1688,13 +1693,14 @@
           <div class="section-card">
             <div class="section-head collapsible" onclick="toggleAdminSection('docs-mod')"><h3>📄 Тушаал, баримт бичиг удирдах</h3><span class="collapse-arrow" id="docs-mod-arrow">▾</span></div>
             <div class="collapsible-body" id="docs-mod-body">
-              <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Энд байршуулсан PDF баримт бичгүүд Сэтгэл зүйчдийн булангийн "Тушаал" хэсэгт админ болон бүртгэлтэй сэтгэл зүйчдэд харагдана.</p>
+              <p style="font-size:.8rem;color:var(--sub);margin:0 0 1rem;">Энд байршуулсан PDF баримт бичгүүд Сэтгэл зүйчдийн булангийн сонгосон хэсэгт админ болон бүртгэлтэй сэтгэл зүйчдэд харагдана.</p>
               <div class="filter-bar" style="margin-bottom:.7rem;">
                 <input type="text" id="doc-upload-title" placeholder="Баримт бичгийн нэр (жишээ: Сэтгэл зүйн хангалтыг зохион байгуулах заавар)" style="flex:1;min-width:220px;border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
                 <select id="doc-upload-category" style="border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;font-family:inherit;font-size:.88rem;background:#fff;color:var(--cream);">
                   <option value="tushaal">Тушаал</option>
                   <option value="guide">Гарын авлага</option>
                   <option value="military_test">Цэргийн алба хаагчдаас авах тест</option>
+                  <option value="individual_exercise">Ганцаарчилсан уулзалтын үед хийгдэх дасгал</option>
                 </select>
                 <input type="file" id="doc-upload-file" accept="application/pdf" style="border:1px solid var(--line);border-radius:12px;padding:.5rem .6rem;font-family:inherit;font-size:.85rem;background:#fff;color:var(--cream);">
               </div>
@@ -1944,7 +1950,7 @@ async function ensureUser() {
   }
   const uid = session.user.id;
   const userEmail = session.user.email || null;
-  const userIsAnon = (typeof session.user.is_anonymous === 'boolean') ? session.user.is_anonymous : !userEmail; // Google/Facebook-ээр нэвтэрсэн бол байнгын бүртгэл
+  const userIsAnon = (typeof session.user.is_anonymous === 'boolean') ? session.user.is_anonymous : !userEmail; // Google-ээр нэвтэрсэн бол байнгын бүртгэл
   const userProvider = (session.user.app_metadata && session.user.app_metadata.provider) || null;
 
   // 2. Тухайн auth хэрэглэгчид харгалзах users мөр байгаа эсэхийг шалгах
@@ -1956,7 +1962,7 @@ async function ensureUser() {
     return;
   }
 
-  // 3a. Google/Facebook-ээр нэвтрээгүй (нэргүй) session бол users мөр үүсгэхгүй — нэвтрэх дэлгэц л харагдана
+  // 3a. Google-ээр нэвтрээгүй (нэргүй) session бол users мөр үүсгэхгүй — нэвтрэх дэлгэц л харагдана
   if (userIsAnon) { currentUser = { id: uid, handle: '', email: userEmail, provider: userProvider, isAnonymous: true }; return; }
   // 3. Байхгүй бол шинэ, нэрээ нуусан профайл үүсгэх (id нь auth.uid()-тэй яг адилхан)
   const handle = randomHandle();
@@ -1973,7 +1979,7 @@ function renderAuthSection() {
   mcSetHTML(el, `
     <h3><span class="pf-hi"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span>Нэвтэрсэн бүртгэл</h3>
     <div class="pf-acct"><div class="g">${(OAUTH_NAMES[currentUser.provider] || 'G').charAt(0)}</div><div><b>${esc(currentUser.email || OAUTH_NAMES[currentUser.provider] || '—')}</b><span>${OAUTH_NAMES[currentUser.provider] || 'Бүртгэл'}-ээр нэвтэрсэн</span></div></div>
-    <p style="margin:0 0 .4rem;">Та <b>${esc(currentUser.email || OAUTH_NAMES[currentUser.provider] || '—')}</b> ${currentUser.email && OAUTH_NAMES[currentUser.provider] ? '(' + OAUTH_NAMES[currentUser.provider] + ') ' : ''}бүртгэлээр нэвтэрсэн байна. Өөр утас, компьютер дээрээс ч мөн адил ${OAUTH_NAMES[currentUser.provider] || (FACEBOOK_LOGIN_ENABLED ? 'Google эсвэл Facebook' : 'Google')} товч дараад, энэ бүртгэлээрээ шууд нэвтэрч, өгөгдлөө үргэлжлүүлэн ашиглах боломжтой.</p>
+    <p style="margin:0 0 .4rem;">Та <b>${esc(currentUser.email || OAUTH_NAMES[currentUser.provider] || '—')}</b> ${currentUser.email && OAUTH_NAMES[currentUser.provider] ? '(' + OAUTH_NAMES[currentUser.provider] + ') ' : ''}бүртгэлээр нэвтэрсэн байна. Өөр утас, компьютер дээрээс ч мөн адил ${OAUTH_NAMES[currentUser.provider] || 'Google'} товч дараад, энэ бүртгэлээрээ шууд нэвтэрч, өгөгдлөө үргэлжлүүлэн ашиглах боломжтой.</p>
   `);
 }
 
@@ -2042,7 +2048,7 @@ function togglePwVisibility(inputId, btn) {
   else { input.type = 'password'; btn.textContent = '👁️'; }
 }
 
-// Google/Facebook руу шилжихийн өмнө, хоосон (branch/personnel_type тохируулаагүй) anonymous
+// Google руу шилжихийн өмнө, хоосон (branch/personnel_type тохируулаагүй) anonymous
 // хэрэглэгчийн мөрийг устгаж, дата санд хэрэггүй "orphan" мөр хуримтлагдахаас сэргийлнэ.
 async function cleanupEmptyAnonBeforeSwitch() {
   if (!currentUser?.id || currentUser.isAnonymous === false) return;
@@ -2078,23 +2084,20 @@ function obGotoBranchStep() {
   renderObBranch();
 }
 
-/* Facebook нэвтрэлт: Meta аппыг Live болгосны дараа true болгоно */
-const FACEBOOK_LOGIN_ENABLED = false;
-if (FACEBOOK_LOGIN_ENABLED) document.documentElement.classList.add('fb-on');
-const OAUTH_NAMES = { google:'Google', facebook:'Facebook' };
+/* Нэвтрэлт: зөвхөн Google */
+const OAUTH_NAMES = { google:'Google' };
 async function obOAuth(provider) {
+  if (provider !== 'google') return;
   const name = OAUTH_NAMES[provider] || provider;
   const msg = document.getElementById('ob-auth-msg');
   msg.style.color = 'var(--sub)'; msg.textContent = name + ' руу шилжиж байна...';
   await cleanupEmptyAnonBeforeSwitch();
   const opts = { redirectTo: location.origin + location.pathname };
-  if (provider === 'facebook') opts.scopes = 'email';
   const { error } = await sb.auth.signInWithOAuth({ provider, options: opts });
   if (error) { msg.style.color = 'var(--red)'; msg.textContent = name + '-ээр нэвтрэхэд алдаа гарлаа: ' + error.message; }
   // Амжилттай бол хөтөч тухайн үйлчилгээ рүү шилжинэ; буцаж ирэхэд session автоматаар тогтоно
 }
 function obGoogleAuth() { return obOAuth('google'); }
-function obFacebookAuth() { if (!FACEBOOK_LOGIN_ENABLED) return; return obOAuth('facebook'); }
 
 function renderObBranch() {
   const el = document.getElementById('ob-branch-grid');
@@ -2445,7 +2448,7 @@ document.getElementById('sidebar-backdrop').addEventListener('click', () => docu
 
 function goto(view, pushState) {
   if (!document.getElementById('view-' + view)) view = 'home'; // хасагдсан/буруу хэсэг рүү орвол нүүр хуудас
-  if ((view === 'psy-corner' || view === 'group-exercise' || view === 'orders' || view === 'guides' || view === 'military-test') && !(isAdmin || myProId)) {
+  if ((view === 'psy-corner' || view === 'group-exercise' || view === 'orders' || view === 'guides' || view === 'military-test' || view === 'individual-exercise') && !(isAdmin || myProId)) {
     showToast('Энэ хэсэг зөвхөн админ болон бүртгэлтэй сэтгэл зүйчдэд нээлттэй.', 'error');
     view = 'home';
   }
@@ -2466,6 +2469,7 @@ function goto(view, pushState) {
   if (view === 'orders') { loadOrders('tushaal', 'orders-list', 'orders-count-sub'); }
   if (view === 'guides') { loadOrders('guide', 'guides-list', 'guides-count-sub'); }
   if (view === 'military-test') { loadOrders('military_test', 'military-test-list', 'military-test-count-sub'); }
+  if (view === 'individual-exercise') { loadOrders('individual_exercise', 'individual-exercise-list', 'individual-exercise-count-sub'); }
   if (view === 'hr-portal') { loadHrResults(); }
   if (view === 'projective') { renderProjectiveMethods(); }
   if (view === 'analytics') { loadAnalyticsSummary(); loadMonthlyAnalysis(); loadPvtTrend(); }
@@ -3084,7 +3088,7 @@ async function addDiary() {
   const { error } = await sb.from('mood_entries').insert({ user_id: currentUser.id, mood: emoObj.key, note: text });
   if (error) { showToast('Хадгалахад алдаа гарлаа: ' + error.message, 'error'); return; }
 
-  // 2) Нийтийн санал (Facebook маягийн feed рүү, нэрээ нуусан тогтмол хэрэглэгчийн нэрээр)
+  // 2) Нийтийн санал (олон нийтийн сүлжээний маягийн feed рүү, нэрээ нуусан тогтмол хэрэглэгчийн нэрээр)
   const { error: postErr } = await sb.from('posts').insert({
     user_id: currentUser.id, anon_handle: currentUser.handle, text: `${emoObj.e} ${text}`, likes: 0
   });
@@ -3167,7 +3171,7 @@ async function loadOrders(category, elId, subElId) {
   if (!data || data.length===0) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;padding:.6rem 0;">Одоогоор баримт бичиг байршуулаагүй байна.</div>'; return; }
   mcSetHTML(el, data.map(d => `
     <div class="section-card" style="display:flex;align-items:center;gap:.8rem;margin-bottom:.8rem;">
-      <div style="font-size:1.6rem;flex-shrink:0;">${category === 'guide' ? '📘' : category === 'military_test' ? '🎖️' : '📄'}</div>
+      <div style="font-size:1.6rem;flex-shrink:0;">${category === 'guide' ? '📘' : category === 'military_test' ? '🎖️' : category === 'individual_exercise' ? '💬' : '📄'}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-weight:700;font-size:.92rem;">${esc(d.title)}</div>
         <div style="font-size:.78rem;color:var(--sub);">${d.file_size ? (Math.round(d.file_size/1024)) + ' KB' : ''}</div>
@@ -3198,10 +3202,10 @@ async function loadAdminDocuments() {
   if (!data || data.length===0) { el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;">Одоогоор баримт бичиг байршуулаагүй байна.</div>'; return; }
   mcSetHTML(el, data.map(d => `
     <div class="comment-row" style="display:flex;gap:.5rem;padding:.6rem 0;border-top:1px solid var(--line);align-items:center;">
-      <div style="font-size:1.3rem;flex-shrink:0;">${d.category === 'guide' ? '📘' : d.category === 'military_test' ? '🎖️' : '📄'}</div>
+      <div style="font-size:1.3rem;flex-shrink:0;">${d.category === 'guide' ? '📘' : d.category === 'military_test' ? '🎖️' : d.category === 'individual_exercise' ? '💬' : '📄'}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-size:.85rem;font-weight:700;">${esc(d.title)}</div>
-        <div style="font-size:.78rem;color:var(--sub);">${d.category === 'guide' ? 'Гарын авлага' : d.category === 'military_test' ? 'Цэргийн алба хаагчдаас авах тест' : 'Тушаал'} · ${timeAgo(d.created_at)}</div>
+        <div style="font-size:.78rem;color:var(--sub);">${d.category === 'guide' ? 'Гарын авлага' : d.category === 'military_test' ? 'Цэргийн алба хаагчдаас авах тест' : d.category === 'individual_exercise' ? 'Ганцаарчилсан уулзалтын үед хийгдэх дасгал' : 'Тушаал'} · ${timeAgo(d.created_at)}</div>
       </div>
       <button onclick="editDocumentTitle('${escAttr(d.id)}', '${escAttr(d.title||'')}')" title="Засах" style="background:none;border:none;color:var(--gold);cursor:pointer;font-size:.85rem;flex-shrink:0;">✏️</button>
       <button onclick="adminDeleteDocument('${escAttr(d.id)}','${escAttr(d.storage_path)}')" title="Устгах" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;flex-shrink:0;">🗑</button>
@@ -8543,7 +8547,7 @@ async function scoreMBTI16Test() {
   `);
 }
 
-/* ================= FEED (Facebook маягийн нийтийн пост + сэтгэгдэл, Supabase-тэй холбогдсон) ================= */
+/* ================= FEED (олон нийтийн сүлжээний маягийн нийтийн пост + сэтгэгдэл, Supabase-тэй холбогдсон) ================= */
 let feedState = [];
 let COMMENTS_BY_POST = {};
 let openCommentPosts = new Set();
@@ -8677,7 +8681,7 @@ async function deletePost(postId) {
   loadPosts();
 }
 
-/* ================= УРВАЛ (Like/Love/Care/Sad — Facebook маягийн) ================= */
+/* ================= УРВАЛ (Like/Love/Care/Sad — олон нийтийн сүлжээний маягийн) ================= */
 const REACTIONS = [
   { key:'like', emo:'👍', label:'Лайк' },
   { key:'love', emo:'❤️', label:'Love' },
@@ -8899,7 +8903,7 @@ function subscribeMyContentRealtime() {
     .subscribe();
 }
 
-/* ================= МЭРГЭЖИЛТНИЙ ШИНЭ ЗУРВАСЫН МЭДЭГДЭЛ (Facebook-ийн badge шиг) ================= */
+/* ================= МЭРГЭЖИЛТНИЙ ШИНЭ ЗУРВАСЫН МЭДЭГДЭЛ (тоон тэмдэг) ================= */
 let proUnreadCount = 0;
 let proGlobalRealtimeChannel = null;
 
@@ -10035,7 +10039,7 @@ function closeAdminChat() {
 let regUsersCache = [], regUsersFilter = 'all';
 const REG_PROV = {
   google:   { name:'Google',   col:'#3c4043', bg:'#F1F3F4' },
-  facebook: { name:'Facebook', col:'#fff',    bg:'#1877F2' },
+  facebook: { name:'Facebook (хуучин)', col:'#fff', bg:'#1877F2' }, // өмнө нь бүртгүүлсэн хэрэглэгч байвал л харагдана
   email:    { name:'Имэйл',    col:'#063F4A', bg:'rgba(10,103,122,.12)' },
   unknown:  { name:'Тодорхойгүй', col:'#5C6A82', bg:'#EEF2F8' },
 };
@@ -10080,7 +10084,7 @@ function renderRegisteredUsers() {
         <td style="padding:.5rem .4rem;color:var(--sub);">${BRANCH_LABELS[u.branch] || '—'}</td>
         <td style="padding:.5rem .4rem;color:var(--sub);">${formatUbFull(u.registered_at)}</td></tr>`).join('')}</tbody></table>`;
   const summary = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.7rem;margin:0 0 1rem;">
-      ${[['Нийт', all.length, 'var(--cream)'], ['Google', cnt('google'), '#3c4043'], ['Facebook', cnt('facebook'), '#1877F2']].map(([l, n, c]) => `<div style="border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;background:#fff;"><div style="font-size:.75rem;color:var(--sub);font-weight:700;">${l}</div><div style="font-size:1.5rem;font-weight:800;color:${c};">${n.toLocaleString('mn-MN')}</div></div>`).join('')}</div>`;
+      ${[['Нийт', all.length, 'var(--cream)'], ['Google', cnt('google'), '#3c4043']].map(([l, n, c]) => `<div style="border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;background:#fff;"><div style="font-size:.75rem;color:var(--sub);font-weight:700;">${l}</div><div style="font-size:1.5rem;font-weight:800;color:${c};">${n.toLocaleString('mn-MN')}</div></div>`).join('')}</div>`;
   const tabs = `<div style="display:flex;gap:.5rem;flex-wrap:wrap;margin:0 0 1rem;">${tab('all', 'Бүгд', all.length)}${groups.map(k => tab(k, REG_PROV[k].name, cnt(k))).join('')}</div>`;
   let body;
   if (!regUsersHasProvider) {
@@ -10090,7 +10094,7 @@ function renderRegisteredUsers() {
   } else {
     body = table(all.filter(u => u.provider === regUsersFilter));
   }
-  mcSetHTML(el, (regUsersHasProvider ? summary + tabs : `<div class="privacy-note" style="margin-bottom:.9rem;">Нэвтэрсэн аргаар (Google / Facebook) ангилахын тулд Supabase дээр <b>get_registered_users_v2</b> SQL функцийг нэмнэ үү.</div>`) + body +
+  mcSetHTML(el, (regUsersHasProvider ? summary + tabs : `<div class="privacy-note" style="margin-bottom:.9rem;">Нэвтэрсэн аргаар ангилахын тулд Supabase дээр <b>get_registered_users_v2</b> SQL функцийг нэмнэ үү.</div>`) + body +
     `<div class="privacy-note" style="margin-top:.9rem;">Энэ жагсаалт зөвхөн баталгаажсан админд харагдана.</div>`);
 }
 

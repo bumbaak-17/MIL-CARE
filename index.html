@@ -713,6 +713,13 @@
   .cmp-rep th{background:var(--line);}
   .cmp-rep h1{font-size:1.25rem;margin:0 0 .2rem;}.cmp-rep h2{font-size:1rem;margin:1.1rem 0 .4rem;}.cmp-rep .sub{font-size:.8rem;color:var(--sub);}
   .cmp-fill .q-block{margin-bottom:1rem;}
+  .cmp-chart{width:100%;height:auto;display:block;margin:.3rem 0 .2rem;}.cmp-chart.cmp-bars{max-width:620px;}
+  .cmp-leg{display:flex;flex-wrap:wrap;gap:.35rem .9rem;font-size:.76rem;margin:.1rem 0 .7rem;}
+  .cmp-leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:.3rem;vertical-align:-1px;}
+  .cmp-band{border-radius:12px;padding:.7rem .9rem;margin:.6rem 0;font-size:.88rem;border:1px solid var(--line);}
+  .cmp-band.ok{background:#EEF7F1;border-color:#CFE6D8;}.cmp-band.watch{background:#FFF6E6;border-color:#F1DDB5;}.cmp-band.alert{background:#FDEEEC;border-color:#F3CCC6;}
+  .cmp-rep ul{margin:.3rem 0 .6rem;padding-left:1.2rem;}.cmp-rep li{margin:.25rem 0;font-size:.86rem;}
+  .cmp-attn{display:inline-flex;align-items:center;gap:.3rem;font-size:.78rem;white-space:nowrap;cursor:pointer;}
   .ob-step-title{font-weight:800;font-size:1.1rem;margin:0 0 .2rem;color:var(--cream);}
   .ob-step-sub{font-size:.85rem;color:var(--sub);margin:0 0 .3rem;}  /* ---------- Toast мэдэгдэл (browser-ийн alert()-ийг орлоно) ---------- */
   #toast-wrap{position:fixed;bottom:1.3rem;right:1.3rem;z-index:200;display:flex;flex-direction:column;gap:.6rem;
@@ -2643,7 +2650,7 @@ async function cmpPreview(id) {
     ${c.description ? `<p class="msub" style="white-space:pre-line;">${esc(c.description)}</p>` : ''}
     ${c.questions.map((q, qi) => `<div class="q-block"><div class="q-text">${qi + 1}. ${esc(q.t)} <span class="cmp-chip">${CMP_KINDS[q.k] || ''}</span></div>
       <div style="font-size:.84rem;color:var(--sub);">${q.o.map((o, oi) => esc(o) + (q.s ? ` (${esc(q.s[oi])})` : '')).join(' · ')}</div></div>`).join('')}
-    ${c.levels?.length ? `<div class="q-block"><div class="q-text">Дүгнэлтийн түвшин</div>${c.levels.map(l => `<div style="font-size:.84rem;margin:.3rem 0;"><b>${esc(l.min)}–${esc(l.max)} оноо: ${esc(l.label)}</b>${l.text ? ' — ' + esc(l.text) : ''}</div>`).join('')}</div>` : ''}
+    ${c.levels?.length ? `<div class="q-block"><div class="q-text">Дүгнэлтийн түвшин</div>${c.levels.map(l => `<div style="font-size:.84rem;margin:.3rem 0;"><b>${esc(l.min)}–${esc(l.max)} оноо: ${esc(l.label)}</b>${l.attn ? ' <span class="cmp-chip closed">анхаарал шаардлагатай</span>' : ''}${l.text ? ' — ' + esc(l.text) : ''}</div>`).join('')}</div>` : ''}
     <div class="modal-actions"><button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="closeModal()">Хаах</button></div>`);
   document.getElementById('modal-overlay').classList.add('open');
 }
@@ -2652,7 +2659,7 @@ async function cmpPreview(id) {
 function cmpSum(list) {
   const t = { n: 0, units: 0, score_sum: 0, level_counts: {}, q_counts: null };
   list.forEach(x => {
-    t.n += +x.n || 0; t.units += +(x.units ?? 1) || 0; t.score_sum += +x.score_sum || 0;
+    t.n += +x.n || 0; t.units += +(x.units ?? 1) || 0; t.score_sum += +x.score_sum || 0; t.registered = (t.registered || 0) + (+x.registered || 0);
     Object.entries(x.level_counts || {}).forEach(([k, v]) => { t.level_counts[k] = (t.level_counts[k] || 0) + (+v || 0); });
     if (!t.q_counts) t.q_counts = (x.q_counts || []).map(r => r.map(() => 0));
     (x.q_counts || []).forEach((r, i) => r.forEach((v, j) => { if (t.q_counts[i]) t.q_counts[i][j] += +v || 0; }));
@@ -2662,32 +2669,169 @@ function cmpSum(list) {
 const cmpPct = (k, n) => n ? Math.round(k * 1000 / n) / 10 : 0;
 function cmpHasScore(qs) { return qs.some(q => q.k !== 'choice'); }
 function cmpMax(qs) { return qs.reduce((s, q) => s + (q.k !== 'choice' ? Math.max(...q.s.map(Number)) : 0), 0); }
-function cmpConclusion(rep, agg) {
-  const qs = rep.questions, lv = rep.levels || [], n = agg.n;
-  if (!n) return '<p>Тестийг хараахан хэн ч бөглөөгүй байна.</p>';
-  let h = `<p>Тестийг нийт <b>${n}</b> хүн бөглөсөн.`;
-  if (cmpHasScore(qs)) h += ` Дундаж оноо <b>${Math.round(agg.score_sum * 10 / n) / 10}</b> (боломжит дээд оноо ${cmpMax(qs)}).`;
-  h += '</p>';
-  if (lv.length && cmpHasScore(qs)) {
-    let top = -1, topK = -1;
-    lv.forEach((l, i) => { const k = +agg.level_counts[i] || 0; if (k > topK) { topK = k; top = i; } });
-    if (topK > 0) h += `<p>Хамгийн олон буюу <b>${cmpPct(topK, n)}%</b> нь «<b>${esc(lv[top].label)}</b>» түвшинд байна.</p>`;
-    h += '<table><tr><th>Түвшин</th><th>Оноо</th><th>Хүн</th><th>%</th><th>Дүгнэлт</th></tr>' + lv.map((l, i) => {
-      const k = +agg.level_counts[i] || 0;
-      return `<tr><td><b>${esc(l.label)}</b></td><td>${esc(l.min)}–${esc(l.max)}</td><td>${k}</td><td>${cmpPct(k, n)}%</td><td>${k ? esc(l.text || '') : ''}</td></tr>`;
-    }).join('') + '</table>';
+const CMP_OK_COL = ['#3F7A5E', '#0A677A', '#5B8DB8', '#7C8CA3', '#6E9E86'];
+const CMP_ATTN_COL = ['#C2410C', '#B42318', '#8E1B12', '#D97706'];
+function cmpLevelColors(lv) { let a = 0, o = 0; return lv.map(l => l.attn ? CMP_ATTN_COL[a++ % CMP_ATTN_COL.length] : CMP_OK_COL[o++ % CMP_OK_COL.length]); }
+const cmpR1 = v => Math.round(v * 10) / 10;
+// Нэг бүлгийн (анги/командлал/нийт) үзүүлэлт
+function cmpStats(rep, x) {
+  const lv = rep.levels || [], n = +x.n || 0, reg = +x.registered || 0;
+  const attnK = lv.reduce((s2, l, i) => s2 + (l.attn ? (+(x.level_counts || {})[i] || 0) : 0), 0);
+  return { n, reg, cov: reg ? cmpPct(n, reg) : null, avg: n ? cmpR1((+x.score_sum || 0) / n) : null,
+           attnK, attnPct: cmpPct(attnK, n), hasAttn: lv.some(l => l.attn) };
+}
+// Өндөр оноо эрсдэлтэй юу, бага оноо эрсдэлтэй юу (анхаарал шаардлагатай түвшний байрлалаар)
+function cmpLowIsBad(lv) {
+  const at = lv.filter(l => l.attn), ok = lv.filter(l => !l.attn);
+  if (!at.length || !ok.length) return false;
+  const m = arr => arr.reduce((s2, l) => s2 + (+l.min + +l.max) / 2, 0) / arr.length;
+  return m(at) < m(ok);
+}
+// Асуулт бүрийн асуудлын илрэл (0–100%): дундаж оноо нь боломжит хүрээний хаана байгаа
+function cmpQuestionSeverity(rep, agg) {
+  const low = cmpLowIsBad(rep.levels || []);
+  return rep.questions.map((q, qi) => {
+    if (q.k === 'choice') return null;
+    const cnt = (agg.q_counts || [])[qi] || [], n = cnt.reduce((a2, b2) => a2 + b2, 0);
+    if (!n) return null;
+    const sc = q.s.map(Number), mn = Math.min(...sc), mx = Math.max(...sc);
+    if (mx === mn) return null;
+    const mean = cnt.reduce((a2, k, j) => a2 + k * sc[j], 0) / n;
+    let r = (mean - mn) / (mx - mn); if (low) r = 1 - r;
+    return { qi, t: q.t, pct: Math.round(r * 100) };
+  }).filter(Boolean).sort((a2, b2) => b2.pct - a2.pct);
+}
+/* --- SVG графикууд --- */
+function cmpStackSvg(parts, total) {
+  const W = 1000, H = 30; let x = 0;
+  const rects = parts.filter(p => p.k > 0).map(p => {
+    const w = total ? p.k / total * W : 0, pc = cmpPct(p.k, total);
+    const r = `<rect x="${x.toFixed(1)}" y="0" width="${Math.max(w, 0.5).toFixed(1)}" height="${H}" fill="${p.color}"/>` +
+      (w > 56 ? `<text x="${(x + w / 2).toFixed(1)}" y="20.5" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">${pc}%</text>` : '');
+    x += w; return r;
+  }).join('');
+  return `<svg class="cmp-chart" viewBox="0 0 ${W} ${H}" role="img"><rect x="0" y="0" width="${W}" height="${H}" rx="6" fill="#E7EBF0"/>${rects}</svg>` +
+    `<div class="cmp-leg">${parts.map(p => `<span><i style="background:${p.color}"></i>${esc(p.label)} — ${p.k} (${cmpPct(p.k, total)}%)</span>`).join('')}</div>`;
+}
+function cmpBarsSvg(items, unitTxt) {
+  // Нэр нь баганын дээр (урт нэр тасрахгүй)
+  const W = 760, RW = 86, rowH = 46, H = items.length * rowH + 4, BW = W - RW;
+  const mx = Math.max(100, ...items.map(i => i.v)) || 1;
+  const rows = items.map((it, i) => {
+    const y = i * rowH, w = BW * it.v / mx;
+    return `<text x="0" y="${y + 16}" font-size="15" fill="#1d2a3a">${esc(it.label)}</text>` +
+      `<rect x="0" y="${y + 22}" width="${BW}" height="18" rx="4" fill="#EEF1F5"/>` +
+      `<rect x="0" y="${y + 22}" width="${Math.max(w, 1).toFixed(1)}" height="18" rx="4" fill="${it.color}"/>` +
+      `<text x="${BW + 10}" y="${y + 37}" font-size="15" font-weight="700" fill="#1d2a3a">${esc(it.txt ?? (it.v + unitTxt))}</text>`;
+  }).join('');
+  return `<svg class="cmp-chart cmp-bars" viewBox="0 0 ${W} ${H}" role="img">${rows}</svg>`;
+}
+function cmpBandOf(st) {
+  if (!st.hasAttn) return null;
+  if (st.attnPct >= 25) return { cls: 'alert', name: 'Түргэн хугацаанд арга хэмжээ авах шаардлагатай' };
+  if (st.attnPct >= 10) return { cls: 'watch', name: 'Анхаарал хандуулах шаардлагатай' };
+  return { cls: 'ok', name: 'Тогтвортой' };
+}
+// Дэлгэрэнгүй дүгнэлт, зөвлөмж
+function cmpDetailed(rep, agg, rows, kind) {
+  const qs = rep.questions, lv = rep.levels || [], st = cmpStats(rep, agg), sc = cmpHasScore(qs);
+  if (!st.n) return '<p>Тестийг хараахан хэн ч бөглөөгүй байна.</p>';
+  const cols = cmpLevelColors(lv), grp = kind === 'cmd' ? 'анги' : 'командлал';
+  let h = '';
+  // 1. Хамрагдалт
+  h += `<p><b>Хамрагдалт.</b> ${st.reg ? `Бүртгэлтэй ${st.reg} хүнээс <b>${st.n}</b> буюу <b>${st.cov}%</b> нь бөглөсөн.` : `Нийт <b>${st.n}</b> хүн бөглөсөн.`}${st.cov != null && st.cov < 50 ? ' Хамрагдалт хагасаас бага тул дүгнэлт бүх бүрэлдэхүүнийг бүрэн илэрхийлэхгүй байж болно.' : ''}</p>`;
+  // 2. Ерөнхий байдал
+  if (sc) {
+    h += `<p><b>Ерөнхий байдал.</b> Дундаж оноо <b>${st.avg}</b> (боломжит дээд оноо ${cmpMax(qs)}).`;
+    if (lv.length) {
+      let top = -1, topK = -1; lv.forEach((l, i) => { const k = +agg.level_counts[i] || 0; if (k > topK) { topK = k; top = i; } });
+      if (topK > 0) h += ` Хамгийн олон буюу <b>${cmpPct(topK, st.n)}%</b> нь «<b>${esc(lv[top].label)}</b>» түвшинд байна.`;
+    }
+    h += '</p>';
+  }
+  if (sc && lv.length) {
+    h += cmpStackSvg(lv.map((l, i) => ({ label: l.label, k: +agg.level_counts[i] || 0, color: cols[i] })), st.n);
+  }
+  // 3. Анхаарал шаардлагатай
+  const band = cmpBandOf(st);
+  if (band) {
+    const names = lv.filter(l => l.attn).map(l => '«' + esc(l.label) + '»').join(', ');
+    h += `<div class="cmp-band ${band.cls}"><b>${band.name}.</b> Анхаарал шаардлагатай түвшинд (${names}) <b>${st.attnK}</b> хүн буюу <b>${st.attnPct}%</b> байна.</div>`;
+  } else if (sc && lv.length) {
+    h += `<p class="sub">Тест оруулахдаа анхаарал шаардлагатай түвшин тэмдэглээгүй тул эрсдэлийн хувь тооцоогүй.</p>`;
+  }
+  // 4. Хамгийн их илэрсэн асуудал
+  const sev = cmpQuestionSeverity(rep, agg);
+  if (sev.length) {
+    const top = sev.slice(0, 3).filter(x => x.pct > 0);
+    if (top.length) h += `<p><b>Хамгийн их илэрсэн асуудал.</b></p><ul>${top.map(x => `<li>${x.qi + 1}. ${esc(x.t)} — <b>${x.pct}%</b></li>`).join('')}</ul>`;
+  }
+  // 5. Анги / командлал харьцуулалт
+  let focus = [];
+  if (rows && rows.length > 1) {
+    const rs = rows.map(r => ({ r, st: cmpStats(rep, r), name: kind === 'cmd' ? r.unit_no + ' дугаар анги' : cmpBranchName(r.branch) }));
+    if (st.hasAttn) {
+      focus = rs.filter(x => x.st.n && x.st.attnPct > st.attnPct && x.st.attnPct >= 10).sort((a2, b2) => b2.st.attnPct - a2.st.attnPct).slice(0, 3);
+      if (focus.length) h += `<p><b>Анхаарах ${grp}.</b> Анхаарал шаардлагатай хувь дунджаас (${st.attnPct}%) өндөр: ${focus.map(x => `${esc(x.name)} — <b>${x.st.attnPct}%</b>`).join('; ')}.</p>`;
+      else h += `<p><b>${grp === 'анги' ? 'Ангиуд' : 'Командлалууд'}.</b> Дунджаас мэдэгдэхүйц ялгарсан ${grp} илрээгүй.</p>`;
+    }
+    const lowCov = rs.filter(x => x.st.cov != null && x.st.cov < 50);
+    if (lowCov.length) h += `<p><b>Хамрагдалт бага.</b> ${lowCov.map(x => `${esc(x.name)} — ${x.st.cov}%`).join('; ')}.</p>`;
+  }
+  // 6. Зөвлөмж
+  const rec = [];
+  if (band?.cls === 'alert') {
+    rec.push('Анхаарал шаардлагатай түвшинд байгаа алба хаагчдад сэтгэл зүйчтэй ганцаарчлан уулзах боломжийг нэн даруй, нээлттэй мэдээлэх.');
+    rec.push('Удирдлага, сэтгэл зүйч хамтран ажлын ачаалал, амралт, нойрны горимыг хянаж, дарамт үүсгэж буй нөхцөлийг тодруулах.');
+    rec.push('Хамгийн их илэрсэн асуудлаар бүлгийн сургалт, ярилцлагыг ойрын хугацаанд зохион байгуулах.');
+    rec.push('Давтан үнэлгээг 2 долоо хоногийн дотор хийж, өөрчлөлтийг харьцуулах.');
+  } else if (band?.cls === 'watch') {
+    rec.push('Анхаарал шаардлагатай түвшинд байгаа алба хаагчдад сэтгэл зүйчтэй ганцаарчлан уулзах боломжийг мэдээлэх.');
+    rec.push('Хамгийн их илэрсэн асуудлаар бүлгийн сургалт, ярилцлага зохион байгуулах.');
+    rec.push('Давтан үнэлгээг 2–4 долоо хоногийн дараа хийх.');
+  } else if (band?.cls === 'ok') {
+    rec.push('Одоогийн сэтгэл зүйн дэмжлэгийн ажлыг хэвээр үргэлжлүүлэх.');
+    rec.push('Дараагийн үнэлгээг төлөвлөсөн хугацаанд хийх.');
+  }
+  if (focus.length) rec.push(`Нэн тэргүүнд сэтгэл зүйн дэмжлэг үзүүлэх: ${focus.map(x => esc(x.name)).join(', ')}.`);
+  if (st.cov != null && st.cov < 70) rec.push('Хамрагдалтыг нэмэгдүүлэх: тестийн зорилго, нууцлалыг бүрэлдэхүүнд дахин тайлбарлах.');
+  const lvRec = lv.map((l, i) => ({ l, k: +agg.level_counts[i] || 0 })).filter(x => x.k > 0 && x.l.text).sort((a2, b2) => (b2.l.attn ? 1 : 0) - (a2.l.attn ? 1 : 0));
+  if (rec.length || lvRec.length) {
+    h += `<p><b>Зөвлөмж.</b></p><ul>${rec.map(r => `<li>${r}</li>`).join('')}</ul>`;
+    if (lvRec.length) h += `<p class="sub" style="margin-bottom:.2rem;">Түвшин тус бүрийн зөвлөмж:</p><ul>${lvRec.map(x => `<li><b>${esc(x.l.label)}</b> (${x.k} хүн, ${cmpPct(x.k, st.n)}%): ${esc(x.l.text)}</li>`).join('')}</ul>`;
   }
   return h;
 }
-function cmpRowsTable(rep, rows, nameFn, unitCol) {
-  const lv = rep.levels || [], sc = cmpHasScore(rep.questions);
-  return `<table><tr><th>${unitCol}</th>${rows.some(r => r.units != null) ? '<th>Анги</th>' : ''}<th>Бөглөсөн</th>${sc ? '<th>Дундаж оноо</th>' : ''}${sc ? lv.map(l => `<th>${esc(l.label)}</th>`).join('') : ''}</tr>` +
-    rows.map(r => `<tr><td>${esc(nameFn(r))}</td>${r.units != null ? `<td>${r.units}</td>` : ''}<td>${r.n}</td>${sc ? `<td>${r.n ? Math.round(r.score_sum * 10 / r.n) / 10 : '—'}</td>` : ''}${sc ? lv.map((l, i) => `<td>${cmpPct(+(r.level_counts || {})[i] || 0, r.n)}%</td>`).join('') : ''}</tr>`).join('') + '</table>';
+function cmpCompare(rep, rows, kind) {
+  const sc = cmpHasScore(rep.questions), lv = rep.levels || [];
+  const rs = rows.map(r => ({ r, st: cmpStats(rep, r), name: kind === 'cmd' ? r.unit_no + ' дугаар анги' : cmpBranchName(r.branch) }));
+  let h = '';
+  if (sc && lv.some(l => l.attn)) {
+    const it = rs.slice().sort((a2, b2) => b2.st.attnPct - a2.st.attnPct).map(x => ({ label: x.name, v: x.st.attnPct, color: x.st.attnPct >= 25 ? '#B42318' : x.st.attnPct >= 10 ? '#D97706' : '#3F7A5E' }));
+    h += `<p class="sub" style="margin:.4rem 0 0;">Анхаарал шаардлагатай түвшинд байгаа хувь</p>${cmpBarsSvg(it, '%')}`;
+  } else if (sc) {
+    const mx = cmpMax(rep.questions) || 1;
+    const it = rs.slice().sort((a2, b2) => (b2.st.avg || 0) - (a2.st.avg || 0)).map(x => ({ label: x.name, v: Math.round((x.st.avg || 0) / mx * 100), txt: String(x.st.avg ?? '—'), color: '#0A677A' }));
+    h += `<p class="sub" style="margin:.4rem 0 0;">Дундаж оноо</p>${cmpBarsSvg(it, '')}`;
+  }
+  if (rs.some(x => x.st.cov != null)) {
+    const it = rs.slice().sort((a2, b2) => (b2.st.cov || 0) - (a2.st.cov || 0)).map(x => ({ label: x.name, v: x.st.cov || 0, color: '#5B8DB8' }));
+    h += `<p class="sub" style="margin:.6rem 0 0;">Хамрагдалт</p>${cmpBarsSvg(it, '%')}`;
+  }
+  // хүснэгт
+  const cols = cmpLevelColors(lv);
+  h += `<table><tr><th>${kind === 'cmd' ? 'Анги' : 'Командлал'}</th>${kind === 'hq' ? '<th>Анги</th>' : ''}<th>Бөглөсөн</th><th>Хамрагдалт</th>${sc ? '<th>Дундаж оноо</th>' : ''}${sc ? lv.map((l, i) => `<th style="color:${cols[i]}">${esc(l.label)}</th>`).join('') : ''}</tr>` +
+    rs.map(x => `<tr><td>${esc(x.name)}</td>${kind === 'hq' ? `<td>${x.r.units}</td>` : ''}<td>${x.st.n}</td><td>${x.st.cov != null ? x.st.cov + '%' : '—'}</td>${sc ? `<td>${x.st.avg ?? '—'}</td>` : ''}${sc ? lv.map((l, i) => `<td>${cmpPct(+(x.r.level_counts || {})[i] || 0, x.st.n)}%</td>`).join('') : ''}</tr>`).join('') + '</table>';
+  return h;
 }
+const CMP_Q_COL = ['#3F7A5E', '#6E9E86', '#D97706', '#B42318', '#0A677A', '#5B8DB8', '#7C8CA3', '#8E1B12', '#A16207', '#475569', '#9333EA', '#0F766E'];
 function cmpQuestionsTable(rep, agg) {
+  const sev = Object.fromEntries(cmpQuestionSeverity(rep, agg).map(x => [x.qi, x.pct]));
   return rep.questions.map((q, qi) => {
-    const cnt = (agg.q_counts || [])[qi] || q.o.map(() => 0), n = cnt.reduce((a, b) => a + b, 0);
-    return `<p style="margin:.8rem 0 .2rem;"><b>${qi + 1}. ${esc(q.t)}</b></p><table><tr>${q.o.map(o => `<th>${esc(o)}</th>`).join('')}</tr><tr>${cnt.map(k => `<td>${k} (${cmpPct(k, n)}%)</td>`).join('')}</tr></table>`;
+    const cnt = (agg.q_counts || [])[qi] || q.o.map(() => 0), n = cnt.reduce((a2, b2) => a2 + b2, 0);
+    const colors = q.k === 'yesno' ? (Number(q.s[0]) > Number(q.s[1]) ? ['#B42318', '#3F7A5E'] : ['#3F7A5E', '#B42318']) : q.o.map((_, j) => q.k === 'choice' ? CMP_Q_COL[(j + 4) % CMP_Q_COL.length] : CMP_Q_COL[j % CMP_Q_COL.length]);
+    return `<p style="margin:.9rem 0 .1rem;"><b>${qi + 1}. ${esc(q.t)}</b>${sev[qi] != null ? ` <span class="sub">· илрэл ${sev[qi]}%</span>` : ''}</p>` +
+      cmpStackSvg(q.o.map((o, j) => ({ label: o, k: cnt[j] || 0, color: colors[j] })), n);
   }).join('');
 }
 let cmpCur = null;
@@ -2703,9 +2847,9 @@ async function cmpOpenReport(kind, id, b, u) {
   const scope = kind === 'unit' ? cmpUnitName(b, u) : kind === 'cmd' ? cmpBranchName(b) : 'Зэвсэгт хүчин (ЗХЖШ)';
   const date = cmpDate();
   let body = `<h1>${esc(rep.title)}</h1><p class="sub">${esc(scope)} · ${esc(date)}${rows ? ` · ${agg.units} анги` : ''}</p>
-    <h2>Дүгнэлт</h2>${cmpConclusion(rep, agg)}`;
-  if (kind === 'cmd' && rows.length) body += `<h2>Анги тус бүрээр</h2>${cmpRowsTable(rep, rows, r => r.unit_no + ' дугаар анги', 'Анги')}`;
-  if (kind === 'hq' && rows.length) body += `<h2>Командлал тус бүрээр</h2>${cmpRowsTable(rep, rows, r => cmpBranchName(r.branch), 'Командлал')}`;
+    <h2>Нэгдсэн дүгнэлт</h2>${cmpDetailed(rep, agg, rows, kind)}`;
+  if (kind === 'cmd' && rows.length) body += `<h2>Анги тус бүрээр</h2>${cmpCompare(rep, rows, 'cmd')}`;
+  if (kind === 'hq' && rows.length) body += `<h2>Командлал тус бүрээр</h2>${cmpCompare(rep, rows, 'hq')}`;
   if (kind === 'hq' && rep.pending?.length) body += `<p class="sub">Хараахан ирээгүй: ${rep.pending.map(p => esc(cmpBranchName(p.branch)) + ' — ' + p.units + ' анги').join('; ')}</p>`;
   if (kind === 'cmd' && rep.running) body += `<p class="sub">Тест явагдаж буй, дүгнэлт ирээгүй анги: ${rep.running}</p>`;
   body += `<h2>Асуулт тус бүрээр</h2>${cmpQuestionsTable(rep, agg)}`;
@@ -2721,13 +2865,18 @@ async function cmpOpenReport(kind, id, b, u) {
 }
 function cmpMarkDone() { if (!cmpCur) return; cmpCur.done = true; const b = document.getElementById('cmp-send-btn'); if (b) { b.disabled = false; b.style.opacity = 1; } }
 const CMP_PRINT_CSS = `body{font-family:Inter,Arial,sans-serif;color:#1d2a3a;padding:0 4mm;font-size:11pt}h1{font-size:16pt;margin:0 0 2mm}h2{font-size:12.5pt;margin:6mm 0 2mm;border-bottom:1px solid #ccd;padding-bottom:1mm}
-  .sub{color:#667;font-size:9.5pt}table{border-collapse:collapse;width:100%;font-size:9pt;margin:1mm 0 3mm}th,td{border:1px solid #bbc;padding:1.2mm 2mm;text-align:left;vertical-align:top}th{background:#eef1f5}@page{size:A4;margin:12mm}`;
+  .sub{color:#667;font-size:9.5pt}.cmp-chart{width:100%;height:auto;display:block;margin:1mm 0}.cmp-chart.cmp-bars{max-width:175mm}.cmp-leg{display:flex;flex-wrap:wrap;gap:1mm 4mm;font-size:8.5pt;margin:0 0 3mm}.cmp-leg i{display:inline-block;width:3mm;height:3mm;border-radius:.6mm;margin-right:1mm;vertical-align:-.3mm}
+  .cmp-band{border-radius:2mm;padding:2mm 3mm;margin:2mm 0;border:1px solid #ddd}.cmp-band.ok{background:#EEF7F1}.cmp-band.watch{background:#FFF6E6}.cmp-band.alert{background:#FDEEEC}ul{margin:1mm 0 2mm;padding-left:5mm}li{margin:.8mm 0}
+  svg,table,.cmp-band{break-inside:avoid}table{border-collapse:collapse;width:100%;font-size:9pt;margin:1mm 0 3mm}th,td{border:1px solid #bbc;padding:1.2mm 2mm;text-align:left;vertical-align:top}th{background:#eef1f5}@page{size:A4;margin:12mm}`;
 function cmpDlPdf() { if (!cmpCur) return; mcPrintWindow(cmpCur.rep.title + ' — ' + cmpCur.scope, CMP_PRINT_CSS, cmpCur.body); cmpMarkDone(); }
 function cmpDlCsv() {
   if (!cmpCur) return;
   const { rep, rows, agg, scope, kind } = cmpCur, lv = rep.levels || [], sc = cmpHasScore(rep.questions);
   const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"', out = [];
+  const st0 = cmpStats(rep, agg);
   out.push([rep.title], [scope, cmpDate()], [], ['Бөглөсөн', agg.n]);
+  if (st0.reg) out.push(['Бүртгэлтэй', st0.reg], ['Хамрагдалт %', st0.cov]);
+  if (st0.hasAttn) out.push(['Анхаарал шаардлагатай (хүн)', st0.attnK], ['Анхаарал шаардлагатай %', st0.attnPct]);
   if (sc && agg.n) out.push(['Дундаж оноо', Math.round(agg.score_sum * 10 / agg.n) / 10]);
   if (sc && lv.length) { out.push([], ['Түвшин', 'Оноо', 'Хүн', '%']); lv.forEach((l, i) => { const k = +agg.level_counts[i] || 0; out.push([l.label, `${l.min}-${l.max}`, k, cmpPct(k, agg.n)]); }); }
   if (rows?.length) {
@@ -2735,6 +2884,8 @@ function cmpDlCsv() {
     rows.forEach(r => out.push([kind === 'hq' ? cmpBranchName(r.branch) : r.unit_no + ' дугаар анги', r.units ?? 1, r.n,
       ...(sc ? [r.n ? Math.round(r.score_sum * 10 / r.n) / 10 : '', ...lv.map((l, i) => cmpPct(+(r.level_counts || {})[i] || 0, r.n))] : [])]));
   }
+  const sevC = cmpQuestionSeverity(rep, agg);
+  if (sevC.length) { out.push([], ['Асуудлын илрэл (асуулт)', '%']); sevC.forEach(x => out.push([`${x.qi + 1}. ${x.t}`, x.pct])); }
   out.push([], ['Асуулт', 'Хариулт', 'Хүн', '%']);
   rep.questions.forEach((qq, qi) => { const c = (agg.q_counts || [])[qi] || [], n = c.reduce((a, b) => a + b, 0); qq.o.forEach((o, oi) => out.push([oi ? '' : `${qi + 1}. ${qq.t}`, o, c[oi] || 0, cmpPct(c[oi] || 0, n)])); });
   const csv = '﻿' + out.map(r => r.map(q).join(',')).join('\r\n');
@@ -2788,7 +2939,7 @@ function cmpCopyOpts(i) {
   cmpDraft.qs.forEach(q => { if (q !== src && q.k === src.k) { q.o = [...src.o]; q.s = src.s ? [...src.s] : null; } });
   cmpRenderBuilder(); showToast('Хариултын хувилбар ижил төрлийн бүх асуултад хуулагдлаа.', 'success');
 }
-function cmpAddLevel() { cmpDraft.levels.push({ min: '', max: '', label: '', text: '' }); cmpRenderBuilder(); }
+function cmpAddLevel() { cmpDraft.levels.push({ min: '', max: '', label: '', text: '', attn: false }); cmpRenderBuilder(); }
 function cmpSetLevel(i, f, v) { cmpDraft.levels[i][f] = v; }
 function cmpDelLevel(i) { cmpDraft.levels.splice(i, 1); cmpRenderBuilder(); }
 function cmpSetMeta(f, v) { cmpDraft[f] = v; }
@@ -2822,11 +2973,12 @@ function cmpRenderBuilder() {
       <div class="cmp-row"><select id="cmp-bulk-kind" class="cmp-in">${Object.entries(CMP_KINDS).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select>
         <button class="modal-close" style="margin:0;" onclick="cmpBulkAdd()">Нэмэх</button></div></details>
     ${hasScore ? `<div style="margin-top:1.2rem;"><b style="font-size:.9rem;">Дүгнэлтийн түвшин</b> <span id="cmp-maxscore" style="font-size:.8rem;color:var(--sub);"></span>
-      <p style="font-size:.78rem;color:var(--sub);margin:.3rem 0 .5rem;">Нийт оноогоор аль түвшинд орохыг тогтооно. Бөглөгч өөрийн түвшин, дүгнэлтийг харна. Анги, командлалын тайланд түвшин тус бүрт хэдэн хүн байгаа нь гарна.</p>
-      ${d.levels.map((l, i) => `<div class="cmp-q" style="padding:.6rem .8rem;"><div class="cmp-opt">
+      <p style="font-size:.78rem;color:var(--sub);margin:.3rem 0 .5rem;">Нийт оноогоор аль түвшинд орохыг тогтооно. Анхаарал шаардлагатай түвшнийг чагтална (жишээ нь стрессийн тестэд «Өндөр»). Бөглөгч өөрийн түвшин, дүгнэлтийг харна. Анги, командлалын тайланд түвшин тус бүрт хэдэн хүн байгаа нь гарна.</p>
+      ${d.levels.map((l, i) => `<div class="cmp-q" style="padding:.6rem .8rem;"><div class="cmp-opt" style="flex-wrap:wrap;">
           <input class="p" type="number" step="any" placeholder="доод" value="${escAttr(l.min)}" oninput="cmpSetLevel(${i},'min',this.value)"><span>–</span>
           <input class="p" type="number" step="any" placeholder="дээд" value="${escAttr(l.max)}" oninput="cmpSetLevel(${i},'max',this.value)">
           <input class="o" placeholder="Түвшний нэр" value="${escAttr(l.label)}" oninput="cmpSetLevel(${i},'label',this.value)">
+          <label class="cmp-attn"><input type="checkbox" ${l.attn ? 'checked' : ''} onchange="cmpSetLevel(${i},'attn',this.checked)"> Анхаарал шаардлагатай</label>
           <button class="cmp-mini" onclick="cmpDelLevel(${i})">✕</button></div>
         <textarea placeholder="Дүгнэлт, зөвлөмж" oninput="cmpSetLevel(${i},'text',this.value)">${esc(l.text)}</textarea></div>`).join('')}
       <button class="modal-close" style="margin:0;" onclick="cmpAddLevel()">+ Түвшин нэмэх</button></div>` : ''}
@@ -2855,7 +3007,8 @@ async function cmpSave() {
   }
   if (!confirm(`«${d.title.trim()}» тестийг ${d.qs.length} асуулттай хадгалах уу? Хадгалсны дараа засах боломжгүй.`)) return;
   const qs = d.qs.map(q => q.k === 'choice' ? { t: q.t.trim(), k: q.k, o: q.o.map(o => String(o).trim()) } : { t: q.t.trim(), k: q.k, o: q.o.map(o => String(o).trim()), s: q.s.map(Number) });
-  const lv = levels.map(l => ({ min: +l.min, max: +l.max, label: String(l.label).trim(), text: String(l.text || '').trim() }));
+  if (levels.length && !levels.some(l => l.attn) && !confirm('Анхаарал шаардлагатай түвшин тэмдэглээгүй байна. Тэгвэл дүгнэлтэд эрсдэлийн хувь гарахгүй. Үргэлжлүүлэх үү?')) return;
+  const lv = levels.map(l => ({ min: +l.min, max: +l.max, label: String(l.label).trim(), text: String(l.text || '').trim(), attn: !!l.attn }));
   try {
     await cmpRpc('mc_cmp_admin_create', { p_title: d.title.trim(), p_description: d.desc.trim(), p_questions: qs, p_levels: lv });
     cmpDraft = { title: '', desc: '', qs: [], levels: [] };

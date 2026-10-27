@@ -747,6 +747,11 @@
   .chat-auto .ck{flex:0 0 26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#22A06B;color:#fff;font-size:.8rem;font-weight:800;}
   @media (max-width:520px){.chat-topic-grid{gap:.5rem;}.chat-topic{padding:.65rem .65rem 1.7rem;}.chat-topic .ic{width:30px;height:30px;border-radius:9px;margin-bottom:.4rem;}.chat-topic .ic svg{width:17px;height:17px;}
     .chat-topic b{font-size:.8rem;}.chat-topic span{font-size:.7rem;}.chat-topic i{width:19px;height:19px;font-size:.7rem;right:.5rem;bottom:.45rem;}}
+  .home-contact{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.4rem .9rem;margin:1.4rem 0 .2rem;padding:.75rem 1rem;border-top:1px solid var(--line);font-size:.86rem;color:var(--sub);}
+  .home-contact b{color:var(--cream);font-weight:700;}
+  .home-contact a{display:inline-flex;align-items:center;gap:.35rem;color:#0A677A;font-weight:700;text-decoration:none;}
+  .home-contact a:hover{text-decoration:underline;}
+  .home-contact svg{width:15px;height:15px;}
   .ob-step-title{font-weight:800;font-size:1.1rem;margin:0 0 .2rem;color:var(--cream);}
   .ob-step-sub{font-size:.85rem;color:var(--sub);margin:0 0 .3rem;}  /* ---------- Toast мэдэгдэл (browser-ийн alert()-ийг орлоно) ---------- */
   #toast-wrap{position:fixed;bottom:1.3rem;right:1.3rem;z-index:200;display:flex;flex-direction:column;gap:.6rem;
@@ -1343,6 +1348,7 @@
             <div class="banner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 6v6c0 5 3.5 8.5 9 10 5.5-1.5 9-5 9-10V6z"/></svg><p>БИД ЗӨВХӨН БИЕЭ БИШ,<br>СЭТГЭЛЭЭ Ч ХАМГААЛНА.</p></div>
           </div>
         </div>
+        <div class="home-contact" id="home-contact"><b>Холбоо барих:</b><a href="tel:80003550"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>8000 3550</a><a href="tel:89178968"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>8917 8968</a></div>
       </div>
 
       <!-- ================= DIARY (Өнөөдөр би...) ================= -->
@@ -1912,7 +1918,7 @@
 
     </div>
 
-    <footer>© 2026 MIL-CARE СЭТГЭЛ ЗҮЙН ДЭМЖЛЭГИЙН ПЛАТФОРМ &nbsp;<a href="#">ХОЛБОО БАРИХ</a></footer>
+    <footer>© 2026 MIL-CARE СЭТГЭЛ ЗҮЙН ДЭМЖЛЭГИЙН ПЛАТФОРМ &nbsp;<a href="#" onclick="goto('home');setTimeout(() => document.getElementById('home-contact')?.scrollIntoView({behavior:'smooth',block:'center'}), 350);return false;">ХОЛБОО БАРИХ</a></footer>
   </div>
 </div>
 

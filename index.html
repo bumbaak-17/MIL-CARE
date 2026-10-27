@@ -720,6 +720,33 @@
   .cmp-band.ok{background:#EEF7F1;border-color:#CFE6D8;}.cmp-band.watch{background:#FFF6E6;border-color:#F1DDB5;}.cmp-band.alert{background:#FDEEEC;border-color:#F3CCC6;}
   .cmp-rep ul{margin:.3rem 0 .6rem;padding-left:1.2rem;}.cmp-rep li{margin:.25rem 0;font-size:.86rem;}
   .cmp-attn{display:inline-flex;align-items:center;gap:.3rem;font-size:.78rem;white-space:nowrap;cursor:pointer;}
+  .chat-pick{position:relative;border-radius:18px;padding:1rem .9rem .95rem;margin:-.2rem;background:radial-gradient(120% 90% at 0% 0%,#E9F6F8 0%,rgba(233,246,248,0) 55%),radial-gradient(120% 90% at 100% 0%,#FFF1E8 0%,rgba(255,241,232,0) 55%),#FAFBFD;}
+  .chat-pick-h{display:flex;align-items:center;gap:.6rem;}
+  .chat-pick-h .wave{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:1.25rem;background:linear-gradient(135deg,#0A677A,#14A3B8);box-shadow:0 6px 14px -6px rgba(10,103,122,.55);}
+  .chat-pick-h b{font-size:1.05rem;font-weight:800;background:linear-gradient(90deg,#0A677A,#7C3AED);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .chat-pick-sub{font-size:.84rem;color:var(--sub);margin:.45rem 0 0;}
+  .chat-topic-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.65rem;margin-top:.85rem;}
+  .chat-topic{--c:#475569;--bg:#F1F5F9;position:relative;text-align:left;border:1.5px solid color-mix(in srgb,var(--c) 22%,transparent);border-radius:16px;padding:.8rem .85rem 1.9rem;cursor:pointer;font-family:inherit;color:var(--cream);
+    background:linear-gradient(160deg,var(--bg) 0%,#fff 70%);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;}
+  .chat-topic:hover,.chat-topic:focus-visible{transform:translateY(-2px);border-color:var(--c);box-shadow:0 10px 22px -12px color-mix(in srgb,var(--c) 70%,transparent);outline:none;}
+  .chat-topic:active{transform:translateY(0) scale(.98);}
+  .chat-topic:disabled{opacity:.55;cursor:default;transform:none;}
+  .chat-topic .ic{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:var(--c);color:#fff;margin-bottom:.55rem;box-shadow:0 5px 12px -6px var(--c);}
+  .chat-topic .ic svg{width:20px;height:20px;}
+  .chat-topic b{display:block;font-size:.9rem;margin-bottom:.2rem;}
+  .chat-topic span{display:block;font-size:.75rem;color:var(--sub);line-height:1.35;}
+  .chat-topic i{position:absolute;right:.65rem;bottom:.6rem;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:.8rem;font-weight:800;
+    color:var(--c);background:#fff;border:1.5px solid color-mix(in srgb,var(--c) 35%,transparent);transition:.18s;}
+  .chat-topic:hover i{background:var(--c);color:#fff;border-color:var(--c);}
+  .chat-topic[data-k=stress]{--c:#EA580C;--bg:#FFF3EA;}.chat-topic[data-k=anx]{--c:#E11D48;--bg:#FFF0F3;}
+  .chat-topic[data-k=mood]{--c:#4F46E5;--bg:#EEF0FF;}.chat-topic[data-k=sleep]{--c:#7C3AED;--bg:#F4EEFF;}
+  .chat-topic[data-k=family]{--c:#0D9488;--bg:#E8F8F5;}.chat-topic[data-k=duty]{--c:#4D7C0F;--bg:#F0F7E4;}
+  .chat-topic[data-k=self]{--c:#D97706;--bg:#FFF7E3;}.chat-topic[data-k=past]{--c:#0284C7;--bg:#E8F5FD;}
+  .chat-topic[data-k=other]{--c:#475569;--bg:#F1F5F9;}
+  .chat-auto{display:flex;align-items:center;gap:.55rem;margin:.4rem auto .6rem;max-width:92%;font-size:.82rem;color:#1F5C46;background:linear-gradient(135deg,#E8F7EF,#F3FBF6);border:1px solid #CBEBD9;border-radius:14px;padding:.6rem .8rem;}
+  .chat-auto .ck{flex:0 0 26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#22A06B;color:#fff;font-size:.8rem;font-weight:800;}
+  @media (max-width:520px){.chat-topic-grid{gap:.5rem;}.chat-topic{padding:.65rem .65rem 1.7rem;}.chat-topic .ic{width:30px;height:30px;border-radius:9px;margin-bottom:.4rem;}.chat-topic .ic svg{width:17px;height:17px;}
+    .chat-topic b{font-size:.8rem;}.chat-topic span{font-size:.7rem;}.chat-topic i{width:19px;height:19px;font-size:.7rem;right:.5rem;bottom:.45rem;}}
   .ob-step-title{font-weight:800;font-size:1.1rem;margin:0 0 .2rem;color:var(--cream);}
   .ob-step-sub{font-size:.85rem;color:var(--sub);margin:0 0 .3rem;}  /* ---------- Toast мэдэгдэл (browser-ийн alert()-ийг орлоно) ---------- */
   #toast-wrap{position:fixed;bottom:1.3rem;right:1.3rem;z-index:200;display:flex;flex-direction:column;gap:.6rem;
@@ -10188,20 +10215,61 @@ async function loadChatMessages() {
   renderChatMessages(data || []);
 }
 
+/* Чат: сэдэв сонгох (анх нээхэд) */
+const CHAT_TOPICS = [
+  { k:'stress', t:'Стресс, дарамт', d:'Ачаалал, бухимдал, ядаргаа' },
+  { k:'anx', t:'Түгшүүр, айдас', d:'Санаа зовнил, тайван бус байдал' },
+  { k:'mood', t:'Гуниг, сэтгэл санаа', d:'Гутрал, ганцаардал, урам зориггүй байдал' },
+  { k:'sleep', t:'Нойрны асуудал', d:'Нойргүйдэх, амарч чадахгүй байх' },
+  { k:'family', t:'Гэр бүл, харилцаа', d:'Маргаан, үл ойлголцол, харилцааны хүндрэл' },
+  { k:'duty', t:'Цэргийн албаны стресс', d:'Дасан зохицол, сахилга, албаны дарамт' },
+  { k:'self', t:'Өөртөө итгэх итгэл', d:'Өөрийгөө үнэлэх, шийдвэр гаргах' },
+  { k:'past', t:'Өнгөрсөн таагүй үйл явдал', d:'Сэтгэлд үлдсэн хүнд дурсамж' },
+  { k:'other', t:'Өөр асуудал', d:'Жагсаалтад байхгүй асуудлаа бичих' },
+];
+const CHAT_TOPIC_ICON = {"stress": "<path d=\"M17.5 19a4.5 4.5 0 1 0-1.4-8.8A6 6 0 1 0 6 15.4\"/><path d=\"M13 11l-3 5h4l-3 5\"/>", "anx": "<path d=\"M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7z\"/><path d=\"M3.2 12h4.3l1.5-3 2 6 1.5-3h4.3\"/>", "mood": "<path d=\"M20 15.5A4.5 4.5 0 0 0 17.5 7a6 6 0 0 0-11.6 1.5A4 4 0 0 0 6 16.5\"/><path d=\"M8 19v2M12 18v3M16 19v2\"/>", "sleep": "<path d=\"M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z\"/>", "family": "<circle cx=\"9\" cy=\"8\" r=\"3.5\"/><path d=\"M2.5 20a6.5 6.5 0 0 1 13 0\"/><circle cx=\"17\" cy=\"9\" r=\"2.5\"/><path d=\"M16 14.2a5 5 0 0 1 5.5 5\"/>", "duty": "<path d=\"M12 2 4 5.5v6c0 5 3.4 8.8 8 10.5 4.6-1.7 8-5.5 8-10.5v-6z\"/>", "self": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><circle cx=\"12\" cy=\"12\" r=\"5\"/><circle cx=\"12\" cy=\"12\" r=\"1.5\"/>", "past": "<path d=\"M9.5 3A3.5 3.5 0 0 0 6 6.5 3.5 3.5 0 0 0 3.5 10a3.5 3.5 0 0 0 1 6A3.5 3.5 0 0 0 9.5 21h0V3z\"/><path d=\"M14.5 3A3.5 3.5 0 0 1 18 6.5a3.5 3.5 0 0 1 2.5 3.5 3.5 3.5 0 0 1-1 6 3.5 3.5 0 0 1-5 5h0V3z\"/>", "other": "<path d=\"M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.6A8.5 8.5 0 1 1 21 11.5z\"/>"};
+function chatTopicPickerHtml() {
+  return `<div class="chat-pick">
+    <div class="chat-pick-h"><div class="wave">👋</div><b>Сайн байна уу? Танд юугаар туслах вэ?</b></div>
+    <p class="chat-pick-sub">Танд хамгийн ойр байгаа асуудлыг сонгоно уу. Та өөрийн нөхцөл байдлыг чөлөөтэй илэрхийлж болно.</p>
+    <div class="chat-topic-grid">${CHAT_TOPICS.map((c, i) => `<button type="button" class="chat-topic" data-k="${c.k}" onclick="chatPickTopic(${i})">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${CHAT_TOPIC_ICON[c.k]}</svg></div>
+      <b>${c.t}</b><span>${c.d}</span><i>→</i></button>`).join('')}</div></div>`;
+}
+async function chatPickTopic(i) {
+  const c = CHAT_TOPICS[i]; if (!c) return;
+  if (c.k === 'other') {
+    const inp = document.getElementById('chat-input');
+    if (inp) { inp.placeholder = 'Асуудлаа товч бичээд «Илгээх» дарна уу...'; inp.focus(); }
+    return;
+  }
+  if (!currentUser?.id || !currentChatProId) return;
+  document.querySelectorAll('.chat-topic').forEach(b => b.disabled = true);
+  const { error } = await sb.from('chat_messages').insert({
+    user_id: currentUser.id, professional_id: currentChatProId, sender: 'user', body: `${c.t} — ${c.d}`
+  });
+  if (error) { document.querySelectorAll('.chat-topic').forEach(b => b.disabled = false); showToast('Илгээхэд алдаа гарлаа: ' + error.message, 'error'); return; }
+  loadChatMessages();
+  refreshUserUnreadReplies();
+}
+const CHAT_AUTO_REPLY = 'Таны хүсэлтийг хүлээн авлаа. Сэтгэл зүйч удахгүй тантай холбогдох болно.';
 function renderChatMessages(msgs) {
   const el = document.getElementById('chat-messages');
   if (!el) return;
   if (!msgs.length) {
-    el.innerHTML = '<div style="color:var(--sub);font-size:.85rem;text-align:center;padding:1rem 0;">Мессеж алга. Эхний мессежээ бичээрэй 👇</div>';
+    el.style.maxHeight = 'none';
+    mcSetHTML(el, chatTopicPickerHtml());
     return;
   }
+  el.style.maxHeight = '320px';
+  const proReplied = msgs.some(m => m.sender !== 'user');
   mcSetHTML(el, msgs.map(m => `
     <div style="display:flex;justify-content:${m.sender === 'user' ? 'flex-end' : 'flex-start'};margin-bottom:.5rem;">
       <div style="max-width:75%;padding:.5rem .8rem;border-radius:12px;font-size:.85rem;
         background:${m.sender === 'user' ? 'var(--gold)' : '#fff'};
         color:${m.sender === 'user' ? '#fff' : 'var(--cream)'};
         border:1px solid var(--line);">${esc(m.body)}</div>
-    </div>`).join(''));
+    </div>`).join('') + (proReplied ? '' : `<div class="chat-auto"><span class="ck">✓</span><span>${CHAT_AUTO_REPLY}</span></div>`));
   el.scrollTop = el.scrollHeight;
 }
 

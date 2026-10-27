@@ -1461,32 +1461,32 @@
       </div>
 
       <div id="view-special" class="view">
-        <div class="page-head"><h2>Удирдлагаас ирсэн тусгай тест</h2><p>Зөвхөн эрх бүхий хүмүүст харагдана. Хувь хүний хариулт хадгалагдахгүй, зөвхөн ангийн нэгтгэсэн тоо шат дамжлагаар дамжина.</p></div>
+        <div class="page-head"><h2>Удирдлагаас ирсэн тусгай тест</h2><p>Зөвхөн эрх бүхий хүмүүст харагдана. Тест ЗХЖШ → командлал → анги гэж доош дамжиж, дүн нь эсрэг чиглэлээр дээш ирнэ. Хувь хүний хариулт хадгалагдахгүй, зөвхөн нэгтгэсэн тоо дамжина.</p></div>
 
         <div id="cmp-unit" style="display:none;">
           <div class="section-card"><div class="section-head"><h3>🎖️ Ангийн тест</h3><button class="modal-close" style="margin:0;" onclick="cmpLoadUnit()">Шинэчлэх</button></div>
-            <p style="font-size:.8rem;color:var(--sub);margin:0 0 .8rem;">«Эхлүүлэх» дарахад тухайн ангиар бүртгэлтэй хүмүүст тест нээгдэнэ. Бөглөж дуусахад «Дуусгах», дараа нь дүгнэлтээ татаж командлал руу илгээнэ. Илгээсний дараа ангийн тоо энд харагдахгүй.</p>
+            <p style="font-size:.8rem;color:var(--sub);margin:0 0 .8rem;">Командлалаас ирсэн тест энд харагдана. «Эхлүүлэх» дарахад тухайн ангиар бүртгэлтэй хүмүүст тест нээгдэнэ. Бөглөж дуусахад «Дуусгах», дараа нь дүгнэлтээ татаж командлал руу илгээнэ. Илгээсний дараа ангийн тоо энд харагдахгүй.</p>
             <div id="cmp-unit-list"></div></div>
         </div>
 
         <div id="cmp-cmd" style="display:none;">
-          <div class="section-card"><div class="section-head"><h3>🏛️ Командлалын нэгтгэл</h3><button class="modal-close" style="margin:0;" onclick="cmpLoadCmd()">Шинэчлэх</button></div>
-            <p style="font-size:.8rem;color:var(--sub);margin:0 0 .8rem;">Ангиудаас ирсэн дүгнэлтийг нэгтгэж татаад ЗХЖШ руу илгээнэ. Илгээсний дараа ангиудын тоо устана.</p>
+          <div class="section-card"><div class="section-head"><h3>🏛️ Командлалын тест</h3><button class="modal-close" style="margin:0;" onclick="cmpLoadCmd()">Шинэчлэх</button></div>
+            <p style="font-size:.8rem;color:var(--sub);margin:0 0 .8rem;">ЗХЖШ-аас ирсэн тестийг «Ангиуд руу илгээх» дарж харьяа ангиуддаа дамжуулна. Ангиудаас ирсэн дүгнэлтийг нэгтгэж татаад ЗХЖШ руу илгээнэ. Илгээсний дараа ангиудын тоо устана.</p>
             <div id="cmp-cmd-list"></div></div>
         </div>
 
         <div id="cmp-admin" style="display:none;">
-          <div class="section-card">
+          <div class="section-card" id="cmp-new-card">
             <div class="section-head collapsible" onclick="cmpToggle('cmp-new')"><h3>➕ Шинэ тест оруулах</h3><span class="collapse-arrow" id="cmp-new-arrow">▾</span></div>
             <div class="collapsible-body" id="cmp-new-body"><div id="cmp-builder"></div></div>
           </div>
-          <div class="section-card">
+          <div class="section-card" id="cmp-off-card">
             <div class="section-head collapsible" onclick="cmpToggle('cmp-off')"><h3>👤 Эрх бүхий хүмүүс</h3><span class="collapse-arrow" id="cmp-off-arrow">▾</span></div>
             <div class="collapsible-body" id="cmp-off-body">
-              <p style="font-size:.8rem;color:var(--sub);margin:0 0 .8rem;">Тухайн хүн сайтад Gmail-ээрээ нэг удаа нэвтэрсэн байх шаардлагатай. Анги бүрт тест эхлүүлэх хүн, командлал бүрт нэгтгэх хүн томилно.</p>
+              <p style="font-size:.8rem;color:var(--sub);margin:0 0 .8rem;">Тухайн хүн сайтад Gmail-ээрээ нэг удаа нэвтэрсэн байх шаардлагатай. Анги бүрт тест эхлүүлэх хүн, командлал бүрт нэгтгэх хүн, ЗХЖШ-д нэгдсэн дүнг харж татах хүн томилно. Тест оруулах, засах, устгах эрх зөвхөн админд.</p>
               <div class="cmp-row" style="margin-top:0;">
                 <input class="cmp-in" id="cmp-off-email" type="email" placeholder="Gmail хаяг" style="flex:1;min-width:200px;">
-                <select class="cmp-in" id="cmp-off-role" onchange="cmpOffRoleChange()"><option value="unit">Ангийн эрх бүхий хүн</option><option value="command">Командлалын эрх бүхий хүн</option></select>
+                <select class="cmp-in" id="cmp-off-role" onchange="cmpOffRoleChange()"><option value="unit">Ангийн эрх бүхий хүн</option><option value="command">Командлалын эрх бүхий хүн</option><option value="hq">ЗХЖШ-ийн эрх бүхий хүн (нэгдсэн дүн)</option></select>
                 <select class="cmp-in" id="cmp-off-branch"></select>
                 <span id="cmp-off-unit-wrap" style="display:flex;align-items:center;gap:.35rem;"><input class="cmp-in" id="cmp-off-unit" inputmode="numeric" maxlength="6" placeholder="016" style="width:80px;text-align:center;"><span style="font-size:.85rem;">дугаар анги</span></span>
                 <button class="connect-btn" style="width:auto;padding:.55rem 1.2rem;" onclick="cmpOfficerAdd()">Нэмэх</button>
@@ -2447,10 +2447,17 @@ async function mcVerifyAdminMfa() {
   location.reload();
 }
 /* ================= УДИРДЛАГААС ИРСЭН ТУСГАЙ ТЕСТ (special_tests.sql) ================= */
-let cmpRoles = { any: false, admin: false, units: [], commands: [] };
+let cmpRoles = { any: false, admin: false, hq: false, units: [], commands: [] };
 let cmpAvail = [];
 const CMP_KINDS = { score: 'Оноотой сонголт', yesno: 'Тийм / Үгүй', choice: 'Сонголттой (оноогүй)' };
 const cmpBranchName = b => BRANCH_LABELS[b] || b;
+const cmpDur = h => !h ? '' : (h % 24 === 0 ? (h / 24) + ' хоног' : h + ' цаг');
+const cmpDT = d => { const x = new Date(d); return `${x.getFullYear()}.${String(x.getMonth() + 1).padStart(2, '0')}.${String(x.getDate()).padStart(2, '0')} ${String(x.getHours()).padStart(2, '0')}:${String(x.getMinutes()).padStart(2, '0')}`; };
+function cmpLeft(d) {
+  const ms = new Date(d) - Date.now(); if (ms <= 0) return 'хугацаа дууссан';
+  const m = Math.floor(ms / 60000), h = Math.floor(m / 60), dd = Math.floor(h / 24);
+  return dd >= 1 ? `үлдсэн ${dd} хоног ${h % 24} цаг` : h >= 1 ? `үлдсэн ${h} цаг ${m % 60} мин` : `үлдсэн ${m} мин`;
+}
 const cmpDate = d => { const x = d ? new Date(d) : new Date(); return `${x.getFullYear()}.${String(x.getMonth() + 1).padStart(2, '0')}.${String(x.getDate()).padStart(2, '0')}`; };
 const cmpUnitName = (b, u) => `${cmpBranchName(b)} · ${u} дугаар анги`;
 function cmpErr(e) {
@@ -2459,11 +2466,14 @@ function cmpErr(e) {
   if (/duplicate key|mc_cmp_done/i.test(m)) return 'Та энэ тестийг бөглөсөн байна.';
   if (/not allowed/.test(m)) return 'Эрх хүрэхгүй байна.';
   if (/not open|not active/.test(m)) return 'Тест хаагдсан байна.';
+  if (/not sent/.test(m)) return 'Энэ тест танай ангид хараахан ирээгүй байна.';
   if (/close first/.test(m)) return 'Эхлээд тестийг «Дуусгах» дарж хаана уу.';
   if (/already submitted/.test(m)) return 'Энэ ангийн дүгнэлт аль хэдийн илгээгдсэн байна.';
   if (/user not found/.test(m)) return 'Ийм Gmail-ээр нэвтэрсэн хэрэглэгч олдсонгүй. Тухайн хүн сайтад нэг удаа нэвтэрсэн байх шаардлагатай.';
-  if (/bad unit/.test(m)) return 'Ангийн дугаарыг тоогоор оруулна уу.';
+  if (/bad unit/.test(m)) return 'Анги сонгоно уу.';
+  if (/bad branch/.test(m)) return 'Командлал сонгоно уу.';
   if (/no unit/.test(m)) return 'Профайлдаа ангийнхаа дугаарыг оруулна уу.';
+  if (/bad duration/.test(m)) return 'Бөглөх хугацаа буруу байна.';
   if (/bad/.test(m)) return 'Тестийн мэдээлэл буруу байна. Бүх талбарыг шалгана уу.';
   return m || 'Алдаа гарлаа.';
 }
@@ -2476,9 +2486,9 @@ async function cmpInit() {
   if (!currentUser?.id || currentUser.isAnonymous) return;
   try {
     const r = await cmpRpc('mc_cmp_my_roles');
-    cmpRoles = { admin: !!r?.admin, units: r?.units || [], commands: r?.commands || [] };
-    cmpRoles.any = cmpRoles.admin || cmpRoles.units.length > 0 || cmpRoles.commands.length > 0;
-  } catch (e) { cmpRoles = { any: false, admin: false, units: [], commands: [] }; }
+    cmpRoles = { admin: !!r?.admin, hq: !!r?.hq, units: r?.units || [], commands: r?.commands || [] };
+    cmpRoles.any = cmpRoles.admin || cmpRoles.hq || cmpRoles.units.length > 0 || cmpRoles.commands.length > 0;
+  } catch (e) { cmpRoles = { any: false, admin: false, hq: false, units: [], commands: [] }; }
   const nav = document.getElementById('cmp-navitem');
   if (nav) nav.style.display = cmpRoles.any ? 'flex' : 'none';
   cmpLoadAvailable();
@@ -2494,7 +2504,7 @@ async function cmpLoadAvailable() {
       <div style="font-size:1.7rem;">📋</div>
       <div style="flex:1;min-width:0;"><div style="font-size:.75rem;color:var(--sub);font-weight:700;">Удирдлагаас ирсэн тест</div>
         <div style="font-weight:800;font-size:.95rem;">${esc(c.title)}</div>
-        <div style="font-size:.78rem;color:var(--sub);">${(c.questions || []).length} асуулт</div></div>
+        <div style="font-size:.78rem;color:var(--sub);">${(c.questions || []).length} асуулт${c.deadline ? ` · ⏱ дуусах: <b>${cmpDT(c.deadline)}</b> (${cmpLeft(c.deadline)})` : ''}</div></div>
       <button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;flex-shrink:0;" onclick="cmpOpenFill(${i})">Бөглөх</button>
     </div>`).join('');
   const note = needUnit ? `<div class="section-card" style="display:flex;align-items:center;gap:.8rem;margin-bottom:.8rem;">
@@ -2547,14 +2557,17 @@ function cmpToggle(id) {
   const open = !b.classList.contains('open'); b.classList.toggle('open', open); if (a) a.textContent = open ? '▴' : '▾';
 }
 async function cmpLoadPage() {
-  document.getElementById('cmp-admin').style.display = cmpRoles.admin ? 'block' : 'none';
+  document.getElementById('cmp-admin').style.display = (cmpRoles.admin || cmpRoles.hq) ? 'block' : 'none';
+  document.getElementById('cmp-new-card').style.display = cmpRoles.admin ? '' : 'none';
+  document.getElementById('cmp-off-card').style.display = cmpRoles.admin ? '' : 'none';
   document.getElementById('cmp-cmd').style.display = cmpRoles.commands.length ? 'block' : 'none';
   document.getElementById('cmp-unit').style.display = cmpRoles.units.length ? 'block' : 'none';
   if (cmpRoles.admin) {
     const bs = document.getElementById('cmp-off-branch');
     if (!bs.options.length) mcSetHTML(bs, BRANCHES.filter(b => b.key !== 'civilian_org').map(b => `<option value="${escAttr(b.key)}">${esc(b.label)}</option>`).join(''));
-    cmpRenderBuilder(); cmpLoadOfficers(); cmpLoadAdmin();
+    cmpRenderBuilder(); cmpLoadOfficers();
   }
+  if (cmpRoles.admin || cmpRoles.hq) cmpLoadAdmin();
   if (cmpRoles.commands.length) cmpLoadCmd();
   if (cmpRoles.units.length) cmpLoadUnit();
 }
@@ -2565,25 +2578,30 @@ const cmpEmpty = (el, t) => mcSetHTML(el, `<div style="color:var(--sub);font-siz
 async function cmpLoadUnit() {
   const el = document.getElementById('cmp-unit-list'); cmpLoading(el);
   let rows; try { rows = await cmpRpc('mc_cmp_unit_overview'); } catch (e) { return cmpEmpty(el, esc(cmpErr(e))); }
-  if (!rows?.length) return cmpEmpty(el, 'Одоогоор явагдаж буй тест алга.');
+  if (!rows?.length) return cmpEmpty(el, 'Одоогоор ирсэн тест алга.');
   mcSetHTML(el, rows.map(r => {
     const a = `'${escAttr(r.id)}','${escAttr(r.branch)}','${escAttr(r.unit_no)}'`;
     const st = r.run_status;
-    const chip = st === 'open' ? '<span class="cmp-chip open">Явагдаж байна</span>' : st === 'closed' ? '<span class="cmp-chip closed">Дууссан</span>' : st === 'submitted' ? '<span class="cmp-chip sent">Командлал руу илгээсэн</span>' : '<span class="cmp-chip">Эхлээгүй</span>';
+    const expired = st === 'closed' && r.deadline && new Date(r.deadline) <= new Date();
+    const chip = st === 'open' ? '<span class="cmp-chip open">Явагдаж байна</span>' : st === 'closed' ? `<span class="cmp-chip closed">${expired ? 'Хугацаа дууссан' : 'Дууссан'}</span>` : st === 'submitted' ? '<span class="cmp-chip sent">Командлал руу илгээсэн</span>' : '<span class="cmp-chip">Эхлээгүй</span>';
     const btns = st === 'open' ? `<button class="connect-btn" style="width:auto;padding:.5rem 1.1rem;" onclick="cmpUnitAct('close',${a})">Дуусгах</button>`
-      : st === 'closed' ? `<button class="connect-btn" style="width:auto;padding:.5rem 1.1rem;" onclick="cmpOpenReport('unit',${a})">Дүгнэлт татах, илгээх</button><button class="modal-close" style="margin:0;" onclick="cmpUnitAct('open',${a})">Дахин нээх</button>`
+      : st === 'closed' ? `<button class="connect-btn" style="width:auto;padding:.5rem 1.1rem;" onclick="cmpOpenReport('unit',${a})">Дүгнэлт татах, илгээх</button><button class="modal-close" style="margin:0;" onclick="cmpUnitAct('reopen',${a})">Дахин нээх</button>`
       : st === 'submitted' ? '' : `<button class="connect-btn" style="width:auto;padding:.5rem 1.1rem;" onclick="cmpUnitAct('open',${a})">Эхлүүлэх</button>`;
     return `<div class="comment-row" style="padding:.8rem 0;border-top:1px solid var(--line);">
       <div style="font-weight:800;font-size:.92rem;">${esc(r.title)} ${chip}</div>
       <div style="font-size:.8rem;color:var(--sub);">${esc(cmpUnitName(r.branch, r.unit_no))} · ${r.q_count} асуулт${st && st !== 'submitted' ? ` · бөглөсөн: <b>${r.n}</b> / бүртгэлтэй ${r.registered}` : ''}</div>
+      ${st === 'open' && r.deadline ? `<div style="font-size:.8rem;margin-top:.2rem;">⏱ Дуусах: <b>${cmpDT(r.deadline)}</b> (${cmpLeft(r.deadline)})</div>` : ''}
+      ${!st && r.duration_hours ? `<div style="font-size:.8rem;margin-top:.2rem;color:var(--sub);">⏱ Бөглөх хугацаа: ${cmpDur(r.duration_hours)} (эхлүүлсэн мөчөөс)</div>` : ''}
       <div class="cmp-row">${btns}<button class="cmp-mini" onclick="cmpPreview('${escAttr(r.id)}')">Асуулт харах</button></div></div>`;
   }).join(''));
 }
+setInterval(() => { if (document.getElementById('view-special')?.classList.contains('active') && cmpRoles.units?.length) cmpLoadUnit(); }, 60000);
 async function cmpUnitAct(act, id, b, u) {
   if (act === 'close' && !confirm('Тестийг дуусгах уу? Үүний дараа ангийн хүмүүс бөглөх боломжгүй болно.')) return;
-  try { await cmpRpc(act === 'open' ? 'mc_cmp_unit_open' : 'mc_cmp_unit_close', { p_cmp: id, p_branch: b, p_unit: u }); }
+  if (act === 'reopen' && !confirm('Тестийг дахин нээх үү? Бөглөх хугацаа тогтоосон бол одооноос шинээр тоологдоно. Өмнө бөглөсөн хүмүүс дахин бөглөхгүй.')) return;
+  try { await cmpRpc(act === 'close' ? 'mc_cmp_unit_close' : 'mc_cmp_unit_open', { p_cmp: id, p_branch: b, p_unit: u }); }
   catch (e) { showToast(cmpErr(e), 'error'); return cmpLoadUnit(); }
-  showToast(act === 'open' ? 'Тест ангид нээгдлээ.' : 'Тест дууслаа.', 'success');
+  showToast(act === 'close' ? 'Тест дууслаа.' : 'Тест ангид нээгдлээ.', 'success');
   cmpLoadUnit();
 }
 
@@ -2591,11 +2609,13 @@ async function cmpUnitAct(act, id, b, u) {
 async function cmpLoadCmd() {
   const el = document.getElementById('cmp-cmd-list'); cmpLoading(el);
   let rows; try { rows = await cmpRpc('mc_cmp_cmd_overview'); } catch (e) { return cmpEmpty(el, esc(cmpErr(e))); }
-  if (!rows?.length) return cmpEmpty(el, 'Одоогоор явагдаж буй тест алга.');
+  if (!rows?.length) return cmpEmpty(el, 'Одоогоор ирсэн тест алга.');
   mcSetHTML(el, rows.map(r => `<div class="comment-row" style="padding:.8rem 0;border-top:1px solid var(--line);">
       <div style="font-weight:800;font-size:.92rem;">${esc(r.title)}</div>
-      <div style="font-size:.8rem;color:var(--sub);">${esc(cmpBranchName(r.branch))} · ирсэн: <b>${r.units_ready}</b> анги · явагдаж буй: ${r.units_running} анги · ЗХЖШ руу илгээсэн: ${r.sent_units} анги</div>
-      <div class="cmp-row">${r.units_ready ? `<button class="connect-btn" style="width:auto;padding:.5rem 1.1rem;" onclick="cmpOpenReport('cmd','${escAttr(r.id)}','${escAttr(r.branch)}','')">Дүгнэлт татах, илгээх</button>` : ''}
+      <div style="font-size:.8rem;color:var(--sub);">${esc(cmpBranchName(r.branch))} · ангиуд руу илгээсэн: <b>${(r.units_sent || []).length}</b>${(r.units_sent || []).length ? ` (${r.units_sent.map(esc).join(', ')})` : ''} · эхэлсэн: ${r.units_started} · ирсэн дүгнэлт: <b>${r.units_ready}</b> · ЗХЖШ руу илгээсэн: ${r.sent_units} анги</div>
+      ${!(r.units_sent || []).length ? '<div style="font-size:.8rem;margin-top:.2rem;">ЗХЖШ-аас ирсэн шинэ тест. «Ангиуд руу илгээх» дарж харьяа ангиуддаа дамжуулна уу.</div>' : ''}
+      <div class="cmp-row"><button class="${(r.units_sent || []).length ? 'modal-close' : 'connect-btn'}" style="${(r.units_sent || []).length ? 'margin:0;' : 'width:auto;padding:.5rem 1.1rem;'}" onclick="cmpCmdDispatch('${escAttr(r.id)}','${escAttr(r.branch)}','${escAttr(JSON.stringify(r.units_sent || []))}')">Ангиуд руу илгээх</button>
+        ${r.units_ready ? `<button class="connect-btn" style="width:auto;padding:.5rem 1.1rem;" onclick="cmpOpenReport('cmd','${escAttr(r.id)}','${escAttr(r.branch)}','')">Дүгнэлт татах, илгээх</button>` : ''}
         <button class="cmp-mini" onclick="cmpPreview('${escAttr(r.id)}')">Асуулт харах</button></div></div>`).join(''));
 }
 
@@ -2605,18 +2625,24 @@ async function cmpLoadAdmin() {
   let rows; try { rows = await cmpRpc('mc_cmp_admin_list'); } catch (e) { return cmpEmpty(el, esc(cmpErr(e))); }
   if (!rows?.length) return cmpEmpty(el, 'Одоогоор тест оруулаагүй байна.');
   mcSetHTML(el, rows.map(r => `<div class="comment-row" style="padding:.8rem 0;border-top:1px solid var(--line);">
-      <div style="font-weight:800;font-size:.92rem;">${esc(r.title)} ${r.status === 'closed' ? '<span class="cmp-chip">Хаагдсан</span>' : '<span class="cmp-chip open">Идэвхтэй</span>'}</div>
-      <div style="font-size:.8rem;color:var(--sub);">${r.q_count} асуулт · ${cmpDate(r.created_at)}${r.status === 'active' ? ` · эхэлсэн: ${r.units_started} анги · явагдаж буй: ${r.units_open} · ирсэн командлал: <b>${r.commands_in}</b>` : ''}</div>
-      <div class="cmp-row">${r.status === 'active' ? `<button class="connect-btn" style="width:auto;padding:.5rem 1.1rem;" onclick="cmpOpenReport('hq','${escAttr(r.id)}','','')">Нэгдсэн дүгнэлт</button>` : ''}
+      <div style="font-weight:800;font-size:.92rem;">${esc(r.title)} ${r.status === 'closed' ? '<span class="cmp-chip">Хаагдсан</span>' : !r.sent_hq_at ? '<span class="cmp-chip">Ноорог — ЗХЖШ руу илгээгээгүй</span>' : '<span class="cmp-chip open">Идэвхтэй</span>'}</div>
+      <div style="font-size:.8rem;color:var(--sub);">${r.q_count} асуулт · ${cmpDate(r.created_at)}${r.duration_hours ? ' · хугацаа: ' + cmpDur(r.duration_hours) : ''}${r.status === 'active' && r.sent_hq_at ? ` · илгээсэн командлал: ${(r.cmd_sent || []).length} · эхэлсэн: ${r.units_started} анги · явагдаж буй: ${r.units_open} · ирсэн командлал: <b>${r.commands_in}</b>` : ''}</div>
+      <div class="cmp-row">${r.status === 'active' && !r.sent_hq_at && cmpRoles.admin ? `<button class="connect-btn" style="width:auto;padding:.5rem 1.1rem;" onclick="cmpSendHq('${escAttr(r.id)}','${escAttr(r.title)}')">ЗХЖШ руу илгээх</button>` : ''}
+        ${r.status === 'active' && r.sent_hq_at ? `<button class="connect-btn" style="width:auto;padding:.5rem 1.1rem;" onclick="cmpHqDispatch('${escAttr(r.id)}','${escAttr(JSON.stringify(r.cmd_sent || []))}')">Командлалууд руу илгээх</button>
+        <button class="modal-close" style="margin:0;" onclick="cmpOpenReport('hq','${escAttr(r.id)}','','')">Нэгдсэн дүгнэлт</button>` : ''}
         <button class="cmp-mini" onclick="cmpPreview('${escAttr(r.id)}')">Асуулт харах</button>
-        <button class="cmp-mini" style="color:var(--red);" onclick="cmpAdminDelete('${escAttr(r.id)}')">Устгах</button></div></div>`).join(''));
+        ${cmpRoles.admin ? `<button class="cmp-mini" style="color:var(--red);" onclick="cmpAdminDelete('${escAttr(r.id)}')">Устгах</button>` : ''}</div></div>`).join(''));
 }
 async function cmpAdminDelete(id) {
   if (!confirm('Энэ тестийг бүх анги, командлалын тоотой нь хамт бүрмөсөн устгах уу?')) return;
   try { await cmpRpc('mc_cmp_admin_delete', { p_cmp: id }); showToast('Устгагдлаа.', 'success'); } catch (e) { showToast(cmpErr(e), 'error'); }
   cmpLoadAdmin();
 }
-function cmpOffRoleChange() { document.getElementById('cmp-off-unit-wrap').style.display = document.getElementById('cmp-off-role').value === 'unit' ? 'flex' : 'none'; }
+function cmpOffRoleChange() {
+  const r = document.getElementById('cmp-off-role').value;
+  document.getElementById('cmp-off-unit-wrap').style.display = r === 'unit' ? 'flex' : 'none';
+  document.getElementById('cmp-off-branch').style.display = r === 'hq' ? 'none' : '';
+}
 async function cmpOfficerAdd() {
   const msg = document.getElementById('cmp-off-msg');
   const email = document.getElementById('cmp-off-email').value.trim(), role = document.getElementById('cmp-off-role').value;
@@ -2634,7 +2660,7 @@ async function cmpLoadOfficers() {
   let rows; try { rows = await cmpRpc('mc_cmp_officer_list'); } catch (e) { return cmpEmpty(el, esc(cmpErr(e))); }
   if (!rows?.length) return cmpEmpty(el, 'Одоогоор томилоогүй байна.');
   mcSetHTML(el, rows.map(r => `<div style="display:flex;align-items:center;gap:.5rem;padding:.45rem 0;border-top:1px solid var(--line);font-size:.84rem;">
-      <div style="flex:1;min-width:0;"><b>${esc(r.email)}</b><div style="font-size:.77rem;color:var(--sub);">${r.role === 'unit' ? esc(cmpUnitName(r.branch, r.unit_no)) : esc(cmpBranchName(r.branch)) + ' (нэгтгэх)'}</div></div>
+      <div style="flex:1;min-width:0;"><b>${esc(r.email)}</b><div style="font-size:.77rem;color:var(--sub);">${r.role === 'hq' ? 'ЗХЖШ (нэгдсэн дүн харах, татах)' : r.role === 'unit' ? esc(cmpUnitName(r.branch, r.unit_no)) : esc(cmpBranchName(r.branch)) + ' (нэгтгэх)'}</div></div>
       <button class="cmp-mini" style="color:var(--red);" onclick="cmpOfficerRemove('${escAttr(r.id)}')">Хасах</button></div>`).join(''));
 }
 async function cmpOfficerRemove(id) {
@@ -2643,11 +2669,60 @@ async function cmpOfficerRemove(id) {
   cmpLoadOfficers();
 }
 
+/* ---------- Илгээх (доош дамжуулах) ---------- */
+let cmpPickCb = null;
+function cmpPickModal(title, sub, items, btnLabel, cb) {
+  cmpPickCb = cb;
+  const free = items.filter(i => !i.done);
+  mcSetHTML(document.getElementById('modal-box'), `<h3>${esc(title)}</h3><p class="msub">${esc(sub)}</p>
+    ${free.length > 1 ? `<label class="cmp-attn" style="margin:.4rem 0 .6rem;font-weight:700;"><input type="checkbox" style="width:auto;margin:0;" onchange="document.querySelectorAll('.cmp-pick:not(:disabled)').forEach(x => x.checked = this.checked)"> Бүгдийг сонгох</label>` : ''}
+    <div style="display:flex;flex-direction:column;gap:.45rem;max-height:52vh;overflow:auto;padding:.2rem 0;">
+      ${items.length ? items.map(i => `<label class="cmp-attn" style="font-size:.9rem;white-space:normal;${i.done ? 'opacity:.6;' : ''}"><input type="checkbox" class="cmp-pick" value="${escAttr(i.key)}" style="width:auto;margin:0;" ${i.done ? 'checked disabled' : ''}> ${esc(i.label)}${i.done ? ' <span class="cmp-chip sent">илгээсэн</span>' : ''}</label>`).join('')
+        : '<div style="color:var(--sub);font-size:.85rem;">Сонгох зүйл алга.</div>'}
+    </div>
+    <div id="cmp-pick-msg" style="font-size:.82rem;color:var(--red);min-height:1em;margin-top:.5rem;"></div>
+    <div class="modal-actions"><button class="modal-close" onclick="closeModal()">Болих</button>
+      ${free.length ? `<button class="connect-btn" style="width:auto;padding:.55rem 1.3rem;" onclick="cmpPickSend()">${esc(btnLabel)}</button>` : ''}</div>`);
+  document.getElementById('modal-overlay').classList.add('open');
+}
+async function cmpPickSend() {
+  const keys = Array.from(document.querySelectorAll('.cmp-pick:checked:not(:disabled)')).map(x => x.value);
+  if (!keys.length) { document.getElementById('cmp-pick-msg').textContent = 'Дор хаяж нэгийг сонгоно уу.'; return; }
+  try { await cmpPickCb(keys); closeModal(); } catch (e) { document.getElementById('cmp-pick-msg').textContent = cmpErr(e); }
+}
+// Хөгжүүлэгч → ЗХЖШ
+async function cmpSendHq(id, title) {
+  if (!confirm(`«${title}» тестийг ЗХЖШ руу илгээх үү? Илгээсний дараа ЗХЖШ-ийн эрх бүхий хүнд харагдаж, командлалууд руу дамжуулах боломжтой болно.`)) return;
+  try { await cmpRpc('mc_cmp_admin_send_hq', { p_cmp: id }); showToast('ЗХЖШ руу илгээгдлээ.', 'success'); } catch (e) { showToast(cmpErr(e), 'error'); }
+  cmpLoadAdmin();
+}
+// ЗХЖШ → командлалууд
+function cmpHqDispatch(id, sentJson) {
+  const sent = JSON.parse(sentJson || '[]');
+  const items = BRANCHES.filter(b => b.key !== 'civilian_org').map(b => ({ key: b.key, label: b.label, done: sent.includes(b.key) }));
+  cmpPickModal('Командлалууд руу илгээх', 'Тестийг аль командлалууд руу илгээхээ сонгоно уу. Командлалын эрх бүхий хүн харьяа ангиуд руугаа дамжуулна.', items, 'Илгээх', async keys => {
+    await cmpRpc('mc_cmp_hq_dispatch', { p_cmp: id, p_branches: keys });
+    showToast(`${keys.length} командлал руу илгээгдлээ.`, 'success'); cmpLoadAdmin();
+  });
+}
+// Командлал → ангиуд
+async function cmpCmdDispatch(id, branch, sentJson) {
+  let units; try { units = await cmpRpc('mc_cmp_cmd_units', { p_branch: branch }); } catch (e) { return showToast(cmpErr(e), 'error'); }
+  const sent = JSON.parse(sentJson || '[]');
+  const items = (units || []).map(u => ({ key: u, label: u + ' дугаар анги', done: sent.includes(u) }));
+  cmpPickModal('Ангиуд руу илгээх', items.length ? 'Тестийг аль ангиуд руу илгээхээ сонгоно уу. Ангийн эрх бүхий хүн «Эхлүүлэх» дарахад бүрэлдэхүүнд нээгдэнэ.'
+    : 'Энэ командлалд ангийн эрх бүхий хүн томилогдоогүй байна. Админд хандана уу.', items, 'Илгээх', async keys => {
+    await cmpRpc('mc_cmp_cmd_dispatch', { p_cmp: id, p_branch: branch, p_units: keys });
+    showToast(`${keys.length} анги руу илгээгдлээ.`, 'success'); cmpLoadCmd();
+  });
+}
+
 /* ---------- Асуулт харах ---------- */
 async function cmpPreview(id) {
   let c; try { c = await cmpRpc('mc_cmp_preview', { p_cmp: id }); } catch (e) { return showToast(cmpErr(e), 'error'); }
   mcSetHTML(document.getElementById('modal-box'), `<h3>📋 ${esc(c.title)}</h3>
     ${c.description ? `<p class="msub" style="white-space:pre-line;">${esc(c.description)}</p>` : ''}
+    <p class="msub">⏱ Бөглөх хугацаа: ${c.duration_hours ? cmpDur(c.duration_hours) + ' (анги эхлүүлсэн мөчөөс)' : 'хязгааргүй'}</p>
     ${c.questions.map((q, qi) => `<div class="q-block"><div class="q-text">${qi + 1}. ${esc(q.t)} <span class="cmp-chip">${CMP_KINDS[q.k] || ''}</span></div>
       <div style="font-size:.84rem;color:var(--sub);">${q.o.map((o, oi) => esc(o) + (q.s ? ` (${esc(q.s[oi])})` : '')).join(' · ')}</div></div>`).join('')}
     ${c.levels?.length ? `<div class="q-block"><div class="q-text">Дүгнэлтийн түвшин</div>${c.levels.map(l => `<div style="font-size:.84rem;margin:.3rem 0;"><b>${esc(l.min)}–${esc(l.max)} оноо: ${esc(l.label)}</b>${l.attn ? ' <span class="cmp-chip closed">анхаарал шаардлагатай</span>' : ''}${l.text ? ' — ' + esc(l.text) : ''}</div>`).join('')}</div>` : ''}
@@ -2850,7 +2925,7 @@ async function cmpOpenReport(kind, id, b, u) {
     <h2>Нэгдсэн дүгнэлт</h2>${cmpDetailed(rep, agg, rows, kind)}`;
   if (kind === 'cmd' && rows.length) body += `<h2>Анги тус бүрээр</h2>${cmpCompare(rep, rows, 'cmd')}`;
   if (kind === 'hq' && rows.length) body += `<h2>Командлал тус бүрээр</h2>${cmpCompare(rep, rows, 'hq')}`;
-  if (kind === 'hq' && rep.pending?.length) body += `<p class="sub">Хараахан ирээгүй: ${rep.pending.map(p => esc(cmpBranchName(p.branch)) + ' — ' + p.units + ' анги').join('; ')}</p>`;
+  if (kind === 'hq' && rep.pending?.length) body += `<p class="sub">Хараахан ирээгүй: ${rep.pending.map(p => esc(cmpBranchName(p.branch)) + ' — ' + (p.sent_units ? p.units + ' анги хүлээгдэж буй' : 'ангиуд руу илгээгээгүй')).join('; ')}</p>`;
   if (kind === 'cmd' && rep.running) body += `<p class="sub">Тест явагдаж буй, дүгнэлт ирээгүй анги: ${rep.running}</p>`;
   body += `<h2>Асуулт тус бүрээр</h2>${cmpQuestionsTable(rep, agg)}`;
   cmpCur = { kind, id, b, u, rep, rows, agg, scope, body, done: false };
@@ -2864,7 +2939,7 @@ async function cmpOpenReport(kind, id, b, u) {
   document.getElementById('modal-overlay').classList.add('open');
 }
 function cmpMarkDone() { if (!cmpCur) return; cmpCur.done = true; const b = document.getElementById('cmp-send-btn'); if (b) { b.disabled = false; b.style.opacity = 1; } }
-const CMP_PRINT_CSS = `body{font-family:Inter,Arial,sans-serif;color:#1d2a3a;padding:0 4mm;font-size:11pt}h1{font-size:16pt;margin:0 0 2mm}h2{font-size:12.5pt;margin:6mm 0 2mm;border-bottom:1px solid #ccd;padding-bottom:1mm}
+const CMP_PRINT_CSS = `*{-webkit-print-color-adjust:exact;print-color-adjust:exact}body{font-family:Inter,Arial,sans-serif;color:#1d2a3a;padding:0 4mm;font-size:11pt}h1{font-size:16pt;margin:0 0 2mm}h2{font-size:12.5pt;margin:6mm 0 2mm;border-bottom:1px solid #ccd;padding-bottom:1mm}
   .sub{color:#667;font-size:9.5pt}.cmp-chart{width:100%;height:auto;display:block;margin:1mm 0}.cmp-chart.cmp-bars{max-width:175mm}.cmp-leg{display:flex;flex-wrap:wrap;gap:1mm 4mm;font-size:8.5pt;margin:0 0 3mm}.cmp-leg i{display:inline-block;width:3mm;height:3mm;border-radius:.6mm;margin-right:1mm;vertical-align:-.3mm}
   .cmp-band{border-radius:2mm;padding:2mm 3mm;margin:2mm 0;border:1px solid #ddd}.cmp-band.ok{background:#EEF7F1}.cmp-band.watch{background:#FFF6E6}.cmp-band.alert{background:#FDEEEC}ul{margin:1mm 0 2mm;padding-left:5mm}li{margin:.8mm 0}
   svg,table,.cmp-band{break-inside:avoid}table{border-collapse:collapse;width:100%;font-size:9pt;margin:1mm 0 3mm}th,td{border:1px solid #bbc;padding:1.2mm 2mm;text-align:left;vertical-align:top}th{background:#eef1f5}@page{size:A4;margin:12mm}`;
@@ -2900,7 +2975,7 @@ async function cmpSend() {
   const { kind, id, b, u } = cmpCur;
   const q = kind === 'unit' ? 'Дүгнэлтийг командлал руу илгээх үү? Илгээсний дараа ангийн тоо энд харагдахгүй.'
           : kind === 'cmd' ? 'Нэгтгэлийг ЗХЖШ руу илгээх үү? Илгээсний дараа ангиудын тоо устана.'
-          : (cmpCur.rep.pending?.length ? `Дараах командлалд хараахан ирээгүй анги байна: ${cmpCur.rep.pending.map(p => cmpBranchName(p.branch) + ' — ' + p.units + ' анги').join(', ')}. Хаавал тэдний тоо ч устана.\n\n` : '') + 'Тайланг татсан бол тестийг хаах уу? Бүх анги, командлалын тоо бүрмөсөн устана.';
+          : (cmpCur.rep.pending?.length ? `Дараах командлалд хараахан ирээгүй анги байна: ${cmpCur.rep.pending.map(p => cmpBranchName(p.branch) + ' — ' + (p.sent_units ? p.units + ' анги' : 'ангиуд руу илгээгээгүй')).join(', ')}. Хаавал тэдний тоо ч устана.\n\n` : '') + 'Тайланг татсан бол тестийг хаах уу? Бүх анги, командлалын тоо бүрмөсөн устана.';
   if (!confirm(q)) return;
   try {
     if (kind === 'unit') await cmpRpc('mc_cmp_unit_submit', { p_cmp: id, p_branch: b, p_unit: u });
@@ -2913,7 +2988,7 @@ async function cmpSend() {
 }
 
 /* ---------- Тест оруулах (админ) ---------- */
-let cmpDraft = { title: '', desc: '', qs: [], levels: [] };
+let cmpDraft = { title: '', desc: '', qs: [], levels: [], durOn: false, durN: '1', durU: 'day' };
 function cmpDefaultOpts(k) {
   if (k === 'yesno') return { o: ['Тийм', 'Үгүй'], s: [1, 0] };
   const last = [...cmpDraft.qs].reverse().find(q => q.k === k);
@@ -2948,12 +3023,44 @@ function cmpUpdMax() {
   const sc = cmpDraft.qs.filter(q => q.k !== 'choice');
   el.textContent = sc.length ? `Боломжит оноо: 0 – ${sc.reduce((s, q) => s + Math.max(...q.s.map(x => +x || 0)), 0)}` : '';
 }
+function cmpLoadSample() {
+  if (cmpDraft.qs.length && !confirm('Одоо бичсэн тестийг жишээгээр солих уу?')) return;
+  const o4 = ['Огт үгүй', 'Заримдаа', 'Ихэнхдээ', 'Байнга'], s4 = [0, 1, 2, 3];
+  cmpDraft = {
+    title: 'Жишээ: Стрессийн түргэн үнэлгээ',
+    desc: 'Сүүлийн 2 долоо хоногийн байдлаа бодож, асуулт бүрт тохирох хариултыг сонгоно уу.',
+    qs: [
+      { t: 'Ядарч сульдсан мэдрэмж төрсөн үү?', k: 'score', o: [...o4], s: [...s4] },
+      { t: 'Нойр хүрэхгүй, нойргүйдсэн үү?', k: 'score', o: [...o4], s: [...s4] },
+      { t: 'Бага зүйлд уурлах, бухимдах нь ихэссэн үү?', k: 'score', o: [...o4], s: [...s4] },
+      { t: 'Албаны үүргээ гүйцэтгэхэд анхаарал төвлөрүүлэхэд хэцүү байсан уу?', k: 'score', o: [...o4], s: [...s4] },
+      { t: 'Сэтгэл зүйчтэй уулзах хүсэлтэй юу?', k: 'yesno', o: ['Тийм', 'Үгүй'], s: [1, 0] },
+      { t: 'Албан хаасан хугацаа', k: 'choice', o: ['1 жилээс бага', '1–3 жил', '3-аас дээш жил'], s: null }
+    ],
+    levels: [
+      { min: 0, max: 4, label: 'Хэвийн', text: 'Стрессийн түвшин хэвийн байна.', attn: false },
+      { min: 5, max: 8, label: 'Дунд', text: 'Амралт, нойрны горимдоо анхаарах.', attn: false },
+      { min: 9, max: 13, label: 'Өндөр', text: 'Сэтгэл зүйчтэй уулзахыг зөвлөж байна.', attn: true }
+    ],
+    durOn: false, durN: '1', durU: 'day'
+  };
+  cmpRenderBuilder();
+  showToast('Жишээ тест ачааллаа. Шалгаад «Тест хадгалах» дарна уу.', 'success');
+}
 function cmpRenderBuilder() {
   const el = document.getElementById('cmp-builder'); if (!el) return;
   const d = cmpDraft, hasScore = d.qs.some(q => q.k !== 'choice');
   mcSetHTML(el, `
+    <div style="display:flex;justify-content:flex-end;margin-bottom:.4rem;"><button class="cmp-mini" onclick="cmpLoadSample()">📋 Жишээ тест ачаалах</button></div>
     <div class="pf-f" style="margin-bottom:.6rem;"><label>Тестийн нэр</label><input class="cmp-in" style="width:100%;" value="${escAttr(d.title)}" oninput="cmpSetMeta('title',this.value)"></div>
-    <div class="pf-f" style="margin-bottom:1rem;"><label>Заавар (бөглөгчид харагдана)</label><textarea class="cmp-in" style="width:100%;min-height:60px;" oninput="cmpSetMeta('desc',this.value)">${esc(d.desc)}</textarea></div>
+    <div class="pf-f" style="margin-bottom:.6rem;"><label>Заавар (бөглөгчид харагдана)</label><textarea class="cmp-in" style="width:100%;min-height:60px;" oninput="cmpSetMeta('desc',this.value)">${esc(d.desc)}</textarea></div>
+    <div class="pf-f" style="margin-bottom:1rem;"><label>Бөглөх хугацаа</label>
+      <div class="cmp-row" style="margin-top:.2rem;">
+        <label class="cmp-attn"><input type="radio" name="cmp-dur-on" style="width:auto;margin:0;padding:0;border:0;flex:0 0 auto;" ${d.durOn ? '' : 'checked'} onchange="cmpSetMeta('durOn',false);cmpRenderBuilder()"> Хугацаагүй</label>
+        <label class="cmp-attn"><input type="radio" name="cmp-dur-on" style="width:auto;margin:0;padding:0;border:0;flex:0 0 auto;" ${d.durOn ? 'checked' : ''} onchange="cmpSetMeta('durOn',true);cmpRenderBuilder()"> Хугацаатай</label>
+        ${d.durOn ? `<input class="cmp-in" type="number" min="1" step="1" style="width:80px;flex:0 0 auto;text-align:center;" value="${escAttr(d.durN)}" oninput="cmpSetMeta('durN',this.value)">
+        <select class="cmp-in" style="width:auto;flex:0 0 auto;" onchange="cmpSetMeta('durU',this.value)"><option value="day" ${d.durU === 'day' ? 'selected' : ''}>хоног</option><option value="hour" ${d.durU === 'hour' ? 'selected' : ''}>цаг</option></select>` : ''}</div>
+      <div style="font-size:.78rem;color:var(--sub);margin-top:.35rem;">${d.durOn ? 'Анги «Эхлүүлэх» дарсан мөчөөс тоолж, дуусмагц тест өөрөө хаагдана.' : 'Ангийн эрх бүхий хүн «Дуусгах» дарах хүртэл нээлттэй байна.'}</div></div>
     ${d.qs.map((q, i) => `<div class="cmp-q">
       <div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.4rem;"><b style="font-size:.85rem;">${i + 1}.</b><span class="cmp-chip">${CMP_KINDS[q.k]}</span><span style="flex:1;"></span>
         <button class="cmp-mini" onclick="cmpMoveQ(${i},-1)">↑</button><button class="cmp-mini" onclick="cmpMoveQ(${i},1)">↓</button><button class="cmp-mini" style="color:var(--red);" onclick="cmpDelQ(${i})">Устгах</button></div>
@@ -2984,7 +3091,7 @@ function cmpRenderBuilder() {
       <button class="modal-close" style="margin:0;" onclick="cmpAddLevel()">+ Түвшин нэмэх</button></div>` : ''}
     <div id="cmp-save-msg" style="font-size:.82rem;margin-top:1rem;min-height:1em;"></div>
     <div class="cmp-row"><button class="connect-btn" style="width:auto;padding:.6rem 1.5rem;" onclick="cmpSave()">Тест хадгалах</button>
-      ${d.qs.length ? `<button class="cmp-mini" onclick="if(confirm('Бүгдийг арилгах уу?')){cmpDraft={title:'',desc:'',qs:[],levels:[]};cmpRenderBuilder();}">Арилгах</button>` : ''}</div>`);
+      ${d.qs.length ? `<button class="cmp-mini" onclick="if(confirm('Бүгдийг арилгах уу?')){cmpDraft={title:'',desc:'',qs:[],levels:[],durOn:false,durN:'1',durU:'day'};cmpRenderBuilder();}">Арилгах</button>` : ''}</div>`);
   cmpUpdMax();
 }
 async function cmpSave() {
@@ -3005,15 +3112,23 @@ async function cmpSave() {
     if (l.min === '' || l.max === '' || isNaN(+l.min) || isNaN(+l.max) || +l.min > +l.max) return bad(`${i + 1}-р түвшний онооны хязгаарыг зөв оруулна уу.`);
     if (!String(l.label).trim()) return bad(`${i + 1}-р түвшний нэрийг оруулна уу.`);
   }
-  if (!confirm(`«${d.title.trim()}» тестийг ${d.qs.length} асуулттай хадгалах уу? Хадгалсны дараа засах боломжгүй.`)) return;
+  let durH = null;
+  if (d.durOn) {
+    if (String(d.durN).trim() === '') return bad('Бөглөх хугацааг оруулна уу.');
+    const nn = Number(d.durN);
+    if (!Number.isInteger(nn) || nn < 1) return bad('Бөглөх хугацааг бүхэл тоогоор оруулна уу.');
+    durH = d.durU === 'day' ? nn * 24 : nn;
+    if (durH > 2160) return bad('Бөглөх хугацаа 90 хоногоос хэтрэхгүй.');
+  }
+  if (!confirm(`«${d.title.trim()}» тестийг ${d.qs.length} асуулттай${durH ? ', ' + cmpDur(durH) + 'ийн хугацаатай' : ', хугацаагүй'} хадгалах уу? Хадгалсны дараа засах боломжгүй.`)) return;
   const qs = d.qs.map(q => q.k === 'choice' ? { t: q.t.trim(), k: q.k, o: q.o.map(o => String(o).trim()) } : { t: q.t.trim(), k: q.k, o: q.o.map(o => String(o).trim()), s: q.s.map(Number) });
   if (levels.length && !levels.some(l => l.attn) && !confirm('Анхаарал шаардлагатай түвшин тэмдэглээгүй байна. Тэгвэл дүгнэлтэд эрсдэлийн хувь гарахгүй. Үргэлжлүүлэх үү?')) return;
   const lv = levels.map(l => ({ min: +l.min, max: +l.max, label: String(l.label).trim(), text: String(l.text || '').trim(), attn: !!l.attn }));
   try {
-    await cmpRpc('mc_cmp_admin_create', { p_title: d.title.trim(), p_description: d.desc.trim(), p_questions: qs, p_levels: lv });
-    cmpDraft = { title: '', desc: '', qs: [], levels: [] };
+    await cmpRpc('mc_cmp_admin_create', { p_title: d.title.trim(), p_description: d.desc.trim(), p_questions: qs, p_levels: lv, p_duration_hours: durH });
+    cmpDraft = { title: '', desc: '', qs: [], levels: [], durOn: false, durN: '1', durU: 'day' };
     cmpRenderBuilder();
-    const m2 = document.getElementById('cmp-save-msg'); m2.style.color = 'var(--gold)'; m2.textContent = 'Тест хадгалагдлаа. Ангийн эрх бүхий хүмүүст харагдана.';
+    const m2 = document.getElementById('cmp-save-msg'); m2.style.color = 'var(--gold)'; m2.textContent = 'Тест хадгалагдлаа. Доорх жагсаалтаас «ЗХЖШ руу илгээх» дарж илгээнэ үү.';
     cmpLoadAdmin();
   } catch (e) { bad(cmpErr(e)); }
 }

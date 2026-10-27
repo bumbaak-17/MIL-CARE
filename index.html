@@ -10182,6 +10182,7 @@ function openChat(proId, name) {
     <h3>💬 ${name}-тэй чатлах</h3>
     <p class="msub">Таны мессежийг зөвхөн энэ мэргэжилтэн болон таны эрх бүхий админ харна. Нэрээ нуусан хэвээр байна.</p>
     <div id="chat-messages" style="max-height:320px;overflow-y:auto;border:1px solid var(--line);border-radius:12px;padding:.8rem;margin:.8rem 0;background:var(--panel-2);"></div>
+    <div id="chat-topic-zone" style="margin:-.2rem 0 .8rem;"></div>
     <div style="display:flex;gap:.5rem;">
       <input type="text" id="chat-input" placeholder="Мессежээ бичих..." onkeydown="if(event.key==='Enter'){sendChatMessage();}" style="flex:1;border:1px solid var(--line);border-radius:10px;padding:.6rem .8rem;font-family:inherit;font-size:.9rem;background:#fff;color:var(--cream);">
       <button class="connect-btn" style="width:auto;padding:.6rem 1.1rem;" onclick="sendChatMessage()">Илгээх</button>
@@ -10252,17 +10253,26 @@ async function chatPickTopic(i) {
   loadChatMessages();
   refreshUserUnreadReplies();
 }
+const CHAT_TOPIC_REOPEN_MS = 3 * 24 * 60 * 60 * 1000;   // 3 хоног
 const CHAT_AUTO_REPLY = 'Таны хүсэлтийг хүлээн авлаа. Сэтгэл зүйч удахгүй тантай холбогдох болно.';
 function renderChatMessages(msgs) {
   const el = document.getElementById('chat-messages');
   if (!el) return;
+  const zone = document.getElementById('chat-topic-zone');
   if (!msgs.length) {
     el.style.maxHeight = 'none';
     mcSetHTML(el, chatTopicPickerHtml());
+    if (zone) zone.replaceChildren();
     return;
   }
   el.style.maxHeight = '320px';
-  const proReplied = msgs.some(m => m.sender !== 'user');
+  // Сүүлийн мессежээс хойш 3 хоног өнгөрсөн бол шинэ асуудлаар хандаж болохоор сэдвүүдийг дахин санал болгоно
+  const lastAt = new Date(msgs[msgs.length - 1].created_at || 0).getTime();
+  const stale = Date.now() - lastAt > CHAT_TOPIC_REOPEN_MS;
+  if (zone) { if (stale) mcSetHTML(zone, chatTopicPickerHtml()); else zone.replaceChildren(); }
+  // Хэрэглэгчийн сүүлийн мессежийн дараа сэтгэл зүйч хариулаагүй бол "удахгүй холбогдох болно"
+  let lastUser = -1; msgs.forEach((m, i) => { if (m.sender === 'user') lastUser = i; });
+  const proReplied = lastUser < 0 || msgs.slice(lastUser + 1).some(m => m.sender !== 'user');
   mcSetHTML(el, msgs.map(m => `
     <div style="display:flex;justify-content:${m.sender === 'user' ? 'flex-end' : 'flex-start'};margin-bottom:.5rem;">
       <div style="max-width:75%;padding:.5rem .8rem;border-radius:12px;font-size:.85rem;

@@ -2212,7 +2212,6 @@ async function obOAuth(provider) {
   const msg = document.getElementById('ob-auth-msg');
   msg.style.color = 'var(--sub)'; msg.textContent = name + ' руу шилжиж байна...';
   await cleanupEmptyAnonBeforeSwitch();
-  try { if (new URLSearchParams(location.search).get('onboarding') === '1') sessionStorage.setItem('mc_force_ob', '1'); } catch (e) {}
   const opts = { redirectTo: location.origin + location.pathname };
   const { error } = await sb.auth.signInWithOAuth({ provider, options: opts });
   if (error) { msg.style.color = 'var(--red)'; msg.textContent = name + '-ээр нэвтрэхэд алдаа гарлаа: ' + error.message; }
@@ -11195,8 +11194,7 @@ async function init() {
 
   // Хөгжүүлэлт/турших зорилгоор: ?onboarding=1 бүхий URL-аар орвол,
   // хэрэглэгчийн бодит branch/role-ийг өөрчлөхгүйгээр onboarding урсгалыг л дахин үзүүлнэ
-  let forcePreview = new URLSearchParams(location.search).get('onboarding') === '1';
-  try { if (sessionStorage.getItem('mc_force_ob') === '1' && currentUser?.isAnonymous === false) { forcePreview = true; sessionStorage.removeItem('mc_force_ob'); } } catch (e) {}
+  const forcePreview = new URLSearchParams(location.search).get('onboarding') === '1';
 
   if (mcAdminPending && !forcePreview) {
     goto('admin'); // goto нь баталгаажуулалтын цонхыг харуулна
@@ -11223,7 +11221,7 @@ async function init() {
     // Шинэ хэрэглэгч эсвэл ?onboarding=1 урьдчилан үзэх горимд цэргийн төрөл, албан хаагчийн төрлөө сонгуулна
     document.querySelector('.app').style.display = 'none';
     document.getElementById('onboarding-overlay').style.display = 'block';
-    const skipAuthStep = currentUser?.isAnonymous === false;
+    const skipAuthStep = currentUser?.isAnonymous === false || forcePreview;
     document.getElementById('ob-step-auth').style.display = skipAuthStep ? 'none' : 'block';
     document.getElementById('ob-step-branch').style.display = skipAuthStep ? 'block' : 'none';
     if (skipAuthStep) { obPreviewMode = false; document.getElementById('ob-preview-close-btn').style.display = 'none'; renderObBranch(); }

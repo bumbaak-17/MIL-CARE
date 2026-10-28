@@ -752,6 +752,7 @@
   .home-contact a{display:inline-flex;align-items:center;gap:.35rem;color:#0A677A;font-weight:700;text-decoration:none;}
   .home-contact a:hover{text-decoration:underline;}
   .home-contact svg{width:15px;height:15px;}
+  .cmp-arrived{margin:.45rem 0 .1rem;padding:.55rem .8rem;border-radius:10px;background:#E9F6EE;border:1px solid #9FD5B3;color:#1E6B3A;font-size:.84rem;font-weight:700;}
   .ob-step-title{font-weight:800;font-size:1.1rem;margin:0 0 .2rem;color:var(--cream);}
   .ob-step-sub{font-size:.85rem;color:var(--sub);margin:0 0 .3rem;}  /* ---------- Toast мэдэгдэл (browser-ийн alert()-ийг орлоно) ---------- */
   #toast-wrap{position:fixed;bottom:1.3rem;right:1.3rem;z-index:200;display:flex;flex-direction:column;gap:.6rem;
@@ -2629,6 +2630,7 @@ async function cmpLoadUnit() {
   }).join(''));
 }
 setInterval(() => { if (document.getElementById('view-special')?.classList.contains('active') && cmpRoles.units?.length) cmpLoadUnit(); }, 60000);
+setInterval(() => { if (document.getElementById('view-special')?.classList.contains('active') && !document.getElementById('modal-overlay')?.classList.contains('open') && (cmpRoles.admin || cmpRoles.hq)) cmpLoadAdmin(); }, 60000);
 async function cmpUnitAct(act, id, b, u) {
   if (act === 'close' && !confirm('Тестийг дуусгах уу? Үүний дараа ангийн хүмүүс бөглөх боломжгүй болно.')) return;
   if (act === 'reopen' && !confirm('Тестийг дахин нээх үү? Бөглөх хугацаа тогтоосон бол одооноос шинээр тоологдоно. Өмнө бөглөсөн хүмүүс дахин бөглөхгүй.')) return;
@@ -2660,9 +2662,10 @@ async function cmpLoadAdmin() {
   mcSetHTML(el, rows.map(r => `<div class="comment-row" style="padding:.8rem 0;border-top:1px solid var(--line);">
       <div style="font-weight:800;font-size:.92rem;">${esc(r.title)} ${r.status === 'closed' ? '<span class="cmp-chip">Хаагдсан</span>' : !r.sent_hq_at ? '<span class="cmp-chip">Ноорог — ЗХЖШ руу илгээгээгүй</span>' : '<span class="cmp-chip open">Идэвхтэй</span>'}</div>
       <div style="font-size:.8rem;color:var(--sub);">${r.q_count} асуулт · ${cmpDate(r.created_at)}${r.duration_hours ? ' · хугацаа: ' + cmpDur(r.duration_hours) : ''}${r.status === 'active' && r.sent_hq_at ? ` · илгээсэн командлал: ${(r.cmd_sent || []).length} · эхэлсэн: ${r.units_started} анги · явагдаж буй: ${r.units_open} · ирсэн командлал: <b>${r.commands_in}</b>` : ''}</div>
+      ${r.status === 'active' && r.sent_hq_at && r.commands_in ? `<div class="cmp-arrived">🔔 ${r.commands_in} командлалаас нэгтгэсэн дүгнэлт ирлээ. «Нэгдсэн дүгнэлт» дарж харна уу.</div>` : ''}
       <div class="cmp-row">${r.status === 'active' && !r.sent_hq_at && cmpRoles.admin ? `<button class="connect-btn" style="width:auto;padding:.5rem 1.1rem;" onclick="cmpSendHq('${escAttr(r.id)}','${escAttr(r.title)}')">ЗХЖШ руу илгээх</button>` : ''}
         ${r.status === 'active' && r.sent_hq_at ? `<button class="connect-btn" style="width:auto;padding:.5rem 1.1rem;" onclick="cmpHqDispatch('${escAttr(r.id)}','${escAttr(JSON.stringify(r.cmd_sent || []))}')">Командлалууд руу илгээх</button>
-        <button class="modal-close" style="margin:0;" onclick="cmpOpenReport('hq','${escAttr(r.id)}','','')">Нэгдсэн дүгнэлт</button>` : ''}
+        <button class="${r.commands_in ? 'connect-btn' : 'modal-close'}" style="${r.commands_in ? 'width:auto;padding:.5rem 1.1rem;' : 'margin:0;'}" onclick="cmpOpenReport('hq','${escAttr(r.id)}','','')">Нэгдсэн дүгнэлт${r.commands_in ? ` (${r.commands_in})` : ''}</button>` : ''}
         <button class="cmp-mini" onclick="cmpPreview('${escAttr(r.id)}')">Асуулт харах</button>
         ${cmpRoles.admin ? `<button class="cmp-mini" style="color:var(--red);" onclick="cmpAdminDelete('${escAttr(r.id)}')">Устгах</button>` : ''}</div></div>`).join(''));
 }
